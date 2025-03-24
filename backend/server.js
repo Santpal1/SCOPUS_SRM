@@ -14,7 +14,7 @@ const db = mysql.createConnection({
   user: 'root', 
   password: '', 
   database: 'scopus',
-  port: 3306
+  port: 3307
 });
 
 db.connect(err => {
@@ -77,7 +77,7 @@ app.get("/api/publications", (req, res) => {
       DATE_FORMAT(date, '%Y-%m') AS month, 
       COUNT(*) AS count 
     FROM papers 
-    WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN ${startDate} AND DATE_FORMAT(CURDATE(), '%Y-%m')
+    WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN ${startDate} AND DATE_FORMAT(CURDATE(), '%Y-%m') AND date <= CURDATE()
     GROUP BY month
     ORDER BY month ASC;
   `;
@@ -102,7 +102,7 @@ app.get("/api/top-author", (req, res) => {
   const query = `
     SELECT author1 AS author, COUNT(*) AS publication_count
     FROM papers
-    WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL ? MONTH)
+    WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL ? MONTH) AND date <= CURDATE()
     AND author1 IS NOT NULL
     GROUP BY author1
     ORDER BY publication_count DESC
@@ -150,6 +150,8 @@ app.get('/api/faculty/papers', (req, res) => {
     dateCondition = 'DATE_SUB(NOW(), INTERVAL 6 MONTH)';
   } else if (timeframe === '1y') {
     dateCondition = 'DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+  } else if(timeframe === '2y') {
+    dateCondition = 'DATE_SUB(NOW(), INTERVAL 2 YEAR)';
   } else {
     return res.status(400).json({ error: 'Invalid timeframe' });
   }

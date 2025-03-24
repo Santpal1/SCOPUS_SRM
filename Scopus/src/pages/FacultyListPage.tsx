@@ -123,6 +123,7 @@ const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
           <option value="1m">Last 1 Month</option>
           <option value="6m">Last 6 Months</option>
           <option value="1y">Last 1 Year</option>
+          <option value="2y">Last 2 Years</option>
         </select>
 
         {/* Button to fetch faculty with <4 papers in past year */}

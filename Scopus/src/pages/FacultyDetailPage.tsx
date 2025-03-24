@@ -16,7 +16,6 @@ interface Faculty {
   scopus_id: string;
   name: string;
   docs_count: number;
-  access: string;
   faculty_id?: string;
 }
 
@@ -89,10 +88,22 @@ const FacultyDetailPage: React.FC = () => {
   ];
 
   papers.forEach((paper) => {
-    const paperYear = new Date(paper.date).getFullYear();
+    const paperDate = new Date(paper.date);
+    const paperYear = paperDate.getFullYear();
+  
     publicationCounts.forEach((entry) => {
+      // If paper is in the year of the entry
       if (entry.year === paperYear) {
-        entry.count += 1;
+        // For the current year, only count papers up to the current month
+        if (paperYear === currentYear) {
+          const currentMonth = new Date().getMonth(); // 0-indexed (0 = Jan)
+          if (paperDate.getMonth() <= currentMonth) {
+            entry.count += 1;
+          }
+        } else {
+          // For past years, count directly
+          entry.count += 1;
+        }
       }
     });
   });
@@ -106,8 +117,16 @@ const FacultyDetailPage: React.FC = () => {
         <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
         {faculty.faculty_id && <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>}
         <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
-        <p><strong>Access Level:</strong> {faculty.access}</p>
+        <a
+          href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="scopus-link-button"
+        >
+          View on Scopus
+        </a>
       </div>
+
 
       <h3 className="publications-title">Publications</h3>
       {papers && papers.length > 0 ? (

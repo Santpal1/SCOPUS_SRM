@@ -58,7 +58,6 @@ export default function ResearchDashboard() {
     try {
       const response = await axios.get(`http://localhost:5000/api/publications?timeframe=${selectedTimeframe}`);
       let sortedData = response.data
-        .filter((d: PublicationData) => d.month !== "2024-03") // Exclude March 2024
         .sort((a: PublicationData, b: PublicationData) => a.month.localeCompare(b.month));
 
       if (selectedTimeframe === "3y") {
