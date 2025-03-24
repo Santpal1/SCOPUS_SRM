@@ -14,7 +14,7 @@ const db = mysql.createConnection({
   user: 'root', 
   password: '', 
   database: 'scopus',
-  port: 3307
+  port: 3306
 });
 
 db.connect(err => {
@@ -58,6 +58,7 @@ app.post('/api/login', (req, res) => {
 
 
 // Get publication count per month based on selected timeframe
+// Get publication count per month based on selected timeframe
 app.get("/api/publications", (req, res) => {
   const { timeframe } = req.query;
 
@@ -66,21 +67,23 @@ app.get("/api/publications", (req, res) => {
     startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), '%Y-%m')";
   } else if (timeframe === "1y") {
     startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR), '%Y-%m')";
-  } else if (timeframe === "3y") {
-    startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 3 YEAR), '%Y-%m')";
+  } else if (timeframe === "2y") {
+    startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 YEAR), '%Y-%m')";
   } else {
     return res.status(400).json({ error: "Invalid timeframe" });
   }
 
   const query = `
-    SELECT 
-      DATE_FORMAT(date, '%Y-%m') AS month, 
-      COUNT(*) AS count 
-    FROM papers 
-    WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN ${startDate} AND DATE_FORMAT(CURDATE(), '%Y-%m') AND date <= CURDATE()
-    GROUP BY month
-    ORDER BY month ASC;
-  `;
+  SELECT 
+    DATE_FORMAT(date, '%Y-%m') AS month, 
+    COUNT(*) AS count 
+  FROM papers 
+  WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN ${startDate} AND DATE_FORMAT(CURDATE(), '%Y-%m')
+    AND date <= CURDATE()
+  GROUP BY month
+  ORDER BY month ASC;
+`;
+
 
   db.query(query, (err, results) => {
     if (err) {
@@ -91,37 +94,52 @@ app.get("/api/publications", (req, res) => {
   });
 });
 
+
 // Get top author in a given timeframe
 app.get("/api/top-author", (req, res) => {
   const { months } = req.query;
 
+  // Validate 'months' parameter
   if (!months || isNaN(months)) {
     return res.status(400).json({ error: "Invalid months parameter" });
   }
 
+  // SQL query to find authors with the most publications in the given timeframe
   const query = `
-    SELECT author1 AS author, COUNT(*) AS publication_count
-    FROM papers
-    WHERE date >= DATE_SUB(CURRENT_DATE, INTERVAL ? MONTH) AND date <= CURDATE()
-    AND author1 IS NOT NULL
-    GROUP BY author1
-    ORDER BY publication_count DESC
-    LIMIT 1;
+    SELECT 
+      u.scopus_id, 
+      u.name, 
+      (SELECT COUNT(*) FROM papers WHERE scopus_id = u.scopus_id) AS total_docs,
+      COUNT(p.scopus_id) AS timeframe_docs
+    FROM users u
+    LEFT JOIN papers p ON u.scopus_id = p.scopus_id 
+      AND p.date >= DATE_SUB(CURRENT_DATE, INTERVAL ? MONTH)
+      AND p.date <= CURRENT_DATE  -- Ensure papers are not from the future
+    GROUP BY u.scopus_id, u.name
+    ORDER BY timeframe_docs DESC;
   `;
 
+  // Execute the query with parameterized values
   db.query(query, [months], (err, results) => {
     if (err) {
       console.error("Error fetching top author:", err);
-      return res.status(500).json({ error: "Failed to retrieve top author" });
+      return res.status(500).json({ error: "Failed to retrieve top authors" });
     }
-    if (results.length > 0) {
-      const { author, publication_count } = results[0];
-      res.json({ author, publication_count });
-    } else {
-      res.json({ message: "No publications found in the selected period" });
+
+    if (results.length === 0) {
+      return res.json({ message: "No publications found in the selected period" });
     }
+
+    // Get the highest number of publications in the timeframe
+    const maxDocs = results[0].timeframe_docs;
+
+    // Filter authors who have the highest count
+    const topAuthors = results.filter(author => author.timeframe_docs === maxDocs);
+
+    res.json(topAuthors);
   });
 });
+
 
 // API routes
 // 1. Get all faculty members

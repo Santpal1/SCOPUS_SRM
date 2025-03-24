@@ -7,6 +7,8 @@ import styles from "../components/AgentLogin.module.css";
 const AgentLogin: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); // ✅ Success state
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -17,14 +19,25 @@ const AgentLogin: React.FC = () => {
       });
 
       if (response.data.success) {
-        //alert("Login Successful");
-        navigate("/dashboard"); // Route to your ResearchDashboard
+        setSuccess("Login Successful!");
+        setError("");
+
+        // Wait 3 seconds, then navigate
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       } else {
-        alert("Invalid Credentials");
+        setError("Invalid Username or Password");
+        setUsername(""); // Clear username
+        setPassword(""); // Clear password
+        setSuccess("");  // Clear success message if any
       }
     } catch (error) {
       console.error("Login Error:", error);
-      alert("Entered wrong Username or Password!");
+      setError("Invalid Username or Password!");
+      setUsername(""); // Clear username
+      setPassword(""); // Clear password
+      setSuccess("");  // Clear success message if any
     }
   };
 
@@ -50,7 +63,11 @@ const AgentLogin: React.FC = () => {
                 placeholder="Username"
                 className={styles.inputField}
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError("");
+                  setSuccess("");
+                }}
               />
             </div>
 
@@ -61,9 +78,19 @@ const AgentLogin: React.FC = () => {
                 placeholder="Password"
                 className={styles.inputField}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                  setSuccess("");
+                }}
               />
             </div>
+
+            {/* Inline Error Message */}
+            {error && <p className={styles.errorMsg}>{error}</p>}
+
+            {/* Inline Success Message */}
+            {success && <p className={styles.successMsg}>{success}</p>}
 
             <button className={styles.signInBtn} onClick={handleLogin}>
               Login

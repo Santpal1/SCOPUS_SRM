@@ -341,6 +341,23 @@ body.reloading {
     transition: transform 0.3s ease-in-out;
 }
 
+.errorMsg {
+    color: #e11d48; 
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+
+.successMsg {
+    color: #16a34a;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .mainContainer {

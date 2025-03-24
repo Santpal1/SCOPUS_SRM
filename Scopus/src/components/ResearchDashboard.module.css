@@ -1,7 +1,7 @@
 /* Main Container */
 .chartContainer {
-    width: 80%;
-    max-width: 900px;
+    width: 90%;
+    max-width: 1440px;
     margin: 20px auto; /* Reduced margin */
     background: white;
     padding: 20px; /* Reduced padding */
