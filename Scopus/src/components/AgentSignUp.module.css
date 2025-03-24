@@ -1,0 +1,370 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.navbar {
+    width: 100%;
+    background-color: #f3f4f6;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    animation: slideDown 0.8s ease-out;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: black;
+    margin-left: 2rem;
+}
+
+.contactBtn {
+    background-color: rgb(219, 217, 217);
+    color: rgb(9, 9, 9);
+    font-weight: 600;
+    font-size: medium;
+    padding: 0.6rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    border: none;
+    margin-right: 2rem;
+}
+
+.contactBtn:hover {
+    background-color: #6b7280;
+    transform: scale(1.05);
+    animation: bounce 0.4s ease-in-out;
+}
+
+
+.mainContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 90%;
+    max-width: 1100px;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-top: 5rem;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.leftSide {
+    flex: 1;
+    background-color: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    border-radius: 15px 0 0 15px;
+}
+
+
+.loginBox {
+    background-color: #fffaf0;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+
+.loginTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: black;
+}
+
+.loginSubtitle {
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+
+.inputGroup {
+    margin-top: 1rem;
+}
+
+.inputLabel {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: black;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    color: black;
+    transition: border 0.2s ease-in-out;
+    animation: fadeIn 1s ease-in;
+}
+
+.inputField:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0px 0px 10px rgba(59, 130, 246, 0.5);
+    animation: glow 0.3s ease-in-out;
+}
+
+.inputField::placeholder {
+    color: black;
+}
+
+.signUpBtn {
+    width: 100%;
+    background: linear-gradient(to right, #d1d5db, #ffffff);
+    padding: 0.75rem;
+    border-radius: 25px;
+    font-weight: bolder;
+    font-size: medium;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    color: black;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    margin-top: 1rem;
+    border: none;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.signUpBtn:hover {
+    background: linear-gradient(to right, #9ca3af, #ffffff);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.03);
+}
+
+.requestText {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.requestLink {
+    color: #3b82f6;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 2px;    
+}
+
+.requestLink:hover {
+    text-decoration: underline;
+}
+
+.rightSide {
+    flex: 1;
+    background-color: #f5f5dc;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 3rem;
+    text-align: left;
+    border-radius: 0 15px 15px 0;
+}
+
+.bannerTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: black;
+    text-align: left;
+    width: 90%;
+    max-width: 400px;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    align-self: flex-start;
+}
+
+.bannerImage {
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 20px;
+    margin-top: 1rem;
+    display: block;
+    align-self: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.bannerImage:hover {
+    transform: scale(1.05);
+    animation: pulse 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0px 0px 5px rgba(59, 130, 246, 0);
+    }
+
+    100% {
+        box-shadow: 0px 0px 10px rgba(59, 130, 246, 0.5);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 1024px) {
+    .mainContainer {
+        width: 95%;
+    }
+
+    .leftSide,
+    .rightSide {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.8rem 1.5rem;
+    }
+
+    .mainContainer {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 4rem;
+    }
+
+    .leftSide,
+    .rightSide {
+        width: 100%;
+        padding: 2rem 1.5rem;
+        border-radius: 0;
+    }
+
+    .bannerImage {
+        max-width: 300px;
+    }
+
+    .bannerTitle {
+        font-size: 2.5rem;
+        max-width: 350px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .navbar {
+        padding: 0.6rem 1rem;
+    }
+
+    .contactBtn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .loginTitle {
+        font-size: 1.8rem;
+    }
+
+    .signUpBtn {
+        padding: 0.6rem;
+    }
+
+    .bannerTitle {
+        font-size: 1.3rem;
+    }
+    .bannerImage {
+        max-width: 250px;
+    }
+}

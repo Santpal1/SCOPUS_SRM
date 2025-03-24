@@ -1,0 +1,207 @@
+
+:root {
+  --primary-color: #3498db;
+  --primary-dark: #2980b9;
+  --secondary-color: #2c3e50;
+  --background-light: #f5f7fa;
+  --table-header: #34495e;
+  --text-color: #2c3e50;
+  --hover-bg: #ecf0f1;
+}
+
+body {
+  background-color: var(--background-light);
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-color);
+}
+
+.faculty-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow-x: auto;
+  transition: all 0.3s ease-in-out;
+}
+
+
+.title {
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.faculty-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.faculty-table thead {
+  background: var(--table-header);
+  color: white;
+}
+
+.faculty-table th,
+.faculty-table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.faculty-table th {
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.faculty-table tbody tr:nth-child(even) {
+  background: var(--hover-bg);
+}
+
+.faculty-table tbody tr:hover {
+  background: #e3e8ee;
+  transition: background 0.3s ease-in-out;
+}
+
+
+.view-button {
+  padding: 10px 16px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.3s ease-in-out, transform 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.view-button:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.loading,
+.error-message,
+.no-records {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dropdown {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.filter-button {
+  padding: 8px 14px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.filter-button:hover {
+  background: var(--primary-dark);
+}
+
+
+.error-message {
+  color: red;
+  background: #ffebeb;
+  border: 1px solid red;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+@media (max-width: 1024px) {
+  .faculty-container {
+      padding: 15px;
+  }
+
+  .faculty-table th, 
+  .faculty-table td {
+      padding: 12px;
+      font-size: 14px;
+  }
+
+  .view-button {
+      padding: 8px 14px;
+      font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .faculty-container {
+      padding: 10px;
+      margin: 20px;
+  }
+
+  .faculty-table th,
+  .faculty-table td {
+      padding: 10px;
+      font-size: 12px;
+  }
+
+  .faculty-table {
+      min-width: 100%;
+  }
+
+  .view-button {
+      padding: 6px 12px;
+      font-size: 12px;
+  }
+}
+
+.search-bar {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.search-input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}

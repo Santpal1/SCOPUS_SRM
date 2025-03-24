@@ -1,0 +1,139 @@
+
+.faculty-detail-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background: linear-gradient(135deg, #0056b3, #003f7f);
+    transform: translateY(-2px);
+  }
+  
+  .faculty-card {
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .faculty-card:hover {
+    transform: scale(1.02);
+  }
+  
+  .faculty-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+  }
+  
+  .publications-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 30px;
+    color: #333;
+  }
+  
+  .publication-card {
+    padding: 20px;
+    background: #ffffff;
+    border-left: 6px solid #007bff;
+    margin-top: 15px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .publication-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .publication-card h4 {
+    margin: 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+  }
+  
+  .publication-card p {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .error-message, .no-records {
+    color: #dc3545;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  @media (max-width: 768px) {
+    .faculty-detail-container {
+      padding: 15px;
+    }
+  
+    .faculty-card, .publication-card {
+      padding: 18px;
+    }
+  
+    .back-button {
+      font-size: 14px;
+      padding: 8px 14px;
+    }
+  
+    .faculty-name {
+      font-size: 20px;
+    }
+  
+    .publications-title {
+      font-size: 18px;
+    }
+  
+    .publication-card h4 {
+      font-size: 16px;
+    }
+  }
+
+  .publications-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  
