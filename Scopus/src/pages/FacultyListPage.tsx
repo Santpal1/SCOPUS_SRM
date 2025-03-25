@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-=======
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
->>>>>>> 0e8e10547351d6c31177cd0d2b899f50881f8389
 import "../components/FacultyListPage.css";
 
 interface Faculty {
