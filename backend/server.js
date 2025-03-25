@@ -14,7 +14,7 @@ const db = mysql.createConnection({
   user: 'root', 
   password: '', 
   database: 'scopus',
-  port: 3306
+  port: 3307
 });
 
 db.connect(err => {
@@ -230,6 +230,7 @@ app.get('/api/faculty/low-papers', (req, res) => {
     res.json(results);
   });
 });
+
 
 
 // 3. Get faculty details by Scopus ID
