@@ -1,14 +1,14 @@
 import React from "react";
-import styles from "../components/AgentSignUp.module.css";
 import bannerImage from "../assets/image-1.avif";
+import styles from "../components/AgentSignUp.module.css";
 
 const AgentSignUp: React.FC = () => {
   return (
     <div className={styles.container}>
       {/* Navbar */}
       <div className={styles.navbar}>
-        <h1 className={styles.logo}>ResearchVault</h1>
-        <button className={styles.contactBtn}>Contact us</button>
+        <h1 className={styles.logo}>SRM SP</h1>
+        {/* <button className={styles.contactBtn}>Contact us</button> */}
       </div>
 
       {/* Main Container */}

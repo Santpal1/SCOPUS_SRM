@@ -107,9 +107,9 @@ export default function ResearchDashboard() {
     <div className={style.container}>
       {/* Navbar */}
       <div className={style.navbar}>
-        <h1 className={style.logo}>ResearchVault</h1>
+        <h1 className={style.logo}>SRM SP</h1>
         <div className={style.buttons}>
-          <button className={style.contactBtn}>Contact us</button>
+          {/* <button className={style.contactBtn}>Contact us</button> */}
         </div>
       </div>
 

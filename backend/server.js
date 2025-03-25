@@ -158,18 +158,23 @@ app.get('/api/faculty', (req, res) => {
 });
 
 // Get faculty paper count based on selected timeframe
+// Get faculty paper count based on selected timeframe
 app.get('/api/faculty/papers', (req, res) => {
   const { timeframe } = req.query;
 
-  let dateCondition = '';
+  let startDate = '';
+  let endDate = 'CURDATE()';
+
+  const currentYear = new Date().getFullYear();
+
   if (timeframe === '1m') {
-    dateCondition = 'DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+    startDate = 'DATE_SUB(NOW(), INTERVAL 1 MONTH)';
   } else if (timeframe === '6m') {
-    dateCondition = 'DATE_SUB(NOW(), INTERVAL 6 MONTH)';
+    startDate = 'DATE_SUB(NOW(), INTERVAL 6 MONTH)';
   } else if (timeframe === '1y') {
-    dateCondition = 'DATE_SUB(NOW(), INTERVAL 1 YEAR)';
-  } else if(timeframe === '2y') {
-    dateCondition = 'DATE_SUB(NOW(), INTERVAL 2 YEAR)';
+    startDate = `'${currentYear - 1}-01-01'`; // January 1st of the current year
+  } else if (timeframe === '2y') {
+    startDate = `'${currentYear - 2}-01-01'`; // January 1st of the previous year
   } else {
     return res.status(400).json({ error: 'Invalid timeframe' });
   }
@@ -182,8 +187,8 @@ app.get('/api/faculty/papers', (req, res) => {
       COUNT(p.scopus_id) AS timeframe_docs
     FROM users u
     LEFT JOIN papers p ON u.scopus_id = p.scopus_id 
-      AND p.date >= ${dateCondition}
-      AND p.date <= CURDATE()
+      AND p.date >= ${startDate}
+      AND p.date <= ${endDate}
     GROUP BY u.scopus_id, u.name;
   `;
 
@@ -199,16 +204,20 @@ app.get('/api/faculty/papers', (req, res) => {
 
 // 2. Get faculty who uploaded fewer than 4 papers in the past year
 app.get('/api/faculty/low-papers', (req, res) => {
+  const lastYear = new Date().getFullYear() - 1;
+  const startDate = `'${lastYear}-01-01'`; // January 1st of last year
+  const endDate = 'CURDATE()';
+
   const query = `
     SELECT 
       u.scopus_id, 
       u.name, 
-      COUNT(p.scopus_id) AS timeframe_docs  -- Rename for clarity
+      COUNT(p.scopus_id) AS timeframe_docs
     FROM users u
     LEFT JOIN papers p 
       ON u.scopus_id = p.scopus_id 
-      AND p.date >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
-      AND p.date <= NOW()
+      AND p.date >= ${startDate}
+      AND p.date <= ${endDate}
     GROUP BY u.scopus_id, u.name
     HAVING timeframe_docs < 4;
   `;

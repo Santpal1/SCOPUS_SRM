@@ -8,7 +8,7 @@ const AgentLogin: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // ✅ Success state
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -22,31 +22,35 @@ const AgentLogin: React.FC = () => {
         setSuccess("Login Successful!");
         setError("");
 
-        // Wait 3 seconds, then navigate
+        // Navigate to dashboard after 1 second
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
       } else {
         setError("Invalid Username or Password");
-        setUsername(""); // Clear username
-        setPassword(""); // Clear password
-        setSuccess("");  // Clear success message if any
+        setUsername("");
+        setPassword("");
+        setSuccess("");
       }
     } catch (error) {
       console.error("Login Error:", error);
       setError("Invalid Username or Password!");
-      setUsername(""); // Clear username
-      setPassword(""); // Clear password
-      setSuccess("");  // Clear success message if any
+      setUsername("");
+      setPassword("");
+      setSuccess("");
     }
+  };
+
+  // ✅ Redirect to signup
+  const handleRequestNow = () => {
+    navigate("/signup");
   };
 
   return (
     <div className={styles.container}>
       {/* Navbar */}
       <div className={styles.navbar}>
-        <h1 className={styles.logo}>ResearchVault</h1>
-        <button className={styles.contactBtn}>Contact us</button>
+        <h1 className={styles.logo}>SRM SP</h1>
       </div>
 
       {/* Main Container */}
@@ -95,11 +99,13 @@ const AgentLogin: React.FC = () => {
             <button className={styles.signInBtn} onClick={handleLogin}>
               Login
             </button>
+
+            {/* ✅ Updated "Request Now" to navigate */}
             <p className={styles.requestText}>
               Don’t have an account?{" "}
-              <a href="#" className={styles.requestLink}>
+              <span className={styles.requestLink} onClick={handleRequestNow}>
                 Request now
-              </a>
+              </span>
             </p>
           </div>
         </div>
