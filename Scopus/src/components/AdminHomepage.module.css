@@ -15,12 +15,12 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
 }
 
 .fullPageContainer {
-    width: 100%;
+    width: 1900px;
     min-height: 100vh;
     background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
     display: flex;
@@ -75,19 +75,26 @@
 }
 
 /* Hero Section */
-.heroContent {
+.headerSection{
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 90%;
+    padding: 16px;
+}
+
+.heroContent {
+    display: flex;
+    align-items: center;
+    width: 90%;
     max-width: 1600px;
-    /* Increased width for large screens */
     margin-top: 50px;
 }
 
 /* Left Section */
 .textContainer {
     max-width: 50%;
+    text-align: left;
 }
 
 .researchBadge {
@@ -100,9 +107,11 @@
 }
 
 .heroTitle {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    margin: 15px 0;
+    margin: 10px 0;
+    margin-top: 0px;
+    margin-left: 0px;
 }
 
 .heroText {
@@ -120,7 +129,8 @@
     padding: 12px 18px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 80px;
-    /* Extra spacing for larger screens */
+    width: 50%;
+    margin-left: auto;
 }
 
 .searchInput {
@@ -132,16 +142,94 @@
 
 .searchIcon {
     color: var(--text-color);
-    font-size: 1.5rem;
+    font-size: 2.3rem;
+
+}
+
+/*Carousel Part */
+.carouselContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 50px 0;
+    width: 90%;
+    height: 16rem;
+    background-color: var(--primary-color);
+}
+
+.carouselItem{
+    width: 250px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    font-weight: bold;
+    color: #004aad;
+}
+
+.carouselButton{
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin: 0 15px;
+}
+
+.carouselDots{
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.dot{
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.activeDot{
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    background-color: rgb(113, 113, 113);
+    text-align: center;
+}
+
+.imagePlaceholder{
+    width: 40%;
+    height: 100px;
+    background-color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    border-radius: 10px;
 }
 
 /* Right Section - Stats Carousel */
 .statsCarousel {
     display: flex;
     overflow: hidden;
-    animation: slide 10s linear infinite;
+    animation: slide 12s linear infinite;
     margin-top: 10px;
-    display: block;
+    position: relative;
+    width: max-content;
     justify-content: center;
 }
 
@@ -149,7 +237,7 @@
     text-align: center;
     background: var(--secondary-color);
     padding: 25px;
-    margin-top: 12px;
+    margin-left: 10px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     min-width: 250px;
@@ -185,7 +273,7 @@
 /* Animations */
 @keyframes slide {
     0% {
-        transform: translateX(0);
+        transform: translateX(50%);
     }
 
     50% {
@@ -193,7 +281,7 @@
     }
 
     100% {
-        transform: translateX(0);
+        transform: translateX(50%);
     }
 }
 
@@ -213,7 +301,7 @@
 
 @media (max-width: 2560px) {
     .heroTitle {
-        font-size: 3.5rem;
+        font-size: 1rem;
     }
 
     .heroText {
@@ -227,27 +315,65 @@
     .statItem {
         min-width: 100px;
     }
+
+    .searchBar{
+        width: fit-content;
+        max-width: 100%;
+    }
 }
 
 @media (max-width: 1919px) {
+    .headerSection{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 90%;
+        padding: 16px;
+    }
+
     .heroTitle {
-        font-size: 3rem;
+        font-size: 2.3rem;
+        margin-top: 0%;
     }
 
     .heroText {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
 
     .statsCarousel {
         position: relative;
     }
+
+    .searchBar{
+        width: max-content;
+        max-width: 100%;
+        margin-top: 0px;
+    }
+    
+    .headerSection{
+        margin: 0;
+        padding-top: 10px;
+        padding-left: 13px;
+    }
 }
 
 /* Tablets (1024px - 1439px) */
 @media (max-width: 1439px) {
+    .headerSection{
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        width: 100%;
+        padding: 16px;
+    }
+
     .heroContent {
         flex-direction: column;
         text-align: center;
+        margin-top: 30px;
+        width: 100%;
     }
 
     .textContainer {
@@ -263,10 +389,48 @@
     .statItem {
         min-width: 200px;
     }
+    .searchBar{
+        width: fit-content;
+        max-width: 100%;
+    }
 }
 
 /* Small Screens (768px - 1023px) */
 @media (max-width: 1023px) {
+    .fullPageContainer{
+        width: 1023px;
+    }
+
+    .navbar {
+        width: 100%;
+        padding: 20px 10%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--secondary-color);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .logocontainer{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logoimage{
+        height: 40px;
+    }
+
+    .headerSection{
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        width: 100%;
+        padding: 16px;
+    }
+
     .heroTitle {
         font-size: 2.5rem;
     }
@@ -283,10 +447,28 @@
     .statsCarousel {
         margin-bottom: 70px;
     }
+
+    .searchBar{
+        width: 900px;
+        max-width: 300%;
+        width: max-content;
+        margin-top: 0px;
+    }
+
+    .headerSection{
+        display: flex;
+    }
 }
 
 /* Mobile (Below 768px) */
 @media (max-width: 767px) {
+    .headerSection{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 90%;
+        padding: 16px;
+    }
     .heroTitle {
         font-size: 2rem;
     }
@@ -308,5 +490,10 @@
 
     .statItem {
         min-width: 80%;
+    }
+    .searchBar{
+        width: max-content;
+        max-width: 100%;
+
     }
 }
