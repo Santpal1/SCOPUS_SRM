@@ -1,14 +1,21 @@
 import React from "react";
-import bannerImage from "../assets/image-1.avif";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import srmLogo from "../assets/srm_logo.png";
 import styles from "../components/AgentSignUp.module.css";
 
 const AgentSignUp: React.FC = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const handleSignUp = () => {
+    // Redirect to dashboard
+    navigate("/dashboard");
+  };
+
   return (
     <div className={styles.container}>
       {/* Navbar */}
       <div className={styles.navbar}>
         <h1 className={styles.logo}>SRM SP</h1>
-        {/* <button className={styles.contactBtn}>Contact us</button> */}
       </div>
 
       {/* Main Container */}
@@ -47,23 +54,20 @@ const AgentSignUp: React.FC = () => {
               />
             </div>
 
-            <button className={styles.signUpBtn}>Sign Up</button>
+            {/* Updated Sign Up Button with Redirect */}
+            <button className={styles.signUpBtn} onClick={handleSignUp}>
+              Sign Up
+            </button>
           </div>
         </div>
 
         {/* Right Side - Banner */}
         <div className={styles.rightSide}>
           <h3 className={styles.bannerTitle}>
-            Insightful and Real Time
-            Analysis of Published
-            Research Papers
+            Insightful and Real Time Analysis of Published Research Papers
           </h3>
           <div>
-            <img
-              src={bannerImage}
-              alt="Analytics"
-              className={styles.bannerImage}
-            />
+            <img src={srmLogo} alt="Analytics" className={styles.bannerImage} />
           </div>
         </div>
       </div>

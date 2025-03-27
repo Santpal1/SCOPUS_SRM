@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import bannerImage from "../assets/image-2.jpg";
+import srmLogo from "../assets/srm_logo.png";
 import styles from "../components/AgentLogin.module.css";
 
 const AgentLogin: React.FC = () => {
@@ -116,7 +116,7 @@ const AgentLogin: React.FC = () => {
             From Research to Results: Delivering Insightful Analysis
           </h3>
           <div>
-            <img src={bannerImage} alt="Analytics" className={styles.bannerImage} />
+            <img src={srmLogo} alt="SRM Logo" className={styles.bannerImage} />
           </div>
         </div>
       </div>
