@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 :root {
-    --primary-color: #f5f5dc;
+    --primary-color1: #f5f5dc;
     /* Beige */
-    --secondary-color: #ffffff;
+    --secondary-color1: #ffffff;
     /* White */
-    --accent-color: #d3d3d3;
+    --accent-color1: #d3d3d3;
     /* Light Grey */
-    --text-color: #333;
-    --button-color: #444;
-    --button-hover-color: #222;
+    --text-color1: #333;
+    --button-color1: #444;
+    --button-hover-color1: #222;
 }
 
 * {
@@ -22,7 +22,7 @@
 .fullPageContainer {
     width: 1900px;
     min-height: 100vh;
-    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    background: linear-gradient(to bottom, var(--primary-color1), var(--secondary-color1));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -34,7 +34,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color1);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -47,7 +47,7 @@
 .logo {
     font-size: 1.8rem;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-color1);
 }
 
 .logoimage{
@@ -59,8 +59,8 @@
 }
 
 .loginButton {
-    background-color: var(--button-color);
-    color: var(--secondary-color);
+    background-color: var(--button-color1);
+    color: var(--secondary-color1);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -71,7 +71,7 @@
 }
 
 .loginButton:hover {
-    background-color: var(--button-hover-color);
+    background-color: var(--button-hover-color1);
 }
 
 /* Hero Section */
@@ -98,8 +98,8 @@
 }
 
 .researchBadge {
-    background: var(--accent-color);
-    color: var(--text-color);
+    background: var(--accent-color1);
+    color: var(--text-color1);
     padding: 5px 15px;
     border-radius: 20px;
     font-size: 1rem;
@@ -117,14 +117,14 @@
 .heroText {
     font-size: 1.3rem;
     /* Increased for readability */
-    color: var(--text-color);
+    color: var(--text-color1);
     margin-bottom: 12px;
 }
 
 .searchBar {
     display: flex;
     align-items: center;
-    background: var(--secondary-color);
+    background: var(--secondary-color1);
     border-radius: 25px;
     padding: 12px 18px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -141,7 +141,7 @@
 }
 
 .searchIcon {
-    color: var(--text-color);
+    color: var(--text-color1);
     font-size: 2.3rem;
 
 }
@@ -154,7 +154,7 @@
     margin: 50px 0;
     width: 90%;
     height: 16rem;
-    background-color: var(--primary-color);
+    background-color: var(--primary-color1);
 }
 
 .carouselItem{
@@ -190,7 +190,7 @@
     height: 10px;
     width: 10px;
     margin: 0 5px;
-    background-color: var(--primary-color);
+    background-color: var(--primary-color1);
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
@@ -201,7 +201,7 @@
     height: 10px;
     width: 10px;
     margin: 0 5px;
-    background-color: var(--primary-color);
+    background-color: var(--primary-color1);
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
@@ -212,13 +212,13 @@
 .imagePlaceholder{
     width: 40%;
     height: 100px;
-    background-color: var(--accent-color);
+    background-color: var(--accent-color1);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--text-color);
+    color: var(--text-color1);
     border-radius: 10px;
 }
 
@@ -235,7 +235,7 @@
 
 .statItem {
     text-align: center;
-    background: var(--secondary-color);
+    background: var(--secondary-color1);
     padding: 25px;
     margin-left: 10px;
     border-radius: 10px;
@@ -251,13 +251,13 @@
 .statNumber {
     font-size: 3rem;
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-color1);
     animation: countUp 2s ease-in-out forwards;
 }
 
 .statLabel {
     font-size: 1.2rem;
-    color: var(--text-color);
+    color: var(--text-color1);
 }
 
 /* Footer */
@@ -266,7 +266,7 @@
     padding: 20px;
     text-align: center;
     width: 100%;
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color1);
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -407,7 +407,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: var(--secondary-color);
+        background-color: var(--secondary-color1);
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
 
