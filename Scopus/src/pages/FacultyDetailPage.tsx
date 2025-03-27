@@ -4,7 +4,6 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import html2canvas from 'html2canvas';
 import {
   Bar,
   BarChart,
@@ -14,8 +13,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import '../components/FacultyDetailPage.css';
 
 interface Faculty {
