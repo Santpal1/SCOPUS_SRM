@@ -120,7 +120,6 @@ body.reloading {
     color: rgb(6, 6, 6);
     font-weight: 650;
     padding: 0.6rem 1.5rem;
-    @extend .button;
     font-size: medium;
     border-radius: 10px;
     cursor: pointer;
