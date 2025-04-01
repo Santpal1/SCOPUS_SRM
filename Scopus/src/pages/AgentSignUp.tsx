@@ -26,8 +26,8 @@ const AgentSignUp: React.FC = () => {
 
     // If no errors, show success message and navigate after 1.5s
     if (Object.keys(newErrors).length === 0) {
-      setSuccessMessage("Account created successfully! Redirecting...");
-      setTimeout(() => navigate("/login"), 1500);
+      setSuccessMessage("Account created successfully!");
+      setTimeout(() => navigate("/login"), 1000);
     }
   };
 
