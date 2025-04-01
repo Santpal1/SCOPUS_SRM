@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import srmLogo from "../assets/srm_logo.png";
@@ -9,6 +10,7 @@ const AgentSignUp: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string }>({});
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -24,7 +26,6 @@ const AgentSignUp: React.FC = () => {
 
     setErrors(newErrors);
 
-    // If no errors, show success message and navigate after 1.5s
     if (Object.keys(newErrors).length === 0) {
       setSuccessMessage("Account created successfully!");
       setTimeout(() => navigate("/login"), 1000);
@@ -33,21 +34,16 @@ const AgentSignUp: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {/* Navbar */}
       <div className={styles.navbar}>
         <h1 className={styles.logo}>SRM SP</h1>
       </div>
 
-      {/* Main Container */}
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>
           <div className={styles.loginBox}>
             <h2 className={styles.loginTitle}>Agent Sign Up</h2>
-            <p className={styles.loginSubtitle}>
-              Enter your details to sign in to your account
-            </p>
+            <p className={styles.loginSubtitle}>Enter your details to sign in to your account</p>
 
-            {/* Username Input */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Username</label>
               <input
@@ -60,7 +56,6 @@ const AgentSignUp: React.FC = () => {
               {errors.username && <p className={styles.errorText}>{errors.username}</p>}
             </div>
 
-            {/* Email Input */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Email ID</label>
               <input
@@ -73,30 +68,34 @@ const AgentSignUp: React.FC = () => {
               {errors.email && <p className={styles.errorText}>{errors.email}</p>}
             </div>
 
-            {/* Password Input */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Password</label>
-              <input
-                type="password"
-                placeholder="Password"
-                className={styles.inputField}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  className={styles.inputField}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
+              </div>
               {errors.password && <p className={styles.errorText}>{errors.password}</p>}
             </div>
 
-            {/* Success Message */}
             {successMessage && <p className={styles.successText}>{successMessage}</p>}
 
-            {/* Sign Up Button */}
             <button className={styles.signUpBtn} onClick={handleSignUp}>
               Sign Up
             </button>
           </div>
         </div>
 
-        {/* Right Side - Banner */}
         <div className={styles.rightSide}>
           <h3 className={styles.bannerTitle}>
             Insightful and Real-Time Analysis of Published Research Papers

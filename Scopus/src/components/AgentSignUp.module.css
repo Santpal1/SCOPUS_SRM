@@ -228,6 +228,27 @@ body {
     /* transition: pulse 0.3s ease-in-out; */
 }
 
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #555;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+}
+
+
 .errorText {
     color: #e11d48; 
     font-size: 0.9rem;
