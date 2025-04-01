@@ -228,11 +228,14 @@ body.reloading {
     background-color: white;
     color: black;
     transition: border 0.2s ease-in-out;
+    animation: fadeIn 1s ease-in;
 }
 
 .inputField:focus {
     border-color: #3b82f6;
     outline: none;
+    box-shadow: 0px 0px 10px rgba(59, 130, 246, 0.5);
+    transition: glow 0.3s ease-in-out;
 }
 
 /* Placeholder */
@@ -341,7 +344,7 @@ body.reloading {
     transition: transform 0.3s ease-in-out;
 }
 
-.errorMsg {
+.errorText {
     color: #e11d48; 
     font-size: 0.9rem;
     margin-top: 0.5rem;
@@ -349,7 +352,7 @@ body.reloading {
 }
 
 
-.successMsg {
+.successText {
     color: #16a34a;
     font-size: 0.9rem;
     margin-top: 0.5rem;

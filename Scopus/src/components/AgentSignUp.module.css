@@ -138,7 +138,7 @@ body {
     border-color: #3b82f6;
     outline: none;
     box-shadow: 0px 0px 10px rgba(59, 130, 246, 0.5);
-    animation: glow 0.3s ease-in-out;
+    transition: glow 0.3s ease-in-out;
 }
 
 .inputField::placeholder {
@@ -147,7 +147,7 @@ body {
 
 .signUpBtn {
     width: 100%;
-    background: linear-gradient(to right, #d1d5db, #ffffff);
+    background: linear-gradient(to right, #776ff3, #2f538b);
     padding: 0.75rem;
     border-radius: 25px;
     font-weight: bolder;
@@ -155,17 +155,17 @@ body {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    color: black;
+    gap: 0.5rem;
+    color: rgb(249, 245, 245);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     margin-top: 1rem;
     border: none;
-    animation: fadeInUp 1s ease-in-out;
 }
 
 .signUpBtn:hover {
-    background: linear-gradient(to right, #9ca3af, #ffffff);
+    background: linear-gradient(to right, #4338ca, #2563eb);
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-    transform: scale(1.03);
+    transform: translateY(-2px);
 }
 
 .requestText {
@@ -213,20 +213,36 @@ body {
 }
 
 .bannerImage {
-    width: 90%;
-    max-width: 400px;
+    width: 100%;
+    max-width: 500px;
     height: auto;
     border-radius: 20px;
     margin-top: 1rem;
     display: block;
     align-self: center;
-    animation: fadeIn 1.5s ease-in-out;
+    transition: transform 0.3s ease-in-out; /* Added smooth transition */
 }
 
 .bannerImage:hover {
     transform: scale(1.05);
-    animation: pulse 0.4s ease-in-out;
+    /* transition: pulse 0.3s ease-in-out; */
 }
+
+.errorText {
+    color: #e11d48; 
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+
+.successText {
+    color: #16a34a;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
 
 @keyframes fadeIn {
     from {

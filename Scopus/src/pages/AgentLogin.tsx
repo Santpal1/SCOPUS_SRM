@@ -7,11 +7,22 @@ import styles from "../components/AgentLogin.module.css";
 const AgentLogin: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    let newErrors: { username?: string; password?: string } = {};
+
+    // Validation for each field
+    if (!username) newErrors.username = "Username is required";
+    if (!password) newErrors.password = "Password is required";
+
+    setErrors(newErrors);
+
+    // Stop if there are validation errors
+    if (Object.keys(newErrors).length > 0) return;
+
     try {
       const response = await axios.post("http://localhost:5000/api/login", {
         username,
@@ -19,29 +30,28 @@ const AgentLogin: React.FC = () => {
       });
 
       if (response.data.success) {
-        setSuccess("Login Successful!");
-        setError("");
+        setSuccessMessage("Login Successful!");
+        setErrors({}); // Clear any previous errors
 
         // Navigate to dashboard after 1 second
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
       } else {
-        setError("Invalid Username or Password");
+        setErrors({ password: "Invalid Username or Password" });
         setUsername("");
         setPassword("");
-        setSuccess("");
+        setSuccessMessage("");
       }
     } catch (error) {
       console.error("Login Error:", error);
-      setError("Invalid Username or Password!");
+      setErrors({ password: "Invalid Username or Password!" });
       setUsername("");
       setPassword("");
-      setSuccess("");
+      setSuccessMessage("");
     }
   };
 
-  // ✅ Redirect to signup
   const handleRequestNow = () => {
     navigate("/signup");
   };
@@ -60,6 +70,7 @@ const AgentLogin: React.FC = () => {
             <h2 className={styles.loginTitle}>Agent Login</h2>
             <p className={styles.loginSubtitle}>Enter your details to log in</p>
 
+            {/* Username Input */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Username</label>
               <input
@@ -67,14 +78,12 @@ const AgentLogin: React.FC = () => {
                 placeholder="Username"
                 className={styles.inputField}
                 value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  setError("");
-                  setSuccess("");
-                }}
+                onChange={(e) => setUsername(e.target.value)}
               />
+              {errors.username && <p className={styles.errorText}>{errors.username}</p>}
             </div>
 
+            {/* Password Input */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Password</label>
               <input
@@ -82,25 +91,20 @@ const AgentLogin: React.FC = () => {
                 placeholder="Password"
                 className={styles.inputField}
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                  setSuccess("");
-                }}
+                onChange={(e) => setPassword(e.target.value)}
               />
+              {errors.password && <p className={styles.errorText}>{errors.password}</p>}
             </div>
 
-            {/* Inline Error Message */}
-            {error && <p className={styles.errorMsg}>{error}</p>}
+            {/* Success Message */}
+            {successMessage && <p className={styles.successText}>{successMessage}</p>}
 
-            {/* Inline Success Message */}
-            {success && <p className={styles.successMsg}>{success}</p>}
-
+            {/* Login Button */}
             <button className={styles.signInBtn} onClick={handleLogin}>
               Login
             </button>
 
-            {/* ✅ Updated "Request Now" to navigate */}
+            {/* Redirect to Signup */}
             <p className={styles.requestText}>
               Don’t have an account?{" "}
               <span className={styles.requestLink} onClick={handleRequestNow}>

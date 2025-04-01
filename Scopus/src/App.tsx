@@ -10,8 +10,8 @@ import ResearchDashboard from "./pages/ResearchDashboard";
 const App: React.FC = () => {
   return (
       <Routes>
-        <Route path="/Home" element={<HomePage />} />
-        <Route path="/" element={<AgentLogin />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<AgentLogin />} />
         <Route path="/signup" element={<AgentSignUp />} />
         <Route path="/hero" element={<HeroSection />}></Route>
         <Route path="/dashboard" element={<ResearchDashboard />}></Route>
