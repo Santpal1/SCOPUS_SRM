@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logoimage from "../assets/srm_logo.png";
 import styles from "../components/AdminHomepage.module.css";
 
@@ -11,24 +11,23 @@ type Faculty = {
 };
 
 const AdminHomepage: React.FC = () => {
-    const navigate = useNavigate(); // Initialize navigate function
+    const navigate = useNavigate();
     const [researchCount, setResearchCount] = useState(0);
     const [facultyCount, setFacultyCount] = useState(0);
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [facultyData, setFacultyData] = useState<Faculty[]>([]);
+    const [animationClass, setAnimationClass] = useState("");
+    const autoSlideRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         fetch("http://localhost:5000/api/faculty")
             .then((response) => response.json())
             .then((data: any[]) => {
-                console.log("✅ Raw API Response:", data); // Debugging log
-    
                 const transformedData = data.map((faculty) => ({
                     name: faculty.name,
-                    scopusId: faculty.scopus_id || "N/A", // Handle missing Scopus ID
-                    documents: faculty.docs_count ?? 0,  // Use 0 if docs_count is missing or null
+                    scopusId: faculty.scopus_id || "N/A",
+                    documents: faculty.docs_count ?? 0,
                 }));
-    
                 setFacultyData(transformedData);
             })
             .catch((error) => console.error("❌ Error fetching faculty data:", error));
@@ -49,13 +48,33 @@ const AdminHomepage: React.FC = () => {
         };
     }, []);
 
-    useEffect(() => {
-        if (facultyData.length > 0) {
-            const interval = setInterval(() => {
-                setCarouselIndex(Math.floor(Math.random() * facultyData.length));
-            }, 5000);
-            return () => clearInterval(interval);
+    const startAutoSlide = () => {
+        if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+        autoSlideRef.current = setInterval(() => {
+            handleCarouselChange("next", false);
+        }, 3000);
+    };
+
+    const handleCarouselChange = (direction: "prev" | "next", resetTimer: boolean = true) => {
+        setAnimationClass(direction === "next" ? styles.slideRight : styles.slideLeft);
+        setTimeout(() => {
+            setCarouselIndex((prev) =>
+                direction === "next"
+                    ? (prev + 1) % facultyData.length
+                    : (prev === 0 ? facultyData.length - 1 : prev - 1)
+            );
+        }, 100);
+
+        if (resetTimer) {
+            startAutoSlide();
         }
+    };
+
+    useEffect(() => {
+        startAutoSlide();
+        return () => {
+            if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+        };
     }, [facultyData.length]);
 
     return (
@@ -66,7 +85,6 @@ const AdminHomepage: React.FC = () => {
                     <h1 className={styles.logo}>SRM SP</h1>
                 </div>
                 <div className={styles.navLinks}>
-                    {/* Navigate to login page when clicked */}
                     <button className={styles.loginButton} onClick={() => navigate("/login")}>
                         Login
                     </button>
@@ -83,17 +101,17 @@ const AdminHomepage: React.FC = () => {
             </div>
 
             <div className={styles.carouselContainer}>
-                <button className={styles.carouselButton} onClick={() => setCarouselIndex((prev) => (prev === 0 ? facultyData.length - 1 : prev - 1))}>
+                <button className={styles.carouselButton} onClick={() => handleCarouselChange("prev")}>
                     <ChevronLeft />
                 </button>
                 {facultyData.length > 0 && (
-                    <div className={styles.carouselItem}>
+                    <div key={carouselIndex} className={`${styles.carouselItem} ${animationClass}`}>
                         <h3>{facultyData[carouselIndex].name}</h3>
                         <p>Scopus ID: {facultyData[carouselIndex].scopusId || "N/A"}</p>
                         <p>No. of Documents: {facultyData[carouselIndex].documents}</p>
                     </div>
                 )}
-                <button className={styles.carouselButton} onClick={() => setCarouselIndex((prev) => (prev === facultyData.length - 1 ? 0 : prev + 1))}>
+                <button className={styles.carouselButton} onClick={() => handleCarouselChange("next")}>
                     <ChevronRight />
                 </button>
             </div>
@@ -115,7 +133,7 @@ const AdminHomepage: React.FC = () => {
 
             <footer className={styles.footer}>
                 <p>
-                    Contact Us: xyz@srmist.edu.in | 
+                    Contact Us: xyz@srmist.edu.in |{" "}
                     <a href="https://www.srmist.edu.in" target="_blank" rel="noopener noreferrer">
                         www.srmist.edu.in
                     </a>
