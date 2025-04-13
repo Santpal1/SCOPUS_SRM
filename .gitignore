@@ -2,3 +2,5 @@ logs
 config.json
 data
 node_modules
+scopus_charts
+scopus_data

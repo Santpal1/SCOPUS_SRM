@@ -286,63 +286,57 @@ yPos += 5; // Adjust for the next line of content
   
 
 
-  return (
-    <div className="faculty-detail-container">
-      <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
+return (
+  <div className="faculty-detail-container">
+    <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
 
-      <div className="faculty-card">
-        <h2 className="faculty-name">{faculty.name}</h2>
-        <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
-        {faculty.faculty_id && <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>}
-        <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
-        <a
-          href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="scopus-link-button"
-        >
-          View on Scopus
-        </a>
+    <div className="faculty-card">
+      <h2 className="faculty-name">{faculty.name}</h2>
+      <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
+      {faculty.faculty_id && <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>}
+      <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
+      <a
+        href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="scopus-link-button"
+      >
+        View on Scopus
+      </a>
 
-        {/* PDF Button */}
-        <button onClick={generatePDF} className="generate-pdf-button">
-          📄 Generate Report
-        </button>
-      </div>
-
-      <h3 className="publications-title">Publications</h3>
-      {papers && papers.length > 0 ? (
-        papers.map((paper, index) => (
-          <div key={paper.doi || `paper-${index}`} className="publication-card">
-            <h4>{paper.title}</h4>
-            <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
-            <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
-            <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
-            <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
-          </div>
-        ))
-      ) : (
-        <div className="no-records">No publications found for this faculty member.</div>
-      )}
-
-      {/* Bar Chart for last 3 years */}
-      <h3 className="publications-title">Publications in the Last 3 Years</h3>
-      <div id="publication-bar-chart" style={{ width: '100%', height: 350 }}>
-        <ResponsiveContainer>
-          <BarChart
-            data={publicationCounts}
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="year" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Bar dataKey="count" fill="#007bff" radius={[10, 10, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <button onClick={generatePDF} className="generate-pdf-button">
+        📄 Generate Report
+      </button>
     </div>
-  );
+
+    <h3 className="publications-title">Publications</h3>
+    {papers && papers.length > 0 ? (
+      papers.map((paper, index) => (
+        <div key={paper.doi || `paper-${index}`} className="publication-card">
+          <h4>{paper.title}</h4>
+          <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
+          <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
+          <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
+          <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
+        </div>
+      ))
+    ) : (
+      <div className="no-records">No publications found for this faculty member.</div>
+    )}
+
+    {/* 🔥 Embedded Highcharts Dashboard */}
+    <h3 className="publications-title">Interactive Scopus Dashboard</h3>
+    <div className="highcharts-frame-container">
+      <iframe
+        src={`/highcharts_dashboards/${faculty.scopus_id}_highcharts_dashboard.html`}
+        title="Highcharts Dashboard"
+        className="highcharts-iframe"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+);
+
 };
 
 export default FacultyDetailPage;

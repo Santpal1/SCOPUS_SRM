@@ -1,0 +1,239 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Author details - Scopus Metrics</title>
+            <script src="https://code.highcharts.com/highcharts.js"></script>
+            <script src="https://code.highcharts.com/modules/exporting.js"></script>
+            <script src="https://code.highcharts.com/modules/export-data.js"></script>
+            <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+            <style>
+                body {
+                    font-family: 'Helvetica Neue', Arial, sans-serif;
+                    margin: 0;
+                    padding: 20px;
+                    background-color: #f7f7f7;
+                }
+                .dashboard-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    padding: 20px;
+                }
+                h1 {
+                    color: #333;
+                    margin-top: 0;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid #eee;
+                }
+                .chart-container {
+                    height: 400px;
+                    margin-bottom: 20px;
+                }
+                .metrics-container {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-bottom: 20px;
+                }
+                .metric-box {
+                    text-align: center;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    padding: 15px;
+                    width: 30%;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+                .metric-value {
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #3679e0;
+                }
+                .metric-label {
+                    font-size: 14px;
+                    color: #777;
+                    margin-top: 5px;
+                }
+                .data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                .data-table th, .data-table td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .data-table th {
+                    background-color: #f2f2f2;
+                }
+                .data-table tr:nth-child(even) {
+                    background-color: #f9f9f9;
+                }
+                .data-table tr:hover {
+                    background-color: #f5f5f5;
+                }
+                .export-buttons {
+                    margin-top: 20px;
+                    text-align: right;
+                }
+                .export-button {
+                    background-color: #3679e0;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    font-size: 14px;
+                }
+                .export-button:hover {
+                    background-color: #2a5cb8;
+                }
+                @media (max-width: 768px) {
+                    .metrics-container {
+                        flex-direction: column;
+                    }
+                    .metric-box {
+                        width: auto;
+                        margin-bottom: 10px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="dashboard-container">
+                <h1>Author details - Scopus Metrics</h1>
+                
+                
+                
+                <div id="chart-container" class="chart-container"></div>
+            </div>
+            
+            <script>
+                // Initialize the chart
+                document.addEventListener('DOMContentLoaded', function() {
+                    Highcharts.chart('chart-container', {
+                        chart: {
+                            zoomType: 'xy',
+                            style: {
+                                fontFamily: "'Helvetica Neue', Arial, sans-serif"
+                            }
+                        },
+                        title: {
+                            text: 'Document and Citation Trends',
+                            style: {
+                                fontSize: '18px'
+                            }
+                        },
+                        xAxis: {
+                            categories: ["2022", "2023", "2024", "2025"],
+                            crosshair: true
+                        },
+                        yAxis: [{
+                            // Primary yAxis (documents)
+                            title: {
+                                text: 'Documents',
+                                style: {
+                                    color: '#3679e0'
+                                }
+                            },
+                            labels: {
+                                style: {
+                                    color: '#3679e0'
+                                }
+                            }
+                        }, {
+                            // Secondary yAxis (citations)
+                            title: {
+                                text: 'Citations',
+                                style: {
+                                    color: '#000347'
+                                }
+                            },
+                            labels: {
+                                style: {
+                                    color: '#000347'
+                                }
+                            },
+                            opposite: true
+                        }],
+                        tooltip: {
+                            shared: true,
+                            useHTML: true,
+                            headerFormat: '<b>Year: {point.key}</b><br>'
+                        },
+                        plotOptions: {
+                            column: {
+                                pointPadding: 0.2,
+                                borderWidth: 0
+                            }
+                        },
+                        series: [{
+                            name: 'Documents',
+                            type: 'column',
+                            yAxis: 0,
+                            data: [2, 3, 4, 0],
+                            color: '#3679e0',
+                            tooltip: {
+                                valueSuffix: ' documents'
+                            }
+                        }, {
+                            name: 'Citations',
+                            type: 'line',
+                            yAxis: 1,
+                            data: [0, 1, 1, 1],
+                            color: '#000347',
+                            marker: {
+                                symbol: 'circle'
+                            },
+                            tooltip: {
+                                valueSuffix: ' citations'
+                            }
+                        }],
+                        credits: {
+                            enabled: false
+                        },
+                        exporting: {
+                            enabled: true,
+                            buttons: {
+                                contextButton: {
+                                    menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                // Function to export table data to CSV
+                function exportCSV() {
+                    const table = document.querySelector('.data-table');
+                    let csv = [];
+                    const rows = table.querySelectorAll('tr');
+                    
+                    for (let i = 0; i < rows.length; i++) {
+                        const row = [];
+                        const cols = rows[i].querySelectorAll('td, th');
+                        
+                        for (let j = 0; j < cols.length; j++) {
+                            row.push(cols[j].textContent);
+                        }
+                        
+                        csv.push(row.join(','));
+                    }
+                    
+                    const csvContent = "data:text/csv;charset=utf-8," + csv.join('\n');
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', encodedUri);
+                    link.setAttribute('download', "6602875353_scopus_data.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            </script>
+        </body>
+        </html>
+        
