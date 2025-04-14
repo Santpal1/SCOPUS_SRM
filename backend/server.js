@@ -273,6 +273,30 @@ app.get('/api/faculty/:scopusId', (req, res) => {
   });
 });
 
+// MANUAL SCOPUS SYNC
+app.post('/api/sync', (req, res) => {
+  exec('python sync.py', (error, stdout, stderr) => {
+    if (error) {
+      console.error("Manual sync error: ${stderr}");
+      return res.status(500).json({ success: false, message: 'Sync failed', error: stderr });
+    }
+    console.log("Manual sync output: ${stdout}");
+    res.json({ success: true, message: 'Scopus data synchronized successfully.', output: stdout });
+  });
+});
+
+// SCHEDULED MONTHLY SCOPUS SYNC
+// cron.schedule('0 0 1 * *', () => {
+//   console.log('Running scheduled monthly Scopus sync...');
+//   exec('python3 scopus_sync.py', (error, stdout, stderr) => {
+//     if (error) {
+//       console.error("Scheduled sync error: ${stderr}");
+//     } else {
+//       console.log("Scheduled sync success:\n${stdout}");
+//     }
+//   });
+// });
+
 // Test API route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });

@@ -4,45 +4,53 @@
   padding: 25px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
   font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.faculty-detail-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .back-button {
   display: inline-block;
   margin-bottom: 20px;
   padding: 10px 18px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background: linear-gradient(135deg, #1A4D6C, #163b4d);
   color: #fff;
   text-decoration: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, transform 0.2s ease;
 }
 
 .back-button:hover {
-  background: linear-gradient(135deg, #0056b3, #003f7f);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #163b4d, #1A4D6C);
+  transform: translateY(-4px) scale(1.05);
 }
 
 .faculty-card {
+  max-height: 250px;
   padding: 25px;
   background: #f8f9fa;
   border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .faculty-card:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .faculty-name {
   font-size: 24px;
   font-weight: bold;
-  color: #343a40;
+  color: #1A4D6C;
   margin-bottom: 8px;
 }
 
@@ -53,25 +61,27 @@ p {
 }
 
 .publications-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   margin-top: 30px;
-  color: #333;
+  color: #1A4D6C;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .publication-card {
   padding: 20px;
   background: #ffffff;
-  border-left: 6px solid #007bff;
+  border-left: 6px solid #1A4D6C;
   margin-top: 15px;
   border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .publication-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .publication-card h4 {
@@ -97,25 +107,124 @@ p {
   text-align: center;
   font-size: 18px;
   font-weight: bold;
-  color: #007bff;
+  color: #1A4D6C;
 }
 
 .scopus-link-button {
   display: inline-block;
   margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #007bff;
+  padding: 8px 20px;
+  background-color: #1A4D6C;
   color: white;
   text-decoration: none;
   border-radius: 5px;
   font-weight: bold;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.3s ease;
 }
 
 .scopus-link-button:hover {
-  background-color: #0056b3;
+  background-color: #163b4d;
+  transform: scale(1.05);
 }
 
+.scopus-link-button:active {
+  background-color: #0d2a35;
+}
+
+.generate-pdf-button {
+  background-color: #1A4D6C;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 640px;
+  transition: background-color 0.3s, transform 0.2s;
+  position: relative;
+  top: -140px;
+  right: -200px;
+}
+
+.generate-pdf-button:hover {
+  background-color: #163b4d;
+  transform: scale(1.05);
+}
+
+.generate-pdf-button:active {
+  background-color: #0d2a35;
+  transform: scale(0.98);
+}
+
+.graph-container {
+  width: 100%;
+  height: 400px;
+  margin-top: 30px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.graph-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1A4D6C;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.graph {
+  height: 100%;
+  border-radius: 10px;
+  background-color: #ffffff;
+  padding: 10px;
+}
+
+.graph .chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.graph .chart-container canvas {
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.graph .chart-container canvas:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Fun animation for generate-pdf-button */
+.generate-pdf-button {
+  animation: pulse 2s infinite;
+}
+
+/* Hover animation for buttons */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Adjusting the position of generate-pdf-button */
+.generate-pdf-button {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  margin-top: 20px;
+  transition: transform 0.3s ease;
+}
 
 @media (max-width: 768px) {
   .faculty-detail-container {
@@ -142,44 +251,31 @@ p {
   .publication-card h4 {
     font-size: 16px;
   }
-}
 
-.publications-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-top: 40px;
-  margin-bottom: 20px;
-  color: #333;
-}
-  
   .generate-pdf-button {
-    background-color: #007bff;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 640px;
-    transition: background-color 0.3s, transform 0.2s;
-    position: relative;
-    top: -55px; /* Moves the button upwards */
+    margin-left: 20px;
+    margin-top: 10px;
   }
-  
-  .generate-pdf-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-  }
-  
-  .generate-pdf-button:active {
-    background-color: #004494;
-    transform: scale(0.98);
-  }
-  
-  
 
-  
+  .graph-container {
+    height: 350px;
+    margin-top: 20px;
+  }
+}
 
- 
-  
+.highcharts-frame-container {
+  width: 100%;
+  height: 587px;
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 20px;
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
+  background: #fff;
+}
+
+.highcharts-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
