@@ -235,12 +235,16 @@ const FacultyDetailPage: React.FC = () => {
         doc.addImage(imgData, 'PNG', margin, yPos, pageWidth - margin * 2, 100);
         yPos += 100; // Adjust position for next content
 
-        const pdfUrl = doc.output('bloburl');
-        window.open(pdfUrl, '_blank');
+        // const pdfUrl = doc.output('bloburl');
+        // window.open(pdfUrl, '_blank');
+        // ✅ Download the PDF
+        doc.save(`${faculty.name.replace(/\s+/g, "_")}_Report.pdf`);
       });
     } else {
-      const pdfUrl = doc.output('bloburl');
-      window.open(pdfUrl, '_blank');
+      // const pdfUrl = doc.output('bloburl');
+      // window.open(pdfUrl, '_blank');
+      // ✅ Fallback: Download without chart
+      doc.save(`${faculty.name.replace(/\s+/g, "_")}_Report.pdf`);
     }
   };
 

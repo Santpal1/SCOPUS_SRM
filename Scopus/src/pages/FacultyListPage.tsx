@@ -16,7 +16,7 @@ interface Faculty {
 const FacultyListPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [faculty, setFaculty] = useState<Faculty[]>([]);
-  const [currentFaculty, setCurrentFaculty] = useState<Faculty[]>([]); // Holds filtered data
+  const [currentFaculty, setCurrentFaculty] = useState<Faculty[]>([]);
   const [filteredFaculty, setFilteredFaculty] = useState<Faculty[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -27,14 +27,14 @@ const FacultyListPage: React.FC = () => {
     fetchFaculty();
   }, []);
 
-  // Fetch all faculty data
   const fetchFaculty = async () => {
     try {
       setLoading(true);
       const response = await axios.get("http://localhost:5000/api/faculty");
-      setFaculty(response.data);
-      setCurrentFaculty(response.data);
-      setFilteredFaculty(response.data);
+      const sortedFaculty = response.data.sort((a: Faculty, b: Faculty) => b.docs_count - a.docs_count);
+      setFaculty(sortedFaculty);
+      setCurrentFaculty(sortedFaculty);
+      setFilteredFaculty(sortedFaculty);
     } catch (err) {
       setError("Failed to fetch faculty data");
       console.error("Error:", err);
@@ -43,13 +43,14 @@ const FacultyListPage: React.FC = () => {
     }
   };
 
-  // Fetch faculty based on timeframe
   const fetchFacultyByTimeframe = async (selectedTimeframe: string) => {
     setTimeframe(selectedTimeframe);
+
     if (selectedTimeframe === "none") {
       setDocsInTimeframeMap({});
-      setFilteredFaculty(faculty);
-      setCurrentFaculty(faculty);
+      const sorted = [...faculty].sort((a, b) => b.docs_count - a.docs_count);
+      setFilteredFaculty(sorted);
+      setCurrentFaculty(sorted);
       return;
     }
 
@@ -63,10 +64,13 @@ const FacultyListPage: React.FC = () => {
 
       setDocsInTimeframeMap(docsMap);
 
-      const updatedFaculty = faculty.map(member => ({
-        ...member,
-        docs_in_timeframe: docsMap[member.scopus_id] ?? 0,
-      }));
+      const updatedFaculty = faculty
+        .map(member => ({
+          ...member,
+          docs_in_timeframe: docsMap[member.scopus_id] ?? 0,
+        }))
+        .filter(member => member.docs_in_timeframe > 0) // ✅ Exclude those with 0 papers in timeframe
+        .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
       setFilteredFaculty(updatedFaculty);
       setCurrentFaculty(updatedFaculty);
@@ -75,30 +79,31 @@ const FacultyListPage: React.FC = () => {
     }
   };
 
-  // Fetch faculty with <4 papers in the past year
   const fetchLowPaperFaculty = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/faculty/low-papers");
 
-      const updatedFaculty = response.data.map((member: Faculty) => ({
-        ...member,
-        docs_in_timeframe: member.timeframe_docs,
-      }));
+      const updatedFaculty = response.data
+        .map((member: Faculty) => ({
+          ...member,
+          docs_in_timeframe: member.timeframe_docs,
+        }))
+        .filter(member => member.docs_in_timeframe > 0) // ✅ Exclude 0 paper entries
+        .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
       setFilteredFaculty(updatedFaculty);
-      setCurrentFaculty(updatedFaculty); // Ensure this becomes the base for searching
+      setCurrentFaculty(updatedFaculty);
     } catch (error) {
       console.error("Error fetching faculty with low papers:", error);
     }
   };
 
-  // Handle search input
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
 
     if (query === "") {
-      setFilteredFaculty(currentFaculty); // Restore latest filter
+      setFilteredFaculty(currentFaculty);
       return;
     }
 
@@ -151,7 +156,7 @@ const FacultyListPage: React.FC = () => {
             <button
               onClick={() => {
                 setSearchQuery("");
-                setFilteredFaculty(currentFaculty); // Restore latest filter
+                setFilteredFaculty(currentFaculty);
               }}
               style={{
                 position: "absolute",
