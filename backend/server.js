@@ -156,7 +156,7 @@ app.get('/api/faculty', (req, res) => {
     }
     
     console.log(`Returned ${results.length} faculty records`);
-    res.json(results);
+    //res.json(results);
   });
 });
 
