@@ -96,47 +96,50 @@ app.get("/api/publications", (req, res) => {
 
 
 // Get top author in a given timeframe
-app.get("/api/top-author", (req, res) => {
-  const { months } = req.query;
+app.get('/api/top-author', (req, res) => {
+  const { timeframe } = req.query;
 
-  // Validate 'months' parameter
-  if (!months || isNaN(months)) {
-    return res.status(400).json({ error: "Invalid months parameter" });
+  let startDate = '';
+  let endDate = 'CURDATE()';
+
+  if (timeframe === '6m') {
+    startDate = 'DATE_SUB(NOW(), INTERVAL 6 MONTH)';
+  } else if (timeframe === '1y') {
+    startDate = 'DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+  } else if (timeframe === '2y') {
+    startDate = 'DATE_SUB(NOW(), INTERVAL 24 MONTH)';
+  } else {
+    return res.status(400).json({ error: 'Invalid timeframe. Use 6m, 1y, or 2y.' });
   }
 
-  // SQL query to find authors with the most publications in the given timeframe
   const query = `
-    SELECT 
-      u.scopus_id, 
-      u.name, 
-      (SELECT COUNT(*) FROM papers WHERE scopus_id = u.scopus_id) AS total_docs,
-      COUNT(p.scopus_id) AS timeframe_docs
-    FROM users u
-    LEFT JOIN papers p ON u.scopus_id = p.scopus_id 
-      AND p.date >= DATE_SUB(CURRENT_DATE, INTERVAL ? MONTH)
-      AND p.date <= CURRENT_DATE  -- Ensure papers are not from the future
-    GROUP BY u.scopus_id, u.name
-    ORDER BY timeframe_docs DESC;
+    WITH author_counts AS (
+      SELECT 
+        u.scopus_id, 
+        u.name, 
+        COUNT(p.scopus_id) AS timeframe_docs
+      FROM users u
+      JOIN papers p ON u.scopus_id = p.scopus_id 
+        AND p.date >= ${startDate}
+        AND p.date <= ${endDate}
+      GROUP BY u.scopus_id, u.name
+    ),
+    max_count AS (
+      SELECT MAX(timeframe_docs) AS max_pub FROM author_counts
+    )
+    SELECT * 
+    FROM author_counts
+    WHERE timeframe_docs = (SELECT max_pub FROM max_count);
   `;
 
-  // Execute the query with parameterized values
-  db.query(query, [months], (err, results) => {
+  db.query(query, (err, results) => {
     if (err) {
-      console.error("Error fetching top author:", err);
-      return res.status(500).json({ error: "Failed to retrieve top authors" });
+      console.error('Error fetching top authors:', err);
+      return res.status(500).json({ error: 'Failed to fetch top authors' });
     }
 
-    if (results.length === 0) {
-      return res.json({ message: "No publications found in the selected period" });
-    }
-
-    // Get the highest number of publications in the timeframe
-    const maxDocs = results[0].timeframe_docs;
-
-    // Filter authors who have the highest count
-    const topAuthors = results.filter(author => author.timeframe_docs === maxDocs);
-
-    res.json(topAuthors);
+    res.json(results); // return all top authors
+    console.log(results);
   });
 });
 
