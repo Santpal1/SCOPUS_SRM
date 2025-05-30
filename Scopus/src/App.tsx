@@ -6,6 +6,8 @@ import FacultyListPage from "./pages/FacultyListPage";
 import HeroSection from "./pages/HeroSection";
 import HomePage from "./pages/HomePage";
 import ResearchDashboard from "./pages/ResearchDashboard";
+import PaperDetailPage from "./pages/PaperDetailPage"; 
+import AnalyticsPage from './pages/AnalyticsPage';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +19,8 @@ const App: React.FC = () => {
         <Route path="/dashboard" element={<ResearchDashboard />}></Route>
         <Route path="/faculty" element={<FacultyListPage />}></Route>
         <Route path="/faculty/:scopusId" element={<FacultyDetailPage />}></Route>
+        <Route path="/paper/:doi" element={<PaperDetailPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </Routes>
   );
 };
