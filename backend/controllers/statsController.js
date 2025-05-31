@@ -1,7 +1,6 @@
 const db = require('../config/db');
 
 exports.getPublicationStats = (req, res) => {
-<<<<<<< HEAD
     const { timeframe } = req.query;
 
     let startDate;
@@ -11,17 +10,6 @@ exports.getPublicationStats = (req, res) => {
     else return res.status(400).json({ error: 'Invalid timeframe' });
 
     const query = `
-=======
-  const { timeframe } = req.query;
-
-  let startDate;
-  if (timeframe === '6m') startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), '%Y-%m')";
-  else if (timeframe === '1y') startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR), '%Y-%m')";
-  else if (timeframe === '2y') startDate = "DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 YEAR), '%Y-%m')";
-  else return res.status(400).json({ error: 'Invalid timeframe' });
-
-  const query = `
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6
     SELECT DATE_FORMAT(date, '%Y-%m') AS month, COUNT(*) AS count
     FROM papers
     WHERE DATE_FORMAT(date, '%Y-%m') BETWEEN ${startDate} AND DATE_FORMAT(CURDATE(), '%Y-%m')
@@ -46,24 +34,6 @@ exports.getTopAuthor = (req, res) => {
     else return res.status(400).json({ error: 'Invalid timeframe' });
 
     const query = `
-=======
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Failed to fetch data' });
-    res.json(results);
-  });
-};
-
-exports.getTopAuthor = (req, res) => {
-  const { timeframe } = req.query;
-
-  let startDate;
-  if (timeframe === '6m') startDate = 'DATE_SUB(NOW(), INTERVAL 6 MONTH)';
-  else if (timeframe === '1y') startDate = 'DATE_SUB(NOW(), INTERVAL 12 MONTH)';
-  else if (timeframe === '2y') startDate = 'DATE_SUB(NOW(), INTERVAL 24 MONTH)';
-  else return res.status(400).json({ error: 'Invalid timeframe' });
-
-  const query = `
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6
     WITH author_counts AS (
       SELECT u.scopus_id, u.name, COUNT(p.scopus_id) AS timeframe_docs
       FROM users u
@@ -77,16 +47,8 @@ exports.getTopAuthor = (req, res) => {
     SELECT * FROM author_counts WHERE timeframe_docs = (SELECT max_pub FROM max_count);
   `;
 
-<<<<<<< HEAD
     db.query(query, (err, results) => {
         if (err) return res.status(500).json({ error: 'Failed to fetch top authors' });
         res.json(results);
     });
 };
-=======
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Failed to fetch top authors' });
-    res.json(results);
-  });
-};
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6

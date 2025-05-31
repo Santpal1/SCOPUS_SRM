@@ -35,8 +35,4 @@ for country in sorted(unique_countries):
 
 # Cleanup
 cursor.close()
-<<<<<<< HEAD
 conn.close()
-=======
-conn.close()
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6

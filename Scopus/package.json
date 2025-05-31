@@ -11,29 +11,17 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
-<<<<<<< HEAD
     "chart.js": "^4.4.9",
-=======
-    "d3-scale": "^4.0.2",
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.482.0",
-<<<<<<< HEAD
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0",
     "react-simple-maps": "^3.0.0",
     "react-tooltip": "^5.20.0",
-=======
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.3.0",
-    "react-simple-maps": "^3.0.0",
-    "react-tooltip": "^5.28.1",
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6
     "recharts": "^2.15.1",
     "scopus": "file:",
     "three": "^0.174.0",

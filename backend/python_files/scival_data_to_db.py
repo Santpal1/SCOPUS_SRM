@@ -64,8 +64,4 @@ for _, row in df.iterrows():
 
 conn.commit()
 cursor.close()
-<<<<<<< HEAD
 conn.close()
-=======
-conn.close()
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6

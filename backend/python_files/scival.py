@@ -35,8 +35,4 @@ def filter_excel_by_scopus_ids(excel_path, output_path):
     print(f"✅ Filtered data saved to: {output_path}")
 
 # Usage
-<<<<<<< HEAD
 filter_excel_by_scopus_ids('scival.xlsx', 'filtered_output.xlsx')
-=======
-filter_excel_by_scopus_ids('scival.xlsx', 'filtered_output.xlsx')
->>>>>>> 7df1d0bda94d9910207082cd8e6f29ae7991f0e6
