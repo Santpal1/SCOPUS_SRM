@@ -8,6 +8,8 @@ import HeroSection from "./pages/HeroSection";
 import HomePage from "./pages/HomePage";
 import PaperDetailPage from "./pages/PaperDetailPage";
 import ResearchDashboard from "./pages/ResearchDashboard";
+import PaperDetailPage from "./pages/PaperDetailPage"; 
+import AnalyticsPage from './pages/AnalyticsPage';
 
 const App: React.FC = () => {
   return (
