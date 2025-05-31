@@ -30,7 +30,6 @@ exports.getPublicationStats = (req, res) => {
     ORDER BY month ASC;
   `;
 
-<<<<<<< HEAD
     db.query(query, (err, results) => {
         if (err) return res.status(500).json({ error: 'Failed to fetch data' });
         res.json(results);
