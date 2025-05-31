@@ -29,7 +29,7 @@ const GlobalCollabMap: React.FC = () => {
         return res.json();
       })
       .then(apiData => {
-        console.log('API data:', apiData);
+        
         setData(apiData);
       })
       .catch(err => {
@@ -47,7 +47,7 @@ const GlobalCollabMap: React.FC = () => {
           ?.map((geo: any) => geo.properties.name)  // note 'name' lowercase here!
           .filter((name: any) => !!name)
           .map((name: string) => name.toLowerCase()) || [];
-        console.log('GeoJSON country names sample:', names.slice(0, 20));
+        
         setGeoNames(names);
       })
       .catch(err => {
@@ -75,7 +75,7 @@ const GlobalCollabMap: React.FC = () => {
       // Check manual mapping first
       if (manualMapping[cLower]) {
         map[cLower] = manualMapping[cLower];
-        console.log(`Manually mapped "${country}" to "${map[cLower]}"`);
+        
         return;
       }
 
@@ -90,7 +90,7 @@ const GlobalCollabMap: React.FC = () => {
         }
       }
       map[cLower] = bestMatch;
-      console.log(`Auto-mapped "${country}" to "${bestMatch}" with score ${bestScore}`);
+      
     });
 
     setMapping(map);
