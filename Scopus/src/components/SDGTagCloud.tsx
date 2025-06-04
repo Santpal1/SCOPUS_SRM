@@ -13,11 +13,20 @@ interface ChartData {
     number: string;
 }
 
+type HoverButtonProps = {
+  activeView: string; // or a union like 'detailed' | 'summary'
+  handleClick: () => void;
+};
+
+
 const SDGInsightsDashboard: React.FC = () => {
     const [data, setData] = useState<SDGData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeView, setActiveView] = useState<'overview' | 'detailed'>('overview');
+     const [hoveredButton, setHoveredButton] = useState<'overview' | 'detailed' | null>(null);
+     const [hoveredButton1, setHoveredButton1] = useState<string | null>(null);
+
 
     // Improved SDG color mapping with official UN colors and better descriptions
     const sdgInfo: { [key: string]: { color: string; title: string; description: string; number: string } } = {
@@ -140,271 +149,331 @@ const SDGInsightsDashboard: React.FC = () => {
     const unspecifiedProjects = data['-'] || 0;
 
     return (
-        <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden">
-            {/* Subtle background elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-500/5 rounded-full blur-2xl"></div>
+    <div style = {{borderRadius: '16px',
+            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.4)',
+            boxSizing: 'border-box', padding : '20px', margin:'20px'}}  className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden">
+      {/* Subtle Blurred Background Decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-500/5 rounded-full blur-2xl"></div>
+      </div>
+
+      {/* Foreground Content */}
+      <div className="relative z-10">
+        {/* Header & Toggle */}
+        <div className="mb-8">
+          <div style = {{padding: '30px'}} className="flex items-center justify-between flex-wrap gap-4 mb-6">
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-2">SDG Impact Overview</h2>
+              <p className="text-slate-400 text-lg">Sustainable Development Goals Distribution</p>
             </div>
+            <div className="flex bg-slate-800/80 backdrop-blur-sm rounded-2xl p-1.5 border border-slate-700">
+               <button
+      onClick={() => setActiveView("overview")}
+      onMouseEnter={() => setHoveredButton("overview")}
+      onMouseLeave={() => setHoveredButton(null)}
+      style={{
+        padding: "12px 24px",
+        fontSize: "18px",
+        backgroundColor: activeView === "overview" ? '#4caf50' : 'white',
+        color: activeView === "overview" ? "white" : '#4caf50',
+        boxShadow: '0 8px 16px rgba(251, 1, 1, 0.08)',
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+        transition: "background 0.3s ease, transform 0.2s ease",
+        transform:
+          hoveredButton === "overview"
+            ? "scale(1.05)"
+            : "scale(1)",
+        margin: '40px',
+      }}
+      className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+        activeView === "overview"
+          ? "bg-blue-600 text-white shadow-lg"
+          : "text-slate-300 hover:text-white hover:bg-slate-700"
+      }`}
+    >
+      Overview
+    </button>
 
-            {/* Content */}
-            <div className="relative z-10">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-4xl font-bold text-white mb-2">
-                                SDG Impact Overview
-                            </h2>
-                            <p className="text-slate-400 text-lg">Sustainable Development Goals Distribution</p>
-                        </div>
+              <button
+      onClick={() => setActiveView("detailed")}
+      onMouseEnter={() => setHoveredButton("detailed")}
+      onMouseLeave={() => setHoveredButton(null)}
+      style={{
+        padding: "12px 24px",
+        fontSize: "18px",
+        backgroundColor: activeView === "detailed" ? '#4caf50' : 'white',
+        color: activeView === "detailed" ? "white" : '#4caf50',
+        boxShadow: '0 8px 16px rgba(251, 1, 1, 0.08)',
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer",
+        transition: "background 0.3s ease, transform 0.2s ease",
+        transform:
+          hoveredButton === "detailed"
+            ? "scale(1.05)"
+            : "scale(1)",
+        margin: '40px',
+      }}
+      className={`rounded-xl font-semibold transition-transform duration-300 ${
+        activeView === "detailed"
+          ? "bg-blue-600 text-white shadow-lg"
+          : "text-slate-300 hover:text-white hover:bg-slate-700"
+      }`}
+    >
+      Detailed
+    </button>
 
-                        <div className="flex bg-slate-800/80 backdrop-blur-sm rounded-2xl p-1.5 border border-slate-700">
-                            <button
-                                onClick={() => setActiveView('overview')}
-                                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${activeView === 'overview'
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'text-slate-300 hover:text-white hover:bg-slate-700'
-                                    }`}
-                            >
-                                Overview
-                            </button>
-                            <button
-                                onClick={() => setActiveView('detailed')}
-                                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${activeView === 'detailed'
-                                        ? 'bg-blue-600 text-white shadow-lg'
-                                        : 'text-slate-300 hover:text-white hover:bg-slate-700'
-                                    }`}
-                            >
-                                Detailed
-                            </button>
-                        </div>
+
+            </div>
+          </div>
+
+          {/* Key Metrics */}
+          <div style={{display: 'flex', flexWrap: 'wrap', gap: '280px'}} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Total Projects",
+                value: totalProjects,
+                percent: 100,
+                color: "blue",
+                border: "2px solid black",
+                barColor: "bg-blue-500",
+              },
+              {
+                title: "SDG Aligned",
+                value: specifiedProjects,
+                percent: (specifiedProjects / totalProjects) * 100,
+                color: "emerald",
+                barColor: "bg-emerald-500",
+              },
+              {
+                title: "Unspecified",
+                value: unspecifiedProjects,
+                percent: (unspecifiedProjects / totalProjects) * 100,
+                color: "amber",
+                barColor: "bg-amber-500",
+              },
+            ].map(({ title, value, percent, color, barColor }) => (
+              <div
+  onMouseEnter={() => setHoveredButton1(title)}
+  onMouseLeave={() => setHoveredButton1(null)}
+  style={{
+    border: '2px solid black',
+    width: '350px',
+    
+    marginBottom: '15px',
+    fontSize: '1.5rem',
+    color: '#123a5b',
+    borderBottom: '3px solid #1a3d6c',
+    paddingBottom: '8px',
+    fontWeight: '700',
+    letterSpacing: '0.04em',
+    borderRadius: '10px',
+    padding: '10px',
+    backgroundColor: '#d0e6fb',
+    boxShadow:
+      hoveredButton1 === title
+        ? '0 8px 16px rgba(18, 75, 124, 0.5)'
+        : '0 2px 5px rgba(18, 75, 124, 0.4)',
+    transform: hoveredButton1 === title ? 'scale(1.05)' : 'scale(1)',
+    transition: 'all 0.3s ease',
+  }}
+  key={title}
+  className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-slate-600 transition-all duration-300"
+>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-slate-400 text-sm font-medium mb-2">{title} : {value.toLocaleString()}</div>
+                    {/* <div className="text-3xl font-bold text-white mb-1">{value.toLocaleString()}</div> */}
+                    {title !== "Total Projects" && (
+                      <p className={`text-${color}-400 text-sm font-medium`}>
+                        {percent.toFixed(1)}% of total
+                      </p>
+                    )}
+                    <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2">
+                      <div className={`${barColor} h-1.5 rounded-full`} style={{ width: `${percent}%` }}></div>
                     </div>
-
-                    {/* Key Metrics */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-slate-600 transition-all duration-300">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-slate-400 text-sm font-medium mb-2">Total Projects</p>
-                                    <p className="text-3xl font-bold text-white mb-1">{totalProjects.toLocaleString()}</p>
-                                    <div className="w-full bg-slate-700 rounded-full h-1.5">
-                                        <div className="bg-blue-500 h-1.5 rounded-full w-full transition-all duration-1000"></div>
-                                    </div>
-                                </div>
-                                <div className="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center border border-blue-500/30">
-                                    <div className="w-6 h-6 bg-blue-500 rounded-lg"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-slate-600 transition-all duration-300">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-slate-400 text-sm font-medium mb-2">SDG Aligned</p>
-                                    <p className="text-3xl font-bold text-white mb-1">{specifiedProjects.toLocaleString()}</p>
-                                    <p className="text-emerald-400 text-sm font-medium">{((specifiedProjects / totalProjects) * 100).toFixed(1)}% of total</p>
-                                    <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2">
-                                        <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${(specifiedProjects / totalProjects) * 100}%` }}></div>
-                                    </div>
-                                </div>
-                                <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl flex items-center justify-between border border-emerald-500/30">
-                                    <div className="w-6 h-6 bg-emerald-500 rounded-lg mx-auto"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-slate-600 transition-all duration-300">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-slate-400 text-sm font-medium mb-2">Unspecified</p>
-                                    <p className="text-3xl font-bold text-white mb-1">{unspecifiedProjects.toLocaleString()}</p>
-                                    <p className="text-amber-400 text-sm font-medium">{((unspecifiedProjects / totalProjects) * 100).toFixed(1)}% of total</p>
-                                    <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2">
-                                        <div className="bg-amber-500 h-1.5 rounded-full transition-all duration-1000" style={{ width: `${(unspecifiedProjects / totalProjects) * 100}%` }}></div>
-                                    </div>
-                                </div>
-                                <div className="w-14 h-14 bg-amber-500/20 rounded-2xl flex items-center justify-center border border-amber-500/30">
-                                    <div className="w-6 h-6 bg-amber-500 rounded-lg"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  </div>
+                  <div
+                    className={`w-14 h-14 bg-${color}-500/20 rounded-2xl flex items-center justify-center border border-${color}-500/30`}
+                  >
+                    <div className={`w-6 h-6 ${barColor} rounded-lg`}></div>
+                  </div>
                 </div>
-
-                {/* Charts */}
-                {activeView === 'overview' ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Top SDGs Bar Chart */}
-                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
-                            <h3 className="text-xl font-bold text-white mb-6 flex items-center">
-                                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                                    <div className="w-4 h-4 bg-white rounded-sm"></div>
-                                </div>
-                                Top Performing SDGs
-                            </h3>
-                            <div className="bg-slate-900/50 rounded-2xl p-4">
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={chartData.slice(0, 8)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                                        <XAxis
-                                            dataKey="name"
-                                            stroke="#94A3B8"
-                                            fontSize={11}
-                                            angle={-45}
-                                            textAnchor="end"
-                                            height={60}
-                                        />
-                                        <YAxis stroke="#94A3B8" fontSize={11} />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#1E293B',
-                                                border: '1px solid #334155',
-                                                borderRadius: '12px',
-                                                color: '#F8FAFC'
-                                            }}
-                                            formatter={(value: any, name: any, props: any) => [
-                                                `${value} projects`,
-                                                props.payload.description
-                                            ]}
-                                        />
-                                        <Bar
-                                            dataKey="value"
-                                            radius={[4, 4, 0, 0]}
-                                            fill={(entry: any) => entry.color}
-                                        >
-                                            {chartData.slice(0, 8).map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-
-                        {/* Distribution Pie Chart */}
-                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
-                            <h3 className="text-xl font-bold text-white mb-6 flex items-center">
-                                <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
-                                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                                </div>
-                                SDG Distribution
-                            </h3>
-                            <div className="bg-slate-900/50 rounded-2xl p-4">
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={chartData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={110}
-                                            paddingAngle={1}
-                                            dataKey="value"
-                                            stroke="#1E293B"
-                                            strokeWidth={2}
-                                        >
-                                            {chartData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#1E293B',
-                                                border: '1px solid #334155',
-                                                borderRadius: '12px',
-                                                color: '#F8FAFC'
-                                            }}
-                                            formatter={(value: any, name: any, props: any) => [
-                                                `${value} projects`,
-                                                props.payload.description
-                                            ]}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="mt-4 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                                {chartData.slice(0, 8).map((entry, index) => (
-                                    <div key={index} className="flex items-center group cursor-pointer p-2 rounded-lg hover:bg-slate-700/50 transition-colors duration-200">
-                                        <div
-                                            className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
-                                            style={{ backgroundColor: entry.color }}
-                                        ></div>
-                                        <span className="text-slate-300 text-xs font-medium truncate">
-                                            SDG {entry.number}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    /* Detailed View */
-                    <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
-                        <h3 className="text-xl font-bold text-white mb-8 flex items-center">
-                            <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center mr-3">
-                                <div className="w-4 h-4 bg-white rounded-sm"></div>
-                            </div>
-                            Complete SDG Breakdown
-                        </h3>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {Object.entries(data)
-                                .sort(([, a], [, b]) => b - a)
-                                .map(([sdg, count]) => (
-                                    <div
-                                        key={sdg}
-                                        className="group bg-slate-900/50 rounded-2xl p-4 border border-slate-700 hover:border-slate-600 transition-all duration-300 hover:shadow-lg"
-                                    >
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex-1">
-                                                <div className="flex items-center mb-1">
-                                                    <div
-                                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0"
-                                                        style={{ backgroundColor: sdgInfo[sdg]?.color || '#64748B' }}
-                                                    >
-                                                        {sdgInfo[sdg]?.number || '?'}
-                                                    </div>
-                                                    <p className="font-semibold text-white text-sm leading-tight">
-                                                        {sdgInfo[sdg]?.title || 'Unknown'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <div className="flex items-end justify-between">
-                                                <div>
-                                                    <p className="text-2xl font-bold text-white">{count}</p>
-                                                    <p className="text-slate-400 text-xs">
-                                                        {((count / totalProjects) * 100).toFixed(1)}% of total
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
-                                                <div
-                                                    className="h-full transition-all duration-1000 rounded-full"
-                                                    style={{
-                                                        width: `${(count / Math.max(...Object.values(data))) * 100}%`,
-                                                        backgroundColor: sdgInfo[sdg]?.color || '#64748B'
-                                                    }}
-                                                ></div>
-                                            </div>
-
-                                            <div className="text-xs text-slate-500 leading-tight">
-                                                {sdgInfo[sdg]?.description || 'No description available'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                        </div>
-                    </div>
-                )}
-            </div>
+              </div>
+            ))}
+          </div>
         </div>
-    );
-};
 
+        {/* Main Chart Section */}
+        {activeView === "overview" ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" >
+            {/* Bar Chart */}
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
+              <h3 style = {{margin : '50px', marginLeft : '700px'}}className="text-xl font-bold text-white mb-6 flex items-center">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                  <div className="w-4 h-4 bg-white rounded-sm"></div>
+                </div>
+                TOP PERFORMING SDGs
+              </h3>
+              <div className="bg-slate-900/50 rounded-2xl p-4">
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={chartData.slice(0, 8)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} angle={-45} textAnchor="end" height={60} />
+                    <YAxis stroke="#94A3B8" fontSize={11} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "white",
+                        border: "3px solid #e1ebf5",
+                        borderRadius: "12px",
+                        color: "red",
+                      }}
+                      formatter={(value: any, name: any, props: any) => [`${value} projects`, props.payload.description]}
+                    />
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                      {chartData.slice(0, 8).map((entry, index) => (
+                        <Cell key={`bar-cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Pie Chart */}
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
+              <h3 style = {{margin :'30px', marginLeft:'735px', fontStyle:'25px'}}className="text-xl font-bold text-white mb-6 flex items-center">
+                <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                  <div className="w-4 h-4 bg-white rounded-full"></div>
+                </div>
+                SDG DISTRIBUTION
+              </h3>
+              <div className="bg-slate-900/50 rounded-2xl p-4">
+                <ResponsiveContainer width="100%" height={510}>
+                  <PieChart style>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={0}
+                      outerRadius={250}
+                      paddingAngle={0}
+                      dataKey="value"
+                      stroke="white"
+                      strokeWidth={1.5}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`pie-cell-${index}`} fill={entry.color}/>
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+          backgroundColor: "#ffffff",
+          border: "1px solid #cbd5e1",
+          borderRadius: "10px",
+          boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
+          padding: "12px 16px",
+        }}
+                      formatter={(value: any, name: any, props: any) => [`${value} projects`, props.payload.description]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div style = {{flex: '1 1 50%',
+                    display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+  gap: '60px',
+  alignContent: 'start', // aligns grid rows vertically
+  justifyContent: 'center', // center grid items horizontally
+  margin: '35px',
+  marginTop: '50px',
+  maxHeight: '500px',
+  overflowY: 'auto',
+  padding: '1rem'}}className="mt-4 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                {chartData.slice(0, 8).map((entry, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center group cursor-pointer p-2 rounded-lg hover:bg-slate-700/50 transition-colors duration-200"
+                  >
+                    <span className="w-3 h-3 rounded-full mr-2 flex-shrink-0" style={{ backgroundColor: entry.color, borderRadius: '6px' }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span className="text-slate-300 text-xs font-medium truncate">&nbsp;&nbsp;&nbsp;&nbsp;SDG {entry.number}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Detailed Breakdown View */
+          <div className="bg-slate-800/60 backdrop-blur-md rounded-3xl p-8 border border-slate-700 shadow-md">
+  <h3  style = {{margin : '30px', marginLeft : '620px', fontSize: '28px', color: '#124b7c'}}className="text-2xl font-bold text-white mb-10 flex items-center">
+    <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center mr-4">
+      <div className="w-4 h-4 bg-white rounded-sm"></div>
+    </div>
+    COMPLETE SDG BREAKDOWN
+  </h3>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {Object.entries(data)
+      .sort(([, a], [, b]) => b - a)
+      .map(([sdg, count]) => (
+        <div onMouseEnter={() => setHoveredButton1(sdg)}
+  onMouseLeave={() => setHoveredButton1(null)} style ={{backgroundColor: '#e1ebf5' ,margin : '5px', marginBottom : '30px', borderRadius: '20px',  boxShadow:
+      hoveredButton1 === sdg
+        ? '0 8px 16px rgba(18, 75, 124, 0.5)'
+        : '0 2px 5px rgba(18, 75, 124, 0.4)', transform: hoveredButton1 === sdg ? 'scale(1.01)' : 'scale(1)', transition: 'all 0.3s ease'}} 
+          key={sdg}
+          className="group bg-slate-900/60 rounded-2xl p-5 border border-slate-700 hover:border-slate-500 hover:shadow-xl transition-all duration-300 ease-in-out"
+        >
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center">
+              <div
+                className="w-9 h-9 rounded-md flex items-center justify-center text-white text-sm font-bold mr-3 shadow-sm"
+                style={{ backgroundColor: "#2d5791", borderTopLeftRadius: '20px' , borderTopRightRadius : '20px', padding : '12px', color:"white", fontSize: '18px'}}
+              >
+                    SDG {sdgInfo[sdg]?.number || "?"}
+              </div>
+              <button style = {{color: 'white',marginTop : '15px', margin : '8px', borderRadius: '8px', padding : '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900"}} className="font-semibold text-white text-sm leading-snug">
+                {sdgInfo[sdg]?.title || "Unknown"} : {count}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-end justify-between">
+              <div >
+                {/* <p className="text-2xl font-bold text-white">{count}</p> */}
+                <button style = {{color: 'white', margin : '8px', borderRadius: '8px', padding : '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900"}} className="text-slate-400 text-xs">
+                  {((count / totalProjects) * 100).toFixed(1)}% of total
+                </button>
+              </div>
+            </div>
+
+            <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+              <div
+                className="h-full transition-all duration-1000 rounded-full"
+                style={{
+                  width: `${(count / Math.max(...Object.values(data))) * 100}%`,
+                  backgroundColor: sdgInfo[sdg]?.color || "#64748B",
+                }}
+              ></div>
+            </div>
+
+            <button style = {{color: 'white',margin : '8px', borderRadius: '8px', padding : '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900", marginBottom: '15px'}} className="text-xs text-slate-400 leading-relaxed">
+              {sdgInfo[sdg]?.description || "No description available"}
+            </button>
+          </div>
+        </div>
+      ))}
+  </div>
+</div>
+
+        )}
+      </div>
+    </div>
+  );
+};
 export default SDGInsightsDashboard;
