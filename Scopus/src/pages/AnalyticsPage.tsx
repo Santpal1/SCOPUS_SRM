@@ -5,8 +5,8 @@ import SDGTagCloud from '../components/SDGTagCloud';
 
 const AnalyticsPage: React.FC = () => {
     return (
-        <div style={{ padding: 20 }}>
-            <h1>Analytics Dashboard</h1>
+        <div style={{ padding: 40 }}>
+            <h1 style={{marginLeft: 550, fontSize:50, color: '#2980b9'}}>ANALYTICS DASHBOARD</h1>
             <section style={{ marginBottom: 40 }}>
                 <GlobalCollabMap />
             </section>
@@ -14,7 +14,7 @@ const AnalyticsPage: React.FC = () => {
                 <SDGPieChart />
             </section>
             <section className="mt-6">
-                <h2 className="text-xl font-semibold mb-4">SDG Tag Cloud</h2>
+                <h2 style={{marginLeft: 720, fontSize : 40 ,color : "#2980b9"}} className="text-xl font-semibold mb-4">SDG TAG CLOUD</h2>
                 <SDGTagCloud />
             </section>
         </div>
