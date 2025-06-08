@@ -41,7 +41,7 @@ export default function ResearchDashboard() {
     try {
       const response = await axios.get(`http://localhost:5000/api/top-author?timeframe=${selectedTimeframe}`);
       const data = response.data;
-  
+
       if (Array.isArray(data) && data.length > 0) {
         setTopAuthors(data); // correctly store the array
       } else {
@@ -52,7 +52,7 @@ export default function ResearchDashboard() {
       setTopAuthors([]);
     }
   };
-  
+
 
   useEffect(() => {
     fetchTopAuthors(timeframe);
@@ -110,9 +110,9 @@ export default function ResearchDashboard() {
   const barWidth = getBarWidth();
   const barSpacing = getBarSpacing();
 
-// Extract Author Names & Shared Publication Count
-const authorNames = topAuthors.map(author => author.name).join(", ");
-const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : null;
+  // Extract Author Names & Shared Publication Count
+  const authorNames = topAuthors.map(author => author.name).join(", ");
+  const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : null;
 
 
   return (
@@ -139,32 +139,35 @@ const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : 
 
         {/* Top Authors Section */}
         <div className={style.topAuthor}>
-  <h3>
-    Top {topAuthors.length > 1 ? "Authors" : "Author"} (
-    {{
-      "6m": "Last 6 Months",
-      "1y": "Last 1 Year",
-      "2y": "Last 2 Years"
-    }[timeframe]}
-    ): {authorNames || "No data available"}{" "}
-    {publicationCount ? `(${publicationCount} publications)` : ""}
-  </h3>
-</div>
+          <h3>
+            Top {topAuthors.length > 1 ? "Authors" : "Author"} (
+            {{
+              "6m": "Last 6 Months",
+              "1y": "Last 1 Year",
+              "2y": "Last 2 Years"
+            }[timeframe]}
+            ): {authorNames || "No data available"}{" "}
+            {publicationCount ? `(${publicationCount} publications)` : ""}
+          </h3>
+        </div>
 
 
         {/* Chart Container */}
         <div className={style.chartContainer}>
-          <h3 className={style.chartTitle}>Research Publications</h3>
+          <h3 className={style.chartTitle}>Research Publications Overview</h3>
           <div className={style.chartBox}>
             <svg width="100%" height={chartHeight + 50} viewBox={`0 0 1100 ${chartHeight + 100}`}>
               {/* Y-axis */}
-              <line x1="80" y1="20" x2="80" y2={chartHeight} stroke="black" strokeWidth="2" />
-              <text x="20" y={chartHeight / 2} transform="rotate(-90, 20, 150)" fontSize="14" textAnchor="middle" fontWeight="bold">
+              <line x1="80" y1="20" x2="80" y2={chartHeight} stroke="black" strokeWidth="3" />
+              <text x="20" y={chartHeight / 2} transform="rotate(-90, 15, 150)" fontSize="16" textAnchor="middle" fontWeight="bold">
                 No. of Publications
               </text>
 
               {/* X-axis */}
-              <line x1="80" y1={chartHeight} x2="1100" y2={chartHeight} stroke="black" strokeWidth="2" />
+              <line x1="80" y1={chartHeight} x2="1100" y2={chartHeight} stroke="black" strokeWidth="3" />
+              <text x="550" y={chartHeight + 60} fontSize="16" textAnchor="middle" fontWeight="bold">
+                Observation Period
+              </text>
 
               {/* Y-axis Labels */}
               {Array.from({ length: yTicks + 1 }).map((_, i) => {
@@ -172,8 +175,8 @@ const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : 
                 const yPosition = chartHeight - (yValue / maxPublications) * (chartHeight - 50);
                 return (
                   <g key={i}>
-                    <line x1="75" y1={yPosition} x2="80" y2={yPosition} stroke="black" strokeWidth="2" />
-                    <text x="60" y={yPosition + 5} fontSize="12" textAnchor="end">{yValue}</text>
+                    <line x1="75" y1={yPosition} x2="80" y2={yPosition} stroke="black" strokeWidth="3" />
+                    <text x="60" y={yPosition + 5} fontSize="16" textAnchor="end">{yValue}</text>
                   </g>
                 );
               })}
@@ -188,9 +191,9 @@ const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : 
                   <g key={data.month} onMouseEnter={() => setHoveredIndex(index)} onMouseLeave={() => setHoveredIndex(null)}>
                     <rect x={barX} y={yPosition} width={barWidth} height={barHeight} fill={hoveredIndex === index ? "#4CAF50" : "#2196F3"} />
                     {hoveredIndex === index && (
-                      <text x={barX + barWidth / 2} y={yPosition - 10} fontSize="18" textAnchor="middle">{data.count}</text>
+                      <text x={barX + barWidth / 2} y={yPosition - 10} fontSize="22" textAnchor="middle">{data.count}</text>
                     )}
-                    <text x={barX + barWidth / 2} y={chartHeight + 20} fontSize="14" textAnchor="middle">{formatLabel(data.month)}</text>
+                    <text x={barX + barWidth / 2} y={chartHeight + 20} fontSize="16" textAnchor="middle">{formatLabel(data.month)}</text>
                   </g>
                 );
               })}
@@ -219,10 +222,15 @@ const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : 
           </div>
         </div>
 
-        {/* Faculty List Button */}
-        <button className={style.facultyBtn} onClick={() => navigate("/faculty")}>
-          Go to Faculty List
-        </button>
+        <div className={style.buttonContainer}>
+          <button className={style.facultyBtn} onClick={() => navigate("/faculty")}>
+            Go to Faculty List
+          </button>
+
+          <button className={style.analyticsBtn} onClick={() => navigate("/analytics")}>
+            Go to Analytics Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );

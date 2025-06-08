@@ -70,7 +70,7 @@ const FacultyDetailPage: React.FC = () => {
 
   const { faculty, papers } = facultyData;
 
-  // 🎯 Generate PDF
+  //  Generate PDF
   const generatePDF = async () => {
     if (!facultyData) {
       alert('No data to generate PDF');
@@ -275,19 +275,26 @@ const FacultyDetailPage: React.FC = () => {
       <h3 className="publications-title">Publications</h3>
       {papers && papers.length > 0 ? (
         papers.map((paper, index) => (
-          <div key={paper.doi || `paper-${index}`} className="publication-card">
-            <h4>{paper.title}</h4>
-            <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
-            <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
-            <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
-            <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
-          </div>
+          <Link
+            to={`/paper/${encodeURIComponent(paper.doi)}`}
+            key={paper.doi || `paper-${index}`}
+            className="publication-card-link"
+          >
+            <div className="publication-card">
+              <h4>{paper.title}</h4>
+              <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
+              <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
+              <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
+              <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
+            </div>
+          </Link>
+
         ))
       ) : (
         <div className="no-records">No publications found for this faculty member.</div>
       )}
 
-      {/* 🔥 Embedded Highcharts Dashboard */}
+      {/*  Embedded Highcharts Dashboard */}
       <h3 className="publications-title">Interactive Scopus Dashboard</h3>
       <div className="highcharts-frame-container">
         <iframe

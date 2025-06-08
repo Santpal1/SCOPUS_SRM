@@ -88,6 +88,10 @@ p {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
+.publication-card-link{
+  text-decoration: none;
+}
+
 .publication-card h4 {
   margin: 5px 0;
   font-size: 18px;

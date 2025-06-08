@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getAllFaculty,
-  getFacultyPaperStats,
-  getLowPublishingFaculty,
-  getFacultyDetails
+    getAllFaculty,
+    getFacultyPaperStats,
+    getLowPublishingFaculty,
+    getFacultyDetails
 } = require('../controllers/facultyController');
 
 router.get('/', getAllFaculty);

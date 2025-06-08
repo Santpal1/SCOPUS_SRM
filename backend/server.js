@@ -11,6 +11,11 @@ app.use(bodyParser.json());
 app.use('/api', require('./routes/auth'));
 app.use('/api', require('./routes/publications'));
 app.use('/api/faculty', require('./routes/faculty'));
+app.use('/api', require('./routes/papers'));
+app.use('/api/insights', require('./routes/insights'));
+app.use('/api', require('./routes/sdg'));
+
+
 
 // Test API route
 app.get('/api/test', (req, res) => {
