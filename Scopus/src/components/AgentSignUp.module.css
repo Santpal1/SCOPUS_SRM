@@ -42,6 +42,10 @@ body {
     margin-left: 2rem;
 }
 
+a {
+    text-decoration: none;
+}
+
 .contactBtn {
     background-color: rgb(219, 217, 217);
     color: rgb(9, 9, 9);

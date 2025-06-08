@@ -52,7 +52,7 @@ const AgentLogin: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
-        <h1 className={styles.logo}>SRM SP</h1>
+        <a className={styles.logo} href="http://localhost:5173/">SRM SP</a>
       </div>
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>

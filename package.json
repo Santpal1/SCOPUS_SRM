@@ -20,6 +20,7 @@
     "scopus-srm": "file:"
   },
   "devDependencies": {
+    "@types/node": "^22.15.23",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.17"

@@ -95,6 +95,10 @@ body.reloading {
     }
 }
 
+a {
+    text-decoration: none;;
+}
+
 .facultyBtn {
     margin-top: 40px;
     padding: 12px 24px;
