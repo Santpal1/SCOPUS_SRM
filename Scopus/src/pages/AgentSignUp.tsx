@@ -35,14 +35,18 @@ const AgentSignUp: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
-        <h1 className={styles.logo}>SRM SP</h1>
+        <a className={styles.logo} href="http://localhost:5173/">
+          SRM SP
+        </a>
       </div>
 
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>
           <div className={styles.loginBox}>
             <h2 className={styles.loginTitle}>Agent Sign Up</h2>
-            <p className={styles.loginSubtitle}>Enter your details to sign in to your account</p>
+            <p className={styles.loginSubtitle}>
+              Enter your details to sign in to your account
+            </p>
 
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Username</label>
@@ -53,7 +57,9 @@ const AgentSignUp: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              {errors.username && <p className={styles.errorText}>{errors.username}</p>}
+              {errors.username && (
+                <p className={styles.errorText}>{errors.username}</p>
+              )}
             </div>
 
             <div className={styles.inputGroup}>
@@ -65,7 +71,9 @@ const AgentSignUp: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && <p className={styles.errorText}>{errors.email}</p>}
+              {errors.email && (
+                <p className={styles.errorText}>{errors.email}</p>
+              )}
             </div>
 
             <div className={styles.inputGroup}>
@@ -85,10 +93,14 @@ const AgentSignUp: React.FC = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </span>
               </div>
-              {errors.password && <p className={styles.errorText}>{errors.password}</p>}
+              {errors.password && (
+                <p className={styles.errorText}>{errors.password}</p>
+              )}
             </div>
 
-            {successMessage && <p className={styles.successText}>{successMessage}</p>}
+            {successMessage && (
+              <p className={styles.successText}>{successMessage}</p>
+            )}
 
             <button className={styles.signUpBtn} onClick={handleSignUp}>
               Sign Up

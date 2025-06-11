@@ -91,6 +91,10 @@ body.reloading {
     animation: slideDown 0.6s ease-in-out;
 }
 
+ a {
+    text-decoration: none;
+}
+
 @keyframes slideDown {
     from {
         transform: translateY(-50px);

@@ -27,6 +27,10 @@
   transition: all 0.3s ease, transform 0.2s ease;
 }
 
+a {
+  text-decoration: none;
+}
+
 .back-button:hover {
   background: linear-gradient(135deg, #163b4d, #1A4D6C);
   transform: translateY(-4px) scale(1.05);

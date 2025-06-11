@@ -119,7 +119,7 @@ export default function ResearchDashboard() {
     <div className={style.container}>
       {/* Navbar */}
       <div className={style.navbar}>
-        <h1 className={style.logo}>SRM SP</h1>
+        <a className={style.logo} href="http://localhost:5173/">SRM SP</a>
       </div>
 
       {/* Dashboard */}

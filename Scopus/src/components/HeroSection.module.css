@@ -118,6 +118,10 @@
     flex-wrap: wrap;
 }
 
+a {
+    text-decoration: none;
+}
+
 .textContainer {
     flex: 1;
     max-width: 50%;

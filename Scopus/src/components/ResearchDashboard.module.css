@@ -97,10 +97,18 @@ body.reloading {
     }
 }
 
+<<<<<<< HEAD
+a {
+    text-decoration: none;;
+}
+
+.facultyBtn {
+=======
 .buttonContainer {
     display: flex;
     justify-content: center;
     gap: 350px;
+>>>>>>> af3e08e026218c1902c03883802ea598c334d8b2
     margin-top: 40px;
 }
 
