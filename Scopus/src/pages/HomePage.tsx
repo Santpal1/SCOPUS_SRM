@@ -430,3 +430,4 @@ const FacultyLandingPage = () => {
 };
 
 export default FacultyLandingPage;
+

@@ -9,14 +9,10 @@
   --shadow: 0 4px 24px rgba(0, 97, 168, 0.08);
 }
 
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  background: var(--background);
-  box-sizing: border-box;
+.fullPageContainer {
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  background: var(--background);
+
   color: var(--primary);
 }
 
@@ -622,4 +618,7 @@ html, body {
     gap: 1.2rem;
     padding: 0 1rem;
   }
+
 }
+
+
