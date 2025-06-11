@@ -1,0 +1,620 @@
+:root {
+  --primary: #0061a8;
+  --secondary: #5fd0f3;
+  --accent: #ffe066;
+  --background: #f8fafc;
+  --white: #fff;
+  --gray: #e0e1dd;
+  --muted: #7b8fa1;
+  --shadow: 0 4px 24px rgba(0, 97, 168, 0.08);
+}
+
+.fullPageContainer {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  background: var(--background);
+  color: var(--primary);
+}
+
+.fullPageContainer {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;  
+}
+
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
+  padding: 1.2rem 3rem;
+  box-shadow: var(--shadow);
+  transition: background 0.3s;
+}
+
+.logo {
+  font-size: 2.2rem;
+  color: var(--accent);
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.navLinks {
+  display: flex;
+  gap: 2rem;
+  margin-left: 80rem;
+  margin-right: 2 rem;
+}
+
+.navLinks a {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 1.15rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navLinks a:hover {
+  color: var(--accent);
+}
+
+.authButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.login, .signup {
+  padding: 0.5rem 1.3rem;
+  border-radius: 24px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.login {
+  background: var(--white);
+  color: var(--primary);
+  border: 2px solid var(--accent);
+}
+
+.login:hover {
+  background: var(--accent);
+  color: var(--primary);
+}
+
+.signup {
+  background: var(--accent);
+  color: var(--primary);
+  border: 2px solid var(--accent);
+}
+
+.signup:hover {
+  background: var(--primary);
+  color: var(--accent);
+}
+
+/* HERO SECTION */
+.heroSection {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(120deg, var(--secondary) 0%, var(--background) 100%);
+  padding-top: 7rem; /* increased to offset navbar */
+  padding-bottom: 3rem;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* move content to top */
+}
+
+.heroSection h1 {
+  font-size: 3.1rem;
+  margin-top: 4rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+.heroSection p {
+  color: var(--muted);
+  font-size: 1.35rem;
+  max-width: 650px;
+  margin: 0 auto 2.5rem auto;
+  line-height: 1.6;
+}
+
+.srmLogo {
+  position: absolute;
+  top: 2rem;
+  right: 3rem;
+  width: 110px;
+  opacity: 0.97;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0, 97, 168, 0.12);
+}
+
+/* Faculty Images Section - moved down for spacing */
+.facultyImagesSection {
+  width: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 0 1.5rem 0;
+  margin-top: 2rem;
+}
+
+.facultyImages {
+  display: flex;
+  justify-content: center;
+  gap: 3.5rem;
+}
+
+.facultyImg {
+  width: 190px;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 7px solid var(--accent);
+  box-shadow: var(--shadow);
+  background: var(--white);
+  transition: transform 0.3s;
+}
+
+.facultyImg:hover {
+  transform: scale(1.08) rotate(-2deg);
+}
+
+/* STATS SECTION */
+.statsSection {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  background: var(--white);
+  padding: 2.5rem 0;
+  margin: 0;
+  box-shadow: var(--shadow);
+  border-radius: 0;
+}
+
+.statsSection > div {
+  text-align: center;
+  font-size: 2.2rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.statsSection > div span {
+  font-size: 2.7rem;
+  color: var(--secondary);
+  font-weight: 800;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.statsSection > div br {
+  display: none;
+}
+
+.statsSection > div::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 3px;
+  background: var(--accent);
+  margin: 0.7rem auto 0 auto;
+  border-radius: 2px;
+}
+
+/* CAROUSEL SECTION */
+.carousel {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  margin: 2.5rem 0 0 0;
+  position: relative;
+}
+
+.carouselBtn {
+  background: var(--accent);
+  color: var(--primary);
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.2s, color 0.2s;
+}
+
+.carouselBtn:hover {
+  background: var(--primary);
+  color: var(--accent);
+}
+
+.carouselContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.carouselImage {
+  width: 320px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  background: var(--gray);
+  margin: 0 1.5rem;
+}
+
+.carouselQuote {
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 1.5rem;
+  text-align: center;
+  max-width: 520px;
+  min-height: 70px;
+  letter-spacing: 0.5px;
+}
+
+.carouselIndicators {
+  display: flex;
+  gap: 0.6rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -30px;
+}
+
+.carouselIndicators span {
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: var(--gray);
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.carouselIndicators span.active,
+.carouselIndicators span:hover {
+  background: var(--accent);
+}
+
+/* DEVELOPERS SECTION */
+.developers {
+  width: 100vw;
+  background: linear-gradient(90deg, var(--secondary) 0%, var(--background) 100%);
+  padding: 3rem 0 2rem 0;
+  text-align: center;
+  min-height: 400px;
+  z-index: 1;
+  position: relative;
+}
+
+.developers h2 {
+  color: var(--primary);
+  font-size: 2.3rem;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+}
+
+.devCards {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+.devCard {
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem 2rem 2.5rem 2rem;
+  min-width: 320px;
+  max-width: 420px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.devCard:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(0,97,168,0.18);
+}
+
+.devContentWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 3rem;
+}
+
+.devTitleWrapper {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 0;
+}
+
+
+.verticalText {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--primary);
+  letter-spacing: 2px;
+  transition: transform 0.5s ease;
+}
+
+
+.devImageWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+.devImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  border: 4px solid var(--secondary);
+  background: var(--gray);
+  transition: filter 0.3s;
+}
+
+.devOverlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(0,97,168,0.82);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.devImageWrapper:hover .devOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.devCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.devCardContent .devName {
+  font-size: 1.25rem;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.devCardContent .devQuote {
+  font-size: 1.05rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+/* FAQ SECTION */
+.faqSection {
+  width: 100vw;
+  background: var(--white);
+  padding: 2rem 0 2rem 0;
+  text-align: center;
+}
+
+.faqSection h2 {
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.faqList {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.faqItem {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gray);
+  padding-bottom: 1rem;
+}
+
+.faqQuestion {
+  color: var(--secondary);
+  font-size: 1.18rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.faqQuestion:hover {
+  color: var(--primary);
+}
+
+.faqAnswer {
+  color: var(--muted);
+  font-size: 1.06rem;
+  margin-top: 0.5rem;
+  transition: max-height 0.3s, opacity 0.3s;
+}
+
+/* DESCRIPTION SECTION */
+.description {
+  width: 100vw;
+  background: linear-gradient(180deg, var(--background) 0%, var(--gray) 100%);
+  padding: 4rem 0 5rem 0;
+  text-align: center;
+  min-height: 160px;
+}
+
+.footerContent {
+  color: var(--primary);
+  font-size: 1.18rem;
+}
+
+.footerContent p {
+  color: var(--muted);
+  margin-top: 0.7rem;
+}
+
+/* FOOTER SECTION */
+.footer {
+  width: 100vw;
+  background: var(--white);
+  color: var(--primary);
+  padding: 1.2rem 0;
+  text-align: center;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  margin-top: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.footerLinksContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.footerLeft {
+  text-align: left;
+}
+
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  text-align: right;
+}
+
+.footerRight a {
+  color: #0061a8;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.footerRight a:hover {
+  color: var(--accent);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .facultyImages {
+    gap: 1.5rem;
+  }
+  .facultyImg {
+    width: 120px;
+    height: 120px;
+  }
+  .carouselQuote {
+    font-size: 1.3rem;
+    min-height: 40px;
+  }
+  .footerLinksContainer {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0 1rem;
+  }
+  .footerLeft, .footerRight {
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .devCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 220px;
+    max-width: 340px;
+    gap: 1.2rem;
+  }
+  .devImageWrapper {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .heroSection {
+    padding: 6rem 1rem 2rem 1rem;
+    min-height: 70vh;
+  }
+  .srmLogo {
+    position: static;
+    margin: 1rem auto 0 auto;
+    display: block;
+  }
+  .statsSection {
+    margin: 1rem 0;
+    border-radius: 10px;
+  }
+  .carousel {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .footerLinksContainer {
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 0 1rem;
+  }
+}

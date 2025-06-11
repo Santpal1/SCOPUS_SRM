@@ -4,9 +4,9 @@ const mysql = require('mysql2');
 
 // DB Config
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
+    host: 'scopus.c3i42gq0gaaj.eu-north-1.rds.amazonaws.com',
+    user: 'admin',
+    password: 'Ca55jYuwofeCboV7FYiw',
     database: 'scopus'
 });
 
