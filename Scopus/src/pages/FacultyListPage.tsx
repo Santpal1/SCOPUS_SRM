@@ -23,6 +23,9 @@ const FacultyListPage: React.FC = () => {
   const [timeframe, setTimeframe] = useState<string>("none");
   const [docsInTimeframeMap, setDocsInTimeframeMap] = useState<{ [key: string]: number }>({});
 
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+
   useEffect(() => {
     fetchFaculty();
   }, []);
@@ -69,7 +72,7 @@ const FacultyListPage: React.FC = () => {
           ...member,
           docs_in_timeframe: docsMap[member.scopus_id] ?? 0,
         }))
-        .filter(member => member.docs_in_timeframe > 0) // ✅ Exclude those with 0 papers in timeframe
+        .filter(member => member.docs_in_timeframe > 0)
         .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
       setFilteredFaculty(updatedFaculty);
@@ -88,7 +91,7 @@ const FacultyListPage: React.FC = () => {
           ...member,
           docs_in_timeframe: member.timeframe_docs,
         }))
-        .filter(member => member.docs_in_timeframe > 0) // ✅ Exclude 0 paper entries
+        .filter(member => member.docs_in_timeframe > 0)
         .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
       setFilteredFaculty(updatedFaculty);
@@ -127,14 +130,12 @@ const FacultyListPage: React.FC = () => {
       <div className="filter-bar">
         <select
           value={timeframe}
-          onChange={e => fetchFacultyByTimeframe(e.target.value)}
+          onChange={(e) => fetchFacultyByTimeframe(e.target.value)}
           className="dropdown"
         >
           <option value="none">None</option>
-          <option value="1m">Last 1 Month</option>
-          <option value="6m">Last 6 Months</option>
-          <option value="1y">Last 1 Year</option>
-          <option value="2y">Last 2 Years</option>
+          <option value={currentYear.toString()}>{`${currentYear}`}</option>
+          <option value={previousYear.toString()}>{`${previousYear}`}</option>
         </select>
 
         <button className="filter-button" onClick={fetchLowPaperFaculty}>
@@ -176,6 +177,7 @@ const FacultyListPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Table */}
       <div className="table-wrapper">
         <table className="faculty-table">
           <thead>

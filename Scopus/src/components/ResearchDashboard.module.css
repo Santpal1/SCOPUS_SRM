@@ -97,19 +97,25 @@ body.reloading {
     }
 }
 
-<<<<<<< HEAD
 a {
-    text-decoration: none;;
+    text-decoration: none;
+    ;
 }
 
-.facultyBtn {
-=======
+/* YourComponent.module.css */
+
 .buttonContainer {
     display: flex;
-    justify-content: center;
-    gap: 350px;
->>>>>>> af3e08e026218c1902c03883802ea598c334d8b2
-    margin-top: 40px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Optional: Set max width and center the container */
+.buttonContainer {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .facultyBtn,
@@ -135,7 +141,6 @@ a {
     background-color: #2e7d32;
     transform: scale(1.05);
 }
-
 
 .select {
     width: 200px;
@@ -318,11 +323,23 @@ a {
         padding: 15px;
     }
 
+    .buttonContainer {
+        flex-direction: column;
+        gap: 12px;
+    }
+
     .facultyBtn {
-        width: 100%;
+        width: 90%;
         padding: 12px;
         text-align: center;
     }
+
+    .analyticsBtn {
+        width: 90%;
+        padding: 12px;
+        text-align: center;
+    }
+
 }
 
 @media screen and (min-width: 1600px) {

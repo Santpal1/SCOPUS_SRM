@@ -92,7 +92,7 @@ const GlobalCollabMap: React.FC = () => {
     return (
         <div
             style={{
-                maxWidth: '1200px',
+                maxWidth: '1700px',
                 margin: '2rem auto',
                 padding: '2rem',
                 borderRadius: '20px',
@@ -103,23 +103,23 @@ const GlobalCollabMap: React.FC = () => {
             <h2 style={{
                 textAlign: 'center',
                 marginBottom: '1.5rem',
-                fontSize: '1.8rem',
+                fontSize: '2rem',
                 fontWeight: 'bold',
                 color: '#333',
             }}>
-                Global Research Collaborations
+                GLOBAL RESEARCH COLLABORATIONS
             </h2>
 
             <div style={{
                 width: '100%',
-                height: '700px',
+                height: '900px',
                 backgroundColor: '#ffffff',
                 border: '2px solid #dbeafe',
                 borderRadius: '12px',
                 overflow: 'hidden',
             }}>
                 <ComposableMap
-                    projectionConfig={{ scale: 200, center: [0, 20] }}
+                    projectionConfig={{ scale: 205, center: [10, 0] }}
                     style={{
                         width: '100%',
                         height: '100%',
