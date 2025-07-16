@@ -61,17 +61,17 @@ const SDGPieChart: React.FC = () => {
 
     return (
         <div style={{
-            width: '90vw',
-            padding: '3rem 5vw',
+            width: '70%',
+            padding: '3rem 5%',
             backgroundColor: '#fff',
-            borderRadius: '16px',
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.08)',
+            borderRadius: '1rem',
+            boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.08)',
             boxSizing: 'border-box',
-            marginLeft: '32px'
+            margin: '0.5rem auto'
         }}>
             <h2 style={{
                 fontSize: '2rem',
-                fontWeight: '600',
+                fontWeight: 600,
                 color: '#333',
                 marginBottom: '2rem',
                 textAlign: 'center'
@@ -84,10 +84,15 @@ const SDGPieChart: React.FC = () => {
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
+                gap: '2rem',
                 width: '100%',
-                gap: '2rem'
             }}>
-                <div style={{ flex: '1 1 40%', minWidth: '300px' }}>
+                <div style={{
+                    flex: '1 1 40%',
+                    minWidth: '18rem',
+                    marginTop:'4rem',
+                    marginLeft: '33%'
+                }}>
                     <Pie
                         data={data}
                         options={{
@@ -95,7 +100,7 @@ const SDGPieChart: React.FC = () => {
                                 legend: { display: false },
                                 tooltip: {
                                     callbacks: {
-                                        title: () => '',  // removes the first line
+                                        title: () => '',
                                         label: function (context) {
                                             const label = context.label;
                                             const value = context.formattedValue;
@@ -111,13 +116,12 @@ const SDGPieChart: React.FC = () => {
                                     displayColors: true,
                                     padding: 10,
                                     bodyFont: {
-                                        size: 14,         // font size
-                                        weight: 'bold',   // 'normal' | 'bold' | number
-                                        lineHeight: 1.2,  // optional, for better spacing
-                                        family: 'Helvetica'   // or 'Roboto', 'Helvetica', etc.
-                                    },
+                                        size: 14,
+                                        weight: 'bold',
+                                        lineHeight: 1.2,
+                                        family: 'Helvetica'
+                                    }
                                 }
-
                             }
                         }}
                     />
@@ -126,34 +130,32 @@ const SDGPieChart: React.FC = () => {
                 <div style={{
                     flex: '1 1 50%',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                    gap: '12px',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(7.5rem, 1fr))',
+                    gap: '2rem',
                     alignContent: 'start',
-                    margin: '35px',
-                    marginTop: '150px',
-                    maxHeight: '500px',
+                    marginTop: '4rem',
+                    maxHeight: '30rem',
                     overflowY: 'auto',
-                    padding: '1rem'
+                    padding: '0.5rem'
                 }}>
                     {data.labels.map((label: string, i: number) => (
                         <div key={label} style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            fontSize: '18px',
-                            fontWeight: '500',
+                            gap: '0.5rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 500,
                             color: '#444'
                         }}>
                             <div style={{
-                                width: '16px',
-                                height: '16px',
+                                width: '1rem',
+                                height: '1rem',
                                 backgroundColor: data.datasets[0].backgroundColor[i],
-                                borderRadius: '3px',
+                                borderRadius: '0.25rem',
                                 flexShrink: 0,
-                                margin: '20px',
-                                fontWeight: '500'
+                                fontWeight: 500
                             }} />
-                            <span style={{ fontWeight: '500' }}>{label}</span>
+                            <span style={{ fontWeight: 500 }}>{label}</span>
                         </div>
                     ))}
                 </div>

@@ -92,12 +92,13 @@ const GlobalCollabMap: React.FC = () => {
     return (
         <div
             style={{
-                maxWidth: '1700px',
+                maxWidth: '70%',
+                maxHeight: '50%',
                 margin: '2rem auto',
                 padding: '2rem',
-                borderRadius: '20px',
-                backgroundColor: '#f8fbff', // light blue area between border and box shadow
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+                borderRadius: '1.25rem',
+                backgroundColor: '#f8fbff',
+                boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.1)',
             }}
         >
             <h2 style={{
@@ -112,17 +113,17 @@ const GlobalCollabMap: React.FC = () => {
 
             <div style={{
                 width: '100%',
-                height: '900px',
+                minHeight: '30vh',
                 backgroundColor: '#ffffff',
-                border: '2px solid #dbeafe',
-                borderRadius: '12px',
+                border: '0.125rem solid #dbeafe',
+                borderRadius: '0.75rem',
                 overflow: 'hidden',
             }}>
                 <ComposableMap
-                    projectionConfig={{ scale: 205, center: [10, 0] }}
+                    projectionConfig={{ scale: 180, center: [15, 0] }}
                     style={{
                         width: '100%',
-                        height: '100%',
+                        height: '50%',
                     }}
                 >
                     <Geographies geography={geoUrl}>
@@ -167,10 +168,10 @@ const GlobalCollabMap: React.FC = () => {
                 style={{
                     backgroundColor: "#e0e7ff",
                     color: "#1A4D6C",
-                    borderRadius: '4px',
-                    borderColor : "#e0e7ff" ,
-                    padding: '8px 12px',
-                    fontSize: '15px',
+                    borderRadius: '0.25rem',
+                    borderColor: "#e0e7ff",
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.95rem',
                     fontWeight: 'bold',
                     zIndex: 1000,
                 }}
