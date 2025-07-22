@@ -22,7 +22,7 @@ const GlobalCollabMap: React.FC = () => {
     const [mapping, setMapping] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/insights/countries')
+        fetch('http://localhost:5001/api/insights/countries')
             .then(res => {
                 if (!res.ok) throw new Error(`Network response not ok: ${res.status}`);
                 return res.json();

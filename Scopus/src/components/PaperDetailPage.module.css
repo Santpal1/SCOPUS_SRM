@@ -97,6 +97,23 @@
     box-shadow: 0 6px 16px rgba(14, 54, 90, 0.5);
 }
 
+.doiButton {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #1A4D6C;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.doiButton:hover {
+    background-color: #13384d;
+}
+
+
 .card {
     background-color: #ffffffee;
     border-radius: 18px;

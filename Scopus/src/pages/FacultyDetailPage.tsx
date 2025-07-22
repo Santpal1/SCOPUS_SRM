@@ -51,7 +51,7 @@ const FacultyDetailPage: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/faculty/${scopusId}`, {
+        const response = await axios.get(`http://localhost:5001/api/faculty/${scopusId}`, {
           params: {
             sdg: sdgFilter !== "none" ? sdgFilter : undefined,
             domain: domainFilter !== "none" ? domainFilter : undefined,

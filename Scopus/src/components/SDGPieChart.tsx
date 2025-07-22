@@ -35,7 +35,7 @@ const SDGPieChart: React.FC = () => {
     const [data, setData] = useState<any>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/sdg-count').then(res => {
+        axios.get('http://localhost:5001/api/sdg-count').then(res => {
             const labels = Object.keys(res.data);
             const values = Object.values(res.data);
 

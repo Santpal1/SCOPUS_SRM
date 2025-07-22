@@ -50,7 +50,7 @@ const FacultyListPage: React.FC = () => {
       if (domainFilter !== "none") params.domain = domainFilter;
       if (timeframe !== "none") params.year = timeframe;
 
-      const response = await axios.get("http://localhost:5000/api/faculty", { params });
+      const response = await axios.get("http://localhost:5001/api/faculty", { params });
 
       const processedFaculty = response.data
         .map((f: Faculty) => ({
@@ -87,7 +87,7 @@ const FacultyListPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/faculty/papers?timeframe=${selectedTimeframe}`);
+      const response = await axios.get(`http://localhost:5001/api/faculty/papers?timeframe=${selectedTimeframe}`);
       const docsMap: { [key: string]: number } = {};
       response.data.forEach((f: Faculty) => {
         docsMap[f.scopus_id] = f.timeframe_docs;
@@ -112,7 +112,7 @@ const FacultyListPage: React.FC = () => {
 
   const fetchLowPaperFaculty = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/faculty/low-papers");
+      const response = await axios.get("http://localhost:5001/api/faculty/low-papers");
 
       const updatedFaculty = response.data
         .map((member: Faculty) => ({

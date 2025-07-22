@@ -54,7 +54,7 @@ const SDGInsightsDashboard: React.FC = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('http://localhost:5000/api/insights/sdg-counts');
+                const response = await fetch('http://localhost:5001/api/insights/sdg-counts');
                 if (!response.ok) throw new Error('Failed to fetch data');
                 const result = await response.json();
                 setData(result);
