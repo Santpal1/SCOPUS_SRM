@@ -24,6 +24,21 @@ body {
   padding: 0;
 }
 
+.back-button {
+  padding: 8px 16px;
+  background-color: #1a4d6c;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #163e55;
+}
+
+
 .faculty-container {
   max-width: 1200px;  /* Increased max-width for more space */
   margin: 40px auto;

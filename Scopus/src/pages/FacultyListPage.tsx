@@ -166,6 +166,12 @@ const FacultyListPage: React.FC = () => {
 
   return (
     <div className="faculty-container">
+  <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+    <Link to="/dashboard" className="back-button">
+      ⬅ Back to Dashboard
+    </Link>
+  </div>
+
       <h1 className="title">Faculty List</h1>
 
       {/* Filter Bar */}
