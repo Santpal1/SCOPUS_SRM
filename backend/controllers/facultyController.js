@@ -22,6 +22,7 @@ exports.getAllFaculty = (req, res) => {
             u.name,
             u.docs_count,
             u.access,
+            u.h_index,
             (
                 SELECT GROUP_CONCAT(DISTINCT pi.sustainable_development_goals SEPARATOR '|')
                 FROM paper_insights pi
@@ -44,6 +45,7 @@ exports.getAllFaculty = (req, res) => {
         FROM users u
         GROUP BY u.scopus_id
     `;
+
 
     db.query(query, (err, results) => {
         if (err) return res.status(500).json({ error: 'Failed to fetch faculty data' });

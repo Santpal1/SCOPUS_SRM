@@ -12,7 +12,9 @@ interface Faculty {
   docs_count: number;
   faculty_id?: string;
   citation_count: number;
+  h_index: number;
 }
+
 
 interface Paper {
   scopus_id: string;
@@ -120,6 +122,14 @@ const FacultyDetailPage: React.FC = () => {
     doc.setFont('helvetica', 'normal');
     const citeLabelWidth = doc.getTextWidth('Citations:');
     doc.text(faculty.citation_count.toString(), margin + citeLabelWidth + 2, yPos);
+
+    yPos += 8;
+doc.setFont('helvetica', 'bold');
+doc.text('H-Index:', margin, yPos);
+doc.setFont('helvetica', 'normal');
+const hindexLabelWidth = doc.getTextWidth('H-Index:');
+doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, yPos);
+
 
     // Show filters if any are selected
     const sdg = new URLSearchParams(window.location.search).get("sdg");
@@ -229,6 +239,7 @@ const FacultyDetailPage: React.FC = () => {
         {faculty.faculty_id && <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>}
         <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
         <p><strong>Citations:</strong> {faculty.citation_count}</p>
+        <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
 
         {(sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none') && (
           <p><strong>Filters Applied:</strong>
