@@ -6,7 +6,7 @@ import SDGTagCloud from '../components/SDGTagCloud';
 const AnalyticsPage: React.FC = () => {
     return (
         <div style={{ padding: 40 }}>
-            <h1 style={{marginLeft: 580, fontSize:50, color: '#2980b9'}}>ANALYTICS DASHBOARD</h1>
+            <h1 style={{marginLeft: 450, fontSize:50, color: '#2980b9'}}>ANALYTICS DASHBOARD</h1>
             <section style={{ marginBottom: 40 }}>
                 <GlobalCollabMap />
             </section>

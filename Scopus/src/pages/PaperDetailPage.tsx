@@ -63,7 +63,7 @@ const PaperDetailPage: React.FC = () => {
         const fetchPaper = async () => {
             try {
                 const encodedDOI = encodeURIComponent(doi || '');
-                const response = await axios.get(`http://localhost:5000/api/paper/${encodedDOI}`);
+                const response = await axios.get(`http://localhost:5001/api/paper/${encodedDOI}`);
                 setPaper(response.data.paper);
                 setInsights(response.data.insights);
             } catch (err) {

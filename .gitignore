@@ -5,3 +5,4 @@ node_modules
 scopus_charts
 scopus_data
 *.xlsx
+*.csv

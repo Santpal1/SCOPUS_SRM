@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2');
 
-// DB Config
 const db = mysql.createConnection({
-    host: 'scopus.c3i42gq0gaaj.eu-north-1.rds.amazonaws.com',
-    user: 'admin',
-    password: 'Ca55jYuwofeCboV7FYiw',
-    database: 'scopus'
+    host: 'localhost',
+    user: 'root',
+    password: '', // change if needed
+    database: 'scopus',
+    port: 3307 // default port
 });
 
 router.get('/sdg-count', (req, res) => {

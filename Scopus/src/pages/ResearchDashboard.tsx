@@ -39,7 +39,7 @@ export default function ResearchDashboard() {
   // Fetch Top Authors
   const fetchTopAuthors = async (selectedTimeframe: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/top-author?timeframe=${selectedTimeframe}`);
+      const response = await axios.get(`http://localhost:5001/api/top-author?timeframe=${selectedTimeframe}`);
       const data = response.data;
 
       if (Array.isArray(data) && data.length > 0) {
@@ -61,7 +61,7 @@ export default function ResearchDashboard() {
   // Fetch Publication Data
   const fetchData = async (selectedTimeframe: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/publications?timeframe=${selectedTimeframe}`);
+      const response = await axios.get(`http://localhost:5001/api/publications?timeframe=${selectedTimeframe}`);
       let sortedData = response.data.sort((a: PublicationData, b: PublicationData) =>
         a.month.localeCompare(b.month)
       );
