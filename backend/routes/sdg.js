@@ -7,7 +7,7 @@ const db = mysql.createConnection({
     user: 'root',
     password: '', // change if needed
     database: 'scopus',
-    port: 3307 // default port
+    port: 3306 // default port
 });
 
 router.get('/sdg-count', (req, res) => {
