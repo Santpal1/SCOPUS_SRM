@@ -1,5 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+// Import SDG images
+import sdg1 from '../assets/sdg1.png';
+import sdg2 from '../assets/sdg2.png';
+import sdg3 from '../assets/sdg3.png';
+import sdg4 from '../assets/sdg4.png';
+import sdg5 from '../assets/sdg5.png';
+import sdg6 from '../assets/sdg6.png';
+import sdg7 from '../assets/sdg7.png';
+import sdg8 from '../assets/sdg8.png';
+import sdg9 from '../assets/sdg9.png';
+import sdg10 from '../assets/sdg10.png';
+import sdg11 from '../assets/sdg11.png';
+import sdg12 from '../assets/sdg12.png';
+import sdg13 from '../assets/sdg13.png';
+import sdg14 from '../assets/sdg14.png';
+import sdg15 from '../assets/sdg15.png';
+import sdg16 from '../assets/sdg16.png';
+import sdg17 from '../assets/sdg17.png';
+
 
 interface SDGData {
   [key: string]: number;
@@ -29,26 +48,27 @@ const SDGInsightsDashboard: React.FC = () => {
 
 
   // Improved SDG color mapping with official UN colors and better descriptions
-  const sdgInfo: { [key: string]: { color: string; title: string; description: string; number: string } } = {
-    'SDG 1': { color: '#E5243B', title: 'No Poverty', description: 'End poverty in all its forms everywhere', number: '1' },
-    'SDG 2': { color: '#DDA63A', title: 'Zero Hunger', description: 'End hunger, achieve food security and improved nutrition', number: '2' },
-    'SDG 3': { color: '#4C9F38', title: 'Good Health and Well-being', description: 'Ensure healthy lives and promote well-being for all', number: '3' },
-    'SDG 4': { color: '#C5192D', title: 'Quality Education', description: 'Ensure inclusive and equitable quality education', number: '4' },
-    'SDG 5': { color: '#FF3A21', title: 'Gender Equality', description: 'Achieve gender equality and empower all women and girls', number: '5' },
-    'SDG 6': { color: '#26BDE2', title: 'Clean Water and Sanitation', description: 'Ensure availability and sustainable management of water', number: '6' },
-    'SDG 7': { color: '#FCC30B', title: 'Affordable and Clean Energy', description: 'Ensure access to affordable, reliable, sustainable energy', number: '7' },
-    'SDG 8': { color: '#A21942', title: 'Decent Work and Economic Growth', description: 'Promote sustained, inclusive economic growth', number: '8' },
-    'SDG 9': { color: '#FD6925', title: 'Industry, Innovation and Infrastructure', description: 'Build resilient infrastructure, promote innovation', number: '9' },
-    'SDG 10': { color: '#DD1367', title: 'Reduced Inequalities', description: 'Reduce inequality within and among countries', number: '10' },
-    'SDG 11': { color: '#FD9D24', title: 'Sustainable Cities and Communities', description: 'Make cities and human settlements inclusive', number: '11' },
-    'SDG 12': { color: '#BF8B2E', title: 'Responsible Consumption and Production', description: 'Ensure sustainable consumption and production patterns', number: '12' },
-    'SDG 13': { color: '#3F7E44', title: 'Climate Action', description: 'Take urgent action to combat climate change', number: '13' },
-    'SDG 14': { color: '#0A97D9', title: 'Life Below Water', description: 'Conserve and sustainably use oceans and marine resources', number: '14' },
-    'SDG 15': { color: '#56C02B', title: 'Life on Land', description: 'Protect, restore and promote sustainable use of ecosystems', number: '15' },
-    'SDG 16': { color: '#00689D', title: 'Peace, Justice and Strong Institutions', description: 'Promote peaceful and inclusive societies', number: '16' },
-    'SDG 17': { color: '#19486A', title: 'Partnerships for the Goals', description: 'Strengthen means of implementation and global partnerships', number: '17' },
-    '-': { color: '#64748B', title: 'Unspecified', description: 'Projects without specified SDG alignment', number: '?' }
+  const sdgInfo: { [key: string]: { color: string; title: string; description: string; number: string; image: string } } = {
+    'SDG 1': { color: '#E5243B', title: 'No Poverty', description: 'End poverty in all its forms everywhere', number: '1', image: sdg1 },
+    'SDG 2': { color: '#DDA63A', title: 'Zero Hunger', description: 'End hunger, achieve food security and improved nutrition', number: '2', image: sdg2 },
+    'SDG 3': { color: '#4C9F38', title: 'Good Health and Well-being', description: 'Ensure healthy lives and promote well-being for all', number: '3', image: sdg3 },
+    'SDG 4': { color: '#C5192D', title: 'Quality Education', description: 'Ensure inclusive and equitable quality education', number: '4', image: sdg4 },
+    'SDG 5': { color: '#FF3A21', title: 'Gender Equality', description: 'Achieve gender equality and empower all women and girls', number: '5', image: sdg5 },
+    'SDG 6': { color: '#26BDE2', title: 'Clean Water and Sanitation', description: 'Ensure availability and sustainable management of water', number: '6', image: sdg6 },
+    'SDG 7': { color: '#FCC30B', title: 'Affordable and Clean Energy', description: 'Ensure access to affordable, reliable, sustainable energy', number: '7', image: sdg7 },
+    'SDG 8': { color: '#A21942', title: 'Decent Work and Economic Growth', description: 'Promote sustained, inclusive economic growth', number: '8', image: sdg8 },
+    'SDG 9': { color: '#FD6925', title: 'Industry, Innovation and Infrastructure', description: 'Build resilient infrastructure, promote innovation', number: '9', image: sdg9 },
+    'SDG 10': { color: '#DD1367', title: 'Reduced Inequalities', description: 'Reduce inequality within and among countries', number: '10', image: sdg10 },
+    'SDG 11': { color: '#FD9D24', title: 'Sustainable Cities and Communities', description: 'Make cities and human settlements inclusive', number: '11', image: sdg11 },
+    'SDG 12': { color: '#BF8B2E', title: 'Responsible Consumption and Production', description: 'Ensure sustainable consumption and production patterns', number: '12', image: sdg12 },
+    'SDG 13': { color: '#3F7E44', title: 'Climate Action', description: 'Take urgent action to combat climate change', number: '13', image: sdg13 },
+    'SDG 14': { color: '#0A97D9', title: 'Life Below Water', description: 'Conserve and sustainably use oceans and marine resources', number: '14', image: sdg14 },
+    'SDG 15': { color: '#56C02B', title: 'Life on Land', description: 'Protect, restore and promote sustainable use of ecosystems', number: '15', image: sdg15 },
+    'SDG 16': { color: '#00689D', title: 'Peace, Justice and Strong Institutions', description: 'Promote peaceful and inclusive societies', number: '16', image: sdg16 },
+    'SDG 17': { color: '#19486A', title: 'Partnerships for the Goals', description: 'Strengthen means of implementation and global partnerships', number: '17', image: sdg17 },
+    '-': { color: '#64748B', title: 'Unspecified', description: 'Projects without specified SDG alignment', number: '?', image: '' }
   };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -191,8 +211,8 @@ const SDGInsightsDashboard: React.FC = () => {
                   margin: '40px',
                 }}
                 className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${activeView === "overview"
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-slate-300 hover:text-white hover:bg-slate-700"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700"
                   }`}
               >
                 Overview
@@ -219,8 +239,8 @@ const SDGInsightsDashboard: React.FC = () => {
                   margin: '40px',
                 }}
                 className={`rounded-xl font-semibold transition-transform duration-300 ${activeView === "detailed"
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-slate-300 hover:text-white hover:bg-slate-700"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700"
                   }`}
               >
                 Detailed
@@ -347,7 +367,15 @@ const SDGInsightsDashboard: React.FC = () => {
         ) : (
           /* Detailed Breakdown View */
           <div className="bg-slate-800/60 backdrop-blur-md rounded-3xl p-8 border border-slate-700 shadow-md">
-            <h3 style={{ margin: '2rem', marginLeft: '21.5rem', fontSize: '28px', color: '#124b7c' }} className="text-2xl font-bold text-white mb-10 flex items-center">
+            <h3
+              style={{
+                margin: "2rem",
+                marginLeft: "21.5rem",
+                fontSize: "28px",
+                color: "#124b7c",
+              }}
+              className="text-2xl font-bold text-white mb-10 flex items-center"
+            >
               <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center mr-4">
                 <div className="w-4 h-4 bg-white rounded-sm"></div>
               </div>
@@ -358,41 +386,54 @@ const SDGInsightsDashboard: React.FC = () => {
               {Object.entries(data)
                 .sort(([, a], [, b]) => b - a)
                 .map(([sdg, count]) => (
-                  <div onMouseEnter={() => setHoveredButton1(sdg)}
-                    onMouseLeave={() => setHoveredButton1(null)} style={{
-                      backgroundColor: '#e1ebf5', margin: '5px', marginBottom: '30px', borderRadius: '20px', boxShadow:
-                        hoveredButton1 === sdg
-                          ? '0 8px 16px rgba(18, 75, 124, 0.5)'
-                          : '0 2px 5px rgba(18, 75, 124, 0.4)', transform: hoveredButton1 === sdg ? 'scale(1.01)' : 'scale(1)', transition: 'all 0.3s ease'
-                    }}
+                  <div
                     key={sdg}
-                    className="group bg-slate-900/60 rounded-2xl p-5 border border-slate-700 hover:border-slate-500 hover:shadow-xl transition-all duration-300 ease-in-out"
+                    onMouseEnter={() => setHoveredButton1(sdg)}
+                    onMouseLeave={() => setHoveredButton1(null)}
+                    className="group rounded-2xl overflow-hidden border border-slate-700 hover:border-slate-500 hover:shadow-xl transition-all duration-300 ease-in-out"
+                    style={{
+                      backgroundColor: "#e1ebf5",
+                      margin: "5px",
+                      marginBottom: "30px",
+                      borderRadius: "5px",
+                      position: "relative",
+                      boxShadow:
+                        hoveredButton1 === sdg
+                          ? "0 8px 16px rgba(18, 75, 124, 0.5)"
+                          : "0 2px 5px rgba(18, 75, 124, 0.4)",
+                      transform: hoveredButton1 === sdg ? "scale(1.02)" : "scale(1)",
+                      transition: "all 0.3s ease",
+                    }}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center">
-                        <div
-                          className="w-9 h-9 rounded-md flex items-center justify-center text-white text-sm font-bold mr-3 shadow-sm"
-                          style={{ backgroundColor: "#2d5791", borderTopLeftRadius: '20px', borderTopRightRadius: '20px', padding: '12px', color: "white", fontSize: '18px' }}
-                        >
-                          SDG {sdgInfo[sdg]?.number || "?"}
-                        </div>
-                        <button style={{ color: 'white', marginTop: '15px', margin: '8px', borderRadius: '8px', padding: '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900" }} className="font-semibold text-white text-sm leading-snug">
-                          {sdgInfo[sdg]?.title || "Unknown"} : {count}
-                        </button>
-                      </div>
+                    {/* Heading with SDG Number & Title */}
+                    <div
+                      style={{
+                        backgroundColor: sdgInfo[sdg]?.color || "#1a3d6c",
+                        padding: "16px",
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <h4 style={{ fontSize: "18px", marginBottom: "4px" }}>
+                        SDG {sdgInfo[sdg]?.number || "?"}: {sdgInfo[sdg]?.title || "Unknown"}
+                      </h4>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-end justify-between">
-                        <div >
-                          {/* <p className="text-2xl font-bold text-white">{count}</p> */}
-                          <button style={{ color: 'white', margin: '8px', borderRadius: '8px', padding: '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900" }} className="text-slate-400 text-xs">
-                            {((count / totalProjects) * 100).toFixed(1)}% of total
-                          </button>
-                        </div>
+                    {/* Content Section */}
+                    <div className="p-5 relative" style={{ marginLeft: "15px" }}>
+                      {/* Description */}
+                      <p className="text-slate-700 text-sm mb-4">
+                        {sdgInfo[sdg]?.description || "No description available"}
+                      </p>
+
+                      {/* Project Count */}
+                      <div className="mb-3 font-semibold text-slate-800">
+                        {count} Projects ({((count / totalProjects) * 100).toFixed(1)}% of the total)
                       </div>
 
-                      <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+
+                      {/* Progress Bar */}
+                      <div className="w-full bg-slate-300 rounded-full h-2 overflow-hidden mb-4">
                         <div
                           className="h-full transition-all duration-1000 rounded-full"
                           style={{
@@ -402,10 +443,24 @@ const SDGInsightsDashboard: React.FC = () => {
                         ></div>
                       </div>
 
-                      <button style={{ color: 'white', margin: '8px', borderRadius: '8px', padding: '5px', backgroundColor: "#1a3d6c", fontSize: "16px", fontWeight: "900", marginBottom: '15px' }} className="text-xs text-slate-400 leading-relaxed">
-                        {sdgInfo[sdg]?.description || "No description available"}
-                      </button>
+                      {/* SDG Image */}
+                      <img
+                        src={sdgInfo[sdg]?.image}
+                        alt={sdgInfo[sdg]?.title}
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          position: "absolute",
+                          bottom: "20px",
+                          right: "20px",
+                          borderRadius: "10px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                          background: "white",
+                          padding: "5px",
+                        }}
+                      />
                     </div>
+
                   </div>
                 ))}
             </div>
@@ -413,7 +468,7 @@ const SDGInsightsDashboard: React.FC = () => {
 
         )}
       </div>
-    </div>
+    </div >
   );
 };
 export default SDGInsightsDashboard;
