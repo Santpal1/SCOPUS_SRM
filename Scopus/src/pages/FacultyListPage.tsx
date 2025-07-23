@@ -27,6 +27,7 @@ const FacultyListPage: React.FC = () => {
   const [sdgFilter, setSdgFilter] = useState<string>("none");
   const [domainFilter, setDomainFilter] = useState<string>("none");
   const [lowPaperFilter, setLowPaperFilter] = useState<string>("none");
+  
 
   const currentYear = new Date().getFullYear();
   const previousYear = currentYear - 1;
@@ -116,14 +117,15 @@ const FacultyListPage: React.FC = () => {
 
   const fetchLowPaperFacultyByYears = async (years: number) => {
     try {
-      const response = await axios.get("http://localhost:5001/api/faculty/low-papers");
+      setLoading(true);
+
+      const response = await axios.get(`http://localhost:5001/api/faculty/low-papers?years=${years}`);
 
       const updatedFaculty = response.data
         .map((member: Faculty) => ({
           ...member,
           docs_in_timeframe: member.timeframe_docs,
         }))
-        .filter(member => member.docs_in_timeframe > 0)
         .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
       setFaculty(updatedFaculty);
@@ -135,6 +137,7 @@ const FacultyListPage: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
@@ -191,9 +194,9 @@ const FacultyListPage: React.FC = () => {
 
   return (
     <div className="faculty-container">
-  <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
-    <Link to="/dashboard" className="back-button">&laquo; Back to Dashboard</Link>
-  </div>
+      <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+        <Link to="/dashboard" className="back-button">&laquo; Back to Dashboard</Link>
+      </div>
 
       <h1 className="title">Faculty List</h1>
 
