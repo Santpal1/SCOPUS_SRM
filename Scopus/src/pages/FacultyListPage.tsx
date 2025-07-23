@@ -26,6 +26,7 @@ const FacultyListPage: React.FC = () => {
   const [docsInTimeframeMap, setDocsInTimeframeMap] = useState<{ [key: string]: number }>({});
   const [sdgFilter, setSdgFilter] = useState<string>("none");
   const [domainFilter, setDomainFilter] = useState<string>("none");
+  const [lowPaperFilter, setLowPaperFilter] = useState<string>("none");
 
   const currentYear = new Date().getFullYear();
   const previousYear = currentYear - 1;
@@ -35,7 +36,9 @@ const FacultyListPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchFaculty(); // Trigger when filters change
+    if (lowPaperFilter === "none") {
+      fetchFaculty(); // Only fetch normal data if not showing low papers
+    }
   }, [sdgFilter, domainFilter, timeframe]);
 
   const fetchFaculty = async () => {
@@ -55,9 +58,9 @@ const FacultyListPage: React.FC = () => {
       const processedFaculty = response.data
         .map((f: Faculty) => ({
           ...f,
-          docs_in_timeframe: isFiltering ? f.docs_in_timeframe : undefined, // undefined = N/A
+          docs_in_timeframe: isFiltering ? f.docs_in_timeframe : undefined,
         }))
-        .filter(f => !isFiltering || f.docs_in_timeframe > 0) // Filter only if filters are active
+        .filter(f => !isFiltering || f.docs_in_timeframe > 0)
         .sort((a, b) =>
           (b.docs_in_timeframe ?? b.docs_count) - (a.docs_in_timeframe ?? a.docs_count)
         );
@@ -76,6 +79,7 @@ const FacultyListPage: React.FC = () => {
 
 
   const fetchFacultyByTimeframe = async (selectedTimeframe: string) => {
+    setLowPaperFilter("none");
     setTimeframe(selectedTimeframe);
 
     if (selectedTimeframe === "none") {
@@ -110,7 +114,7 @@ const FacultyListPage: React.FC = () => {
     }
   };
 
-  const fetchLowPaperFaculty = async () => {
+  const fetchLowPaperFacultyByYears = async (years: number) => {
     try {
       const response = await axios.get("http://localhost:5001/api/faculty/low-papers");
 
@@ -122,10 +126,13 @@ const FacultyListPage: React.FC = () => {
         .filter(member => member.docs_in_timeframe > 0)
         .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
 
+      setFaculty(updatedFaculty);
       setCurrentFaculty(updatedFaculty);
-      applyAllFilters(updatedFaculty);
+      setFilteredFaculty(updatedFaculty);
     } catch (error) {
       console.error("Error fetching faculty with low papers:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,6 +168,24 @@ const FacultyListPage: React.FC = () => {
     setFilteredFaculty(updatedList);
   };
 
+  const handleLowPaperSelect = (value: string) => {
+    if (value === "none") {
+      setLowPaperFilter("none");
+      fetchFaculty(); // reset to full list
+      return;
+    }
+
+    const hasOtherFilters = sdgFilter !== "none" || domainFilter !== "none" || timeframe !== "none";
+
+    if (hasOtherFilters) {
+      alert("Please clear other filters (Year, SDG, Domain) before using this option.");
+      return;
+    }
+
+    setLowPaperFilter(value);
+    fetchLowPaperFacultyByYears(parseInt(value));
+  };
+
   if (loading) return <div className="loading">Loading faculty data...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -180,86 +205,70 @@ const FacultyListPage: React.FC = () => {
           value={timeframe}
           onChange={(e) => fetchFacultyByTimeframe(e.target.value)}
           className="dropdown"
+          disabled={lowPaperFilter !== "none"}
         >
           <option value="none" disabled hidden>Year Filter</option>
           <option value="none">None</option>
-          <option value={currentYear.toString()}>{`${currentYear}`}</option>
-          <option value={previousYear.toString()}>{`${previousYear}`}</option>
+          <option value={currentYear.toString()}>{currentYear}</option>
+          <option value={previousYear.toString()}>{previousYear}</option>
         </select>
 
         <select
           value={sdgFilter}
-          onChange={(e) => setSdgFilter(e.target.value)}
+          onChange={(e) => {
+            setSdgFilter(e.target.value);
+            setLowPaperFilter("none");
+          }}
           className="dropdown"
+          disabled={lowPaperFilter !== "none"}
         >
           <option value="none" disabled hidden>SDG Filter</option>
           <option value="none">None</option>
-          <option value="SDG1">SDG 1</option>
-          <option value="SDG2">SDG 2</option>
-          <option value="SDG3">SDG 3</option>
-          <option value="SDG4">SDG 4</option>
-          <option value="SDG5">SDG 5</option>
-          <option value="SDG6">SDG 6</option>
-          <option value="SDG7">SDG 7</option>
-          <option value="SDG8">SDG 8</option>
-          <option value="SDG9">SDG 9</option>
-          <option value="SDG10">SDG 10</option>
-          <option value="SDG11">SDG 11</option>
-          <option value="SDG12">SDG 12</option>
-          <option value="SDG13">SDG 13</option>
-          <option value="SDG14">SDG 14</option>
-          <option value="SDG15">SDG 15</option>
-          <option value="SDG16">SDG 16</option>
-          <option value="SDG17">SDG 17</option>
+          {[...Array(17)].map((_, i) => (
+            <option key={i + 1} value={`SDG${i + 1}`}>{`SDG ${i + 1}`}</option>
+          ))}
         </select>
 
 
         <select
           value={domainFilter}
-          onChange={(e) => setDomainFilter(e.target.value)}
+          onChange={(e) => {
+            setDomainFilter(e.target.value);
+            setLowPaperFilter("none");
+          }}
           className="dropdown"
+          disabled={lowPaperFilter !== "none"}
         >
           <option value="none" disabled hidden>Domain Filter</option>
           <option value="none">None</option>
-          <option value="Agriculture & Forestry">Agriculture & Forestry</option>
-          <option value="Architecture">Architecture</option>
-          <option value="Biological Sciences">Biological Sciences</option>
-          <option value="Business & Management Studies">Business & Management Studies</option>
-          <option value="Chemistry">Chemistry</option>
-          <option value="Communication & Media Studies">Communication & Media Studies</option>
-          <option value="Computer Science & Information Systems">Computer Science & Information Systems</option>
-          <option value="Data Science">Data Science</option>
-          <option value="Development Studies">Development Studies</option>
-          <option value="Earth & Marine Sciences">Earth & Marine Sciences</option>
-          <option value="Economics & Econometrics">Economics & Econometrics</option>
-          <option value="Education & Training">Education & Training</option>
-          <option value="Engineering - Chemical">Engineering - Chemical</option>
-          <option value="Engineering - Civil & Structural">Engineering - Civil & Structural</option>
-          <option value="Engineering - Electrical & Electronic">Engineering - Electrical & Electronic</option>
-          <option value="Engineering - Mechanical">Engineering - Mechanical</option>
-          <option value="Engineering - Mineral & Mining">Engineering - Mineral & Mining</option>
-          <option value="Engineering - Petroleum">Engineering - Petroleum</option>
-          <option value="Environmental Sciences">Environmental Sciences</option>
-          <option value="Geography">Geography</option>
-          <option value="Geology">Geology</option>
-          <option value="Geophysics">Geophysics</option>
-          <option value="Law and Legal Studies">Law and Legal Studies</option>
-          <option value="Library & Information Management">Library & Information Management</option>
-          <option value="Linguistics">Linguistics</option>
-          <option value="Materials Science">Materials Science</option>
-          <option value="Mathematics">Mathematics</option>
-          <option value="Medicine">Medicine</option>
-          <option value="Nursing">Nursing</option>
-          <option value="Pharmacy & Pharmacology">Pharmacy & Pharmacology</option>
-          <option value="Physics & Astronomy">Physics & Astronomy</option>
-          <option value="Psychology">Psychology</option>
-          <option value="Statistics & Operational Research">Statistics & Operational Research</option>
+          {[
+            "Agriculture & Forestry", "Architecture", "Biological Sciences", "Business & Management Studies", "Chemistry",
+            "Communication & Media Studies", "Computer Science & Information Systems", "Data Science", "Development Studies",
+            "Earth & Marine Sciences", "Economics & Econometrics", "Education & Training", "Engineering - Chemical",
+            "Engineering - Civil & Structural", "Engineering - Electrical & Electronic", "Engineering - Mechanical",
+            "Engineering - Mineral & Mining", "Engineering - Petroleum", "Environmental Sciences", "Geography", "Geology",
+            "Geophysics", "Law and Legal Studies", "Library & Information Management", "Linguistics", "Materials Science",
+            "Mathematics", "Medicine", "Nursing", "Pharmacy & Pharmacology", "Physics & Astronomy", "Psychology",
+            "Statistics & Operational Research"
+          ].map(domain => (
+            <option key={domain} value={domain}>{domain}</option>
+          ))}
         </select>
 
+        <select
+          className="dropdown"
+          value={lowPaperFilter}
+          onChange={(e) => handleLowPaperSelect(e.target.value)}
+        >
+          <option value="none" disabled hidden>Criteria Filter</option>
+          <option value="none">None</option>
+          <option value="1">Show Faculty with &lt; 4 Papers in 1 Year</option>
+          <option value="2">Show Faculty with &lt; 4 Papers in 2 Years</option>
+          <option value="3">Show Faculty with &lt; 4 Papers in 3 Years</option>
+          <option value="4">Show Faculty with &lt; 4 Papers in 4 Years</option>
+          <option value="5">Show Faculty with &lt; 4 Papers in 5 Years</option>
+        </select>
 
-        <button className="filter-button" onClick={fetchLowPaperFaculty}>
-          Show Faculty (less than 4 Papers in 1 Year)
-        </button>
       </div>
 
       {/* Search Bar */}

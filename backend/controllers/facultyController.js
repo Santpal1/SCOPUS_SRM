@@ -97,7 +97,9 @@ exports.getFacultyPaperStats = (req, res) => {
 exports.getLowPublishingFaculty = (req, res) => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    const startDate = `${currentYear - 1}-07-01`;
+
+    const years = parseInt(req.query.years) || 1; // Default is 1 year if not provided
+    const startDate = `${currentYear - years}-07-01`;
     const endDate = `${currentYear}-06-30`;
 
     const query = `
@@ -110,10 +112,14 @@ exports.getLowPublishingFaculty = (req, res) => {
     `;
 
     db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: 'Failed to fetch data' });
+        if (err) {
+            console.error("DB Error:", err);
+            return res.status(500).json({ error: 'Failed to fetch data' });
+        }
         res.json(results);
     });
 };
+
 
 exports.getFacultyDetails = (req, res) => {
     const { scopusId } = req.params;

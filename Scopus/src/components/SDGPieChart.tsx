@@ -90,7 +90,7 @@ const SDGPieChart: React.FC = () => {
                 <div style={{
                     flex: '1 1 40%',
                     minWidth: '18rem',
-                    marginTop:'4rem',
+                    marginTop: '4rem',
                     marginLeft: '33%'
                 }}>
                     <Pie
