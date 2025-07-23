@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import srmLogo from "../assets/srm_logo.png";
+import srmLogo from "../assets/srmist-logo.png";
 import styles from "../components/AgentSignUp.module.css";
 
 const AgentSignUp: React.FC = () => {
@@ -43,7 +43,7 @@ const AgentSignUp: React.FC = () => {
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>
           <div className={styles.loginBox}>
-            <h2 className={styles.loginTitle}>Agent Sign Up</h2>
+            <h2 className={styles.loginTitle}>Faculty Sign Up</h2>
             <p className={styles.loginSubtitle}>
               Enter your details to sign in to your account
             </p>

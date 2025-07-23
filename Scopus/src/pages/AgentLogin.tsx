@@ -2,7 +2,7 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import srmLogo from "../assets/srm_logo.png";
+import srmLogo from "../assets/srmist-logo.png";
 import styles from "../components/AgentLogin.module.css";
 
 const AgentLogin: React.FC = () => {
@@ -57,7 +57,7 @@ const AgentLogin: React.FC = () => {
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>
           <div className={styles.loginBox}>
-            <h2 className={styles.loginTitle}>Agent Login</h2>
+            <h2 className={styles.loginTitle}>Faculty Login</h2>
             <p className={styles.loginSubtitle}>Enter your details to log in</p>
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Username</label>

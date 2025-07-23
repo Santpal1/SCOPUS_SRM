@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import '../components/FacultyDetailPage.css';
 
 interface Faculty {
@@ -14,7 +14,6 @@ interface Faculty {
   citation_count: number;
   h_index: number;
 }
-
 
 interface Paper {
   scopus_id: string;
@@ -33,16 +32,46 @@ interface FacultyDetailResponse {
 const FacultyDetailPage: React.FC = () => {
   const { scopusId } = useParams<{ scopusId: string }>();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
-  const sdgFilter = queryParams.get("sdg") || "none";
-  const domainFilter = queryParams.get("domain") || "none";
-  const yearFilter = queryParams.get("year") || "none";
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [facultyData, setFacultyData] = useState<FacultyDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
+
+  const [sdgFilter, setSdgFilter] = useState<string>(
+    new URLSearchParams(location.search).get("sdg") || "none"
+  );
+  const [domainFilter, setDomainFilter] = useState<string>(
+    new URLSearchParams(location.search).get("domain") || "none"
+  );
+  const [yearFilter, setYearFilter] = useState<string>(
+    new URLSearchParams(location.search).get("year") || "none"
+  );
+
+  const updateQuery = (key: string) => {
+    const queryParams = new URLSearchParams(location.search);
+    queryParams.delete(key);
+
+    switch (key) {
+      case 'sdg':
+        setSdgFilter("none");
+        break;
+      case 'domain':
+        setDomainFilter("none");
+        break;
+      case 'year':
+        setYearFilter("none");
+        break;
+      default:
+        break;
+    }
+
+    navigate({
+      pathname: location.pathname,
+      search: queryParams.toString()
+    });
+  };
 
   useEffect(() => {
     const fetchFacultyDetails = async () => {
@@ -53,6 +82,7 @@ const FacultyDetailPage: React.FC = () => {
       }
 
       try {
+        setLoading(true);
         const response = await axios.get(`http://localhost:5001/api/faculty/${scopusId}`, {
           params: {
             sdg: sdgFilter !== "none" ? sdgFilter : undefined,
@@ -89,12 +119,10 @@ const FacultyDetailPage: React.FC = () => {
 
     let yPos = margin + 15;
 
-    // Title
     doc.setFontSize(18);
     doc.setFont('times', 'bold');
     doc.text('FACULTY REPORT', pageWidth / 2, margin + 5, { align: 'center' });
 
-    // Faculty Details
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Name:', margin, yPos);
@@ -124,22 +152,16 @@ const FacultyDetailPage: React.FC = () => {
     doc.text(faculty.citation_count.toString(), margin + citeLabelWidth + 2, yPos);
 
     yPos += 8;
-doc.setFont('helvetica', 'bold');
-doc.text('H-Index:', margin, yPos);
-doc.setFont('helvetica', 'normal');
-const hindexLabelWidth = doc.getTextWidth('H-Index:');
-doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, yPos);
-
-
-    // Show filters if any are selected
-    const sdg = new URLSearchParams(window.location.search).get("sdg");
-    const domain = new URLSearchParams(window.location.search).get("domain");
-    const year = new URLSearchParams(window.location.search).get("year");
+    doc.setFont('helvetica', 'bold');
+    doc.text('H-Index:', margin, yPos);
+    doc.setFont('helvetica', 'normal');
+    const hindexLabelWidth = doc.getTextWidth('H-Index:');
+    doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, yPos);
 
     const filterLines: string[] = [];
-    if (sdg && sdg !== 'none') filterLines.push(`SDG: ${sdg}`);
-    if (domain && domain !== 'none') filterLines.push(`Domain: ${domain}`);
-    if (year && year !== 'none') filterLines.push(`Year: ${year}`);
+    if (sdgFilter !== 'none') filterLines.push(`SDG: ${sdgFilter}`);
+    if (domainFilter !== 'none') filterLines.push(`Domain: ${domainFilter}`);
+    if (yearFilter !== 'none') filterLines.push(`Year: ${yearFilter}`);
 
     if (filterLines.length > 0) {
       yPos += 10;
@@ -151,13 +173,11 @@ doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, y
 
     yPos += 12;
 
-    // Publications Title
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('Publications', pageWidth / 2, yPos, { align: 'center' });
     yPos += 10;
 
-    // Publications
     const cleanText = (text: string | null | undefined) => text?.replace(/[^ -~]+/g, '') || 'N/A';
 
     papers.forEach((paper, index) => {
@@ -195,12 +215,10 @@ doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, y
       writeLine('Type:', cleanText(paper.type));
       writeLine('Publication:', cleanText(paper.publication_name));
       writeLine('Date:', paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A');
-
       yPos += 5;
     });
 
-    // Only include chart if NO filters are applied
-    if ((!sdg || sdg === 'none') && (!domain || domain === 'none') && (!year || year === 'none')) {
+    if (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none') {
       const iframe = document.querySelector('.highcharts-iframe') as HTMLIFrameElement;
       const iframeDoc = iframe?.contentDocument;
 
@@ -217,11 +235,9 @@ doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, y
       }
     }
 
-    // Save the file
     const fileName = `${faculty.name.replace(/\s+/g, "_")}_Report.pdf`;
     doc.save(fileName);
   };
-
 
   if (loading) return <div className="loading">Loading faculty details...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -242,11 +258,18 @@ doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, y
         <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
 
         {(sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none') && (
-          <p><strong>Filters Applied:</strong>
-            {sdgFilter !== 'none' && ` SDG: ${sdgFilter}`}
-            {domainFilter !== 'none' && ` | Domain: ${domainFilter}`}
-            {yearFilter !== 'none' && ` | Year: ${yearFilter}`}
-          </p>
+          <div className="filter-badges">
+            <strong>Filters Applied: </strong>
+            {sdgFilter !== 'none' && (
+              <span className="filter-chip">SDG: {sdgFilter} <button onClick={() => updateQuery("sdg")}>❌</button></span>
+            )}
+            {domainFilter !== 'none' && (
+              <span className="filter-chip">Domain: {domainFilter} <button onClick={() => updateQuery("domain")}>❌</button></span>
+            )}
+            {yearFilter !== 'none' && (
+              <span className="filter-chip">Year: {yearFilter} <button onClick={() => updateQuery("year")}>❌</button></span>
+            )}
+          </div>
         )}
 
         <a

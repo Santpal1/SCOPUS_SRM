@@ -25,19 +25,22 @@ body {
 }
 
 .back-button {
-  padding: 8px 16px;
-  background-color: #1a4d6c;
-  color: white;
+  display: inline-block;
+  margin-bottom: 20px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #1A4D6C, #163b4d);
+  color: #fff;
   text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease, transform 0.2s ease;
 }
 
 .back-button:hover {
-  background-color: #163e55;
+  background: linear-gradient(135deg, #163b4d, #1A4D6C);
+  transform: translateY(-4px) scale(1.05);
 }
-
 
 .faculty-container {
   max-width: 1200px;  /* Increased max-width for more space */

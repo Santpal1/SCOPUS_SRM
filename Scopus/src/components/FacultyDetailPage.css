@@ -36,8 +36,35 @@ a {
   transform: translateY(-4px) scale(1.05);
 }
 
+.active-filters {
+  margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+.filter-chip {
+  display: inline-block;
+  background-color: #e0f0ff;
+  color: #0074cc;
+  margin-left: 8px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.filter-chip:hover {
+  background-color: #cce5ff;
+}
+.remove-btn {
+  background: none;
+  border: none;
+  color: #cc0000;
+  margin-left: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+
 .faculty-card {
-  max-height: 250px;
+  max-height: 300px;
   padding: 25px;
   background: #f8f9fa;
   border-radius: 10px;
@@ -230,7 +257,7 @@ p {
   margin-left: auto;
   margin-right: auto;
   display: block;
-  margin-top: 20px;
+  /* margin-top: 10px; */
   transition: transform 0.3s ease;
 }
 
