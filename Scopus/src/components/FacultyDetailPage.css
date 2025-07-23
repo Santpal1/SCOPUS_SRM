@@ -1,3 +1,4 @@
+
 .faculty-detail-container {
   max-width: 1100px;
   margin: 40px auto;
@@ -7,6 +8,127 @@
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
   font-family: 'Poppins', sans-serif;
   transition: all 0.3s ease;
+}
+
+/* Fixed quartile summary positioning - removed absolute positioning */
+.quartile-summary-table {
+  width: fit-content;
+  background-color: #f8f9fb;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  font-size: 14px;
+}
+
+.quartile-summary-table h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #1A4D6C;
+}
+
+.quartile-summary-table table {
+  border-collapse: collapse;
+}
+
+.quartile-summary-table td {
+  padding: 4px 8px;
+  color: #333;
+}
+
+.quartile-summary-table tr:nth-child(even) {
+  background-color: rgba(26,77,108,0.05);
+}
+
+.quartile-badge {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;                 /* moved down */
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  transform: rotate(-10deg);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #ffffff10, #ffffff05);
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quartile-badge:hover {
+  transform: rotate(0deg) scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+
+/* color variants */
+.q1 { background: #4CAF50; }
+.q2 { background: #2196F3; }
+.q3 { background: #FF9800; }
+.q4 { background: #F44336; }
+
+.quartile-text {
+  margin-right: 4px;
+  color: white;
+  font-weight: 600;
+}
+
+.badge-icon {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* optional pulsing glow */
+.quartile-badge.q1 { animation: glow 3s ease-in-out infinite; }
+@keyframes glow {
+  0%,100% { box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+  50%     { box-shadow: 0 6px 20px rgba(0,255,0,0.4); }
+}
+
+.publication-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: relative;
+  background-color: #fefefe;
+}
+
+.publication-left {
+  flex: 1;
+}
+
+.quartile-badge {
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  min-width: 55px;
+  text-align: center;
+  align-self: flex-start;
+}
+
+.q1 {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.q2 {
+  background-color: #2196F3;
+  color: white;
+}
+
+.q3 {
+  background-color: #FF9800;
+  color: white;
+}
+
+.q4 {
+  background-color: #F44336;
+  color: white;
 }
 
 .faculty-detail-container:hover {
@@ -62,15 +184,14 @@ a {
   cursor: pointer;
 }
 
-
 .faculty-card {
-  max-height: 300px;
   padding: 25px;
   background: #f8f9fa;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
 .faculty-card:hover {
@@ -148,13 +269,15 @@ p {
 .scopus-link-button {
   display: inline-block;
   margin-top: 10px;
-  padding: 8px 20px;
+  padding: 8px 16px;
   background-color: #1A4D6C;
   color: white;
   text-decoration: none;
   border-radius: 5px;
   font-weight: bold;
   transition: background-color 0.2s, transform 0.3s ease;
+  width: fit-content;
+  max-width: 200px;
 }
 
 .scopus-link-button:hover {
@@ -175,11 +298,8 @@ p {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 640px;
   transition: background-color 0.3s, transform 0.2s;
-  position: relative;
-  top: -140px;
-  right: -200px;
+  margin-bottom: 15px;
 }
 
 .generate-pdf-button:hover {
@@ -190,6 +310,17 @@ p {
 .generate-pdf-button:active {
   background-color: #0d2a35;
   transform: scale(0.98);
+}
+
+/* Simple positioning for faculty actions */
+.faculty-actions {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
 }
 
 .graph-container {
@@ -252,15 +383,6 @@ p {
   }
 }
 
-/* Adjusting the position of generate-pdf-button */
-.generate-pdf-button {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  /* margin-top: 10px; */
-  transition: transform 0.3s ease;
-}
-
 @media (max-width: 768px) {
   .faculty-detail-container {
     padding: 15px;
@@ -287,9 +409,10 @@ p {
     font-size: 16px;
   }
 
-  .generate-pdf-button {
-    margin-left: 20px;
-    margin-top: 10px;
+  .faculty-actions {
+    position: static;
+    margin-top: 20px;
+    align-items: flex-start;
   }
 
   .graph-container {

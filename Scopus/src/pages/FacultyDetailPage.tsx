@@ -22,6 +22,7 @@ interface Paper {
   type: string;
   publication_name: string;
   date: string;
+  quartile?: string;
 }
 
 interface FacultyDetailResponse {
@@ -245,46 +246,88 @@ const FacultyDetailPage: React.FC = () => {
 
   const { faculty, papers } = facultyData;
 
+const quartileCounts = {
+  Q1: 0,
+  Q2: 0,
+  Q3: 0,
+  Q4: 0
+};
+
+papers.forEach(p => {
+  const q = p.quartile?.toUpperCase();
+  if (q && quartileCounts[q as keyof typeof quartileCounts] !== undefined) {
+    quartileCounts[q as keyof typeof quartileCounts]++;
+  }
+});
+
+
   return (
     <div className="faculty-detail-container">
       <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
 
       <div className="faculty-card">
-        <h2 className="faculty-name">{faculty.name}</h2>
-        <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
-        {faculty.faculty_id && <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>}
-        <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
-        <p><strong>Citations:</strong> {faculty.citation_count}</p>
-        <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
+  <div className="faculty-info">
+    <h2 className="faculty-name">{faculty.name}</h2>
+    <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
+    {faculty.faculty_id && (
+      <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
+    )}
+    <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
+    <p><strong>Citations:</strong> {faculty.citation_count}</p>
+    <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
 
-        {(sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none') && (
-          <div className="filter-badges">
-            <strong>Filters Applied: </strong>
-            {sdgFilter !== 'none' && (
-              <span className="filter-chip">SDG: {sdgFilter} <button onClick={() => updateQuery("sdg")}>❌</button></span>
-            )}
-            {domainFilter !== 'none' && (
-              <span className="filter-chip">Domain: {domainFilter} <button onClick={() => updateQuery("domain")}>❌</button></span>
-            )}
-            {yearFilter !== 'none' && (
-              <span className="filter-chip">Year: {yearFilter} <button onClick={() => updateQuery("year")}>❌</button></span>
-            )}
-          </div>
+    {(sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none') && (
+      <div className="filter-badges">
+        <strong>Filters Applied: </strong>
+        {sdgFilter !== 'none' && (
+          <span className="filter-chip">
+            SDG: {sdgFilter} <button onClick={() => updateQuery('sdg')}>❌</button>
+          </span>
         )}
-
-        <a
-          href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="scopus-link-button"
-        >
-          View on Scopus
-        </a>
-
-        <button onClick={generatePDF} className="generate-pdf-button">
-          📄 Generate Report
-        </button>
+        {domainFilter !== 'none' && (
+          <span className="filter-chip">
+            Domain: {domainFilter} <button onClick={() => updateQuery('domain')}>❌</button>
+          </span>
+        )}
+        {yearFilter !== 'none' && (
+          <span className="filter-chip">
+            Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
+          </span>
+        )}
       </div>
+    )}
+  </div>
+
+  <div className="faculty-bottom">
+    <a
+      href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="scopus-link-button"
+    >
+      View on Scopus
+    </a>
+  </div>
+
+  <div className="faculty-actions">
+    <button onClick={generatePDF} className="generate-pdf-button">
+      📄 Generate Report
+    </button>
+
+    <div className="quartile-summary-table">
+      <h4>Quartile Summary</h4>
+      <table>
+        <tbody>
+          <tr><td>Q1</td><td>{quartileCounts.Q1}</td></tr>
+          <tr><td>Q2</td><td>{quartileCounts.Q2}</td></tr>
+          <tr><td>Q3</td><td>{quartileCounts.Q3}</td></tr>
+          <tr><td>Q4</td><td>{quartileCounts.Q4}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 
       <h3 className="publications-title">Publications</h3>
       {papers.length > 0 ? (
@@ -295,12 +338,21 @@ const FacultyDetailPage: React.FC = () => {
             className="publication-card-link"
           >
             <div className="publication-card">
+            <div className="publication-left">
               <h4>{paper.title}</h4>
               <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
               <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
               <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
               <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
             </div>
+            {paper.quartile && (
+            <div className={`quartile-badge ${paper.quartile.toLowerCase()}`}>
+              <span className="quartile-text">{paper.quartile.toUpperCase()}</span>
+                <i className="badge-icon">★</i>
+              </div>
+            )}
+</div>
+
           </Link>
         ))
       ) : (
