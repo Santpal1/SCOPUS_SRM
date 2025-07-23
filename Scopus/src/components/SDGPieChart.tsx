@@ -5,7 +5,7 @@ import {
     Legend,
     Tooltip,
 } from 'chart.js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -33,6 +33,7 @@ const sdgInfo: { [key: string]: { color: string; title: string; number: string }
 
 const SDGPieChart: React.FC = () => {
     const [data, setData] = useState<any>(null);
+    const chartRef = useRef<any>(null);
 
     useEffect(() => {
         axios.get('http://localhost:5001/api/sdg-count').then(res => {
@@ -51,6 +52,21 @@ const SDGPieChart: React.FC = () => {
         });
     }, []);
 
+    // Highlight slice on hover
+    const highlightSlice = (index: number | null) => {
+        const chart = chartRef.current;
+        if (!chart) return;
+
+        if (index !== null) {
+            chart.setActiveElements([{ datasetIndex: 0, index }]);
+            chart.tooltip.setActiveElements([{ datasetIndex: 0, index }], { x: 0, y: 0 });
+        } else {
+            chart.setActiveElements([]);
+            chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+        }
+        chart.update();
+    };
+
     if (!data) {
         return (
             <div style={{ textAlign: 'center', padding: '2rem', fontSize: '1.2rem' }}>
@@ -61,13 +77,14 @@ const SDGPieChart: React.FC = () => {
 
     return (
         <div style={{
-            width: '70%',
+            width: '90%',
+            maxWidth: '1200px',
             padding: '3rem 5%',
             backgroundColor: '#fff',
             borderRadius: '1rem',
             boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.08)',
-            boxSizing: 'border-box',
-            margin: '0.5rem auto'
+            margin: '1rem auto',
+            boxSizing: 'border-box'
         }}>
             <h2 style={{
                 fontSize: '2rem',
@@ -81,21 +98,21 @@ const SDGPieChart: React.FC = () => {
 
             <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-                gap: '2rem',
+                flexDirection: 'column',
+                alignItems: 'center',  // Center content
+                gap: '3rem',
                 width: '100%',
             }}>
+                {/* Pie Chart */}
                 <div style={{
-                    flex: '1 1 40%',
-                    minWidth: '18rem',
-                    marginTop: '4rem',
-                    marginLeft: '33%'
+                    width: '350px',      // Reduced size
+                    height: '350px',     // Fixed size
                 }}>
                     <Pie
+                        ref={chartRef}
                         data={data}
                         options={{
+                            maintainAspectRatio: false,  // Allow fixed sizing
                             plugins: {
                                 legend: { display: false },
                                 tooltip: {
@@ -105,57 +122,53 @@ const SDGPieChart: React.FC = () => {
                                             const label = context.label;
                                             const value = context.formattedValue;
                                             const info = sdgInfo[label];
-
-                                            return [
-                                                `SDG ${info?.number || '-'}: ${info?.title || label} - ${value}`
-                                            ];
+                                            return [`SDG ${info?.number || '-'}: ${info?.title || label} - ${value}`];
                                         }
                                     },
                                     backgroundColor: 'white',
                                     bodyColor: '#34383b',
                                     displayColors: true,
                                     padding: 10,
-                                    bodyFont: {
-                                        size: 14,
-                                        weight: 'bold',
-                                        lineHeight: 1.2,
-                                        family: 'Helvetica'
-                                    }
+                                    bodyFont: { size: 14, weight: 'bold' }
                                 }
                             }
                         }}
                     />
                 </div>
 
+                {/* Interactive Legend */}
                 <div style={{
-                    flex: '1 1 50%',
+                    width: '100%',
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(7.5rem, 1fr))',
-                    gap: '2rem',
-                    alignContent: 'start',
-                    marginTop: '4rem',
+                    gap: '1.5rem',
                     maxHeight: '30rem',
                     overflowY: 'auto',
                     padding: '0.5rem'
                 }}>
                     {data.labels.map((label: string, i: number) => (
-                        <div key={label} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontSize: '1.1rem',
-                            fontWeight: 500,
-                            color: '#444'
-                        }}>
+                        <div
+                            key={label}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                fontSize: '1.1rem',
+                                fontWeight: 500,
+                                color: '#444',
+                                cursor: 'pointer',
+                                transition: 'transform 0.2s ease'
+                            }}
+                            onMouseEnter={() => highlightSlice(i)}
+                            onMouseLeave={() => highlightSlice(null)}
+                        >
                             <div style={{
                                 width: '1rem',
                                 height: '1rem',
                                 backgroundColor: data.datasets[0].backgroundColor[i],
                                 borderRadius: '0.25rem',
-                                flexShrink: 0,
-                                fontWeight: 500
                             }} />
-                            <span style={{ fontWeight: 500 }}>{label}</span>
+                            <span>{label}</span>
                         </div>
                     ))}
                 </div>
