@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../components/PaperDetailPage.module.css';
 
 interface Paper {
@@ -33,7 +33,7 @@ const parseTags = (str: string, separator = '|'): string[] => {
     return str
         .split(separator)
         .map((item) => item.trim())
-        .map((item) => item.replace(/\s*\(\d+\)$/g, '').trim()) // remove trailing (number)
+        .map((item) => item.replace(/\s*\(\d+\)$/g, '').trim())
         .filter((item) => item.length > 0);
 };
 
@@ -50,10 +50,10 @@ const parsePairedTags = (namesStr: string, codesStr: string): string[] => {
     return tags;
 };
 
-
-
 const PaperDetailPage: React.FC = () => {
     const { doi } = useParams<{ doi: string }>();
+    const navigate = useNavigate(); // ✅ Correct place to declare
+
     const [paper, setPaper] = useState<Paper | null>(null);
     const [insights, setInsights] = useState<PaperInsights | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -81,80 +81,85 @@ const PaperDetailPage: React.FC = () => {
     if (!paper) return <div className={styles.errorMessage}>No data found for this paper.</div>;
 
     return (
-    <div className={styles.paperDetailContainer}>
+        <div className={styles.paperDetailContainer}>
 
-        {/* Paper Info Card */}
-        <div className={styles.card}>
-            <h2>{paper.title}</h2>
-            <p><span className={styles.label}>DOI:</span> <span className={styles.value}>{paper.doi}</span></p>
-            <p><span className={styles.label}>Publication:</span> <span className={styles.value}>{paper.publication_name}</span></p>
-            <p><span className={styles.label}>Type:</span> <span className={styles.value}>{paper.type}</span></p>
-            <p><span className={styles.label}>Date:</span> <span className={styles.value}>{new Date(paper.date).toLocaleDateString()}</span></p>
-
-            {/* View Paper Button */}
-            <a
-                href={`https://doi.org/${paper.doi}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.doiButton}
-            >
-                🔗 View Paper on DOI.org
-            </a>
-        </div>
-
-        {/* Analytics Card */}
-        {insights ? (
-            <div className={styles.section}>
-                <h3>Analytics</h3>
-                <p><span className={styles.label}>First Author ID:</span> <span className={styles.value}>{insights.scopus_author_id_first}</span></p>
-                <p><span className={styles.label}>Corresponding Author ID:</span> <span className={styles.value}>{insights.scopus_author_id_corresponding}</span></p>
-
-                <p>
-                    <span className={styles.label}>SDGs:</span>{' '}
-                    {insights.sustainable_development_goals
-                        ? insights.sustainable_development_goals.split('|').map((sdg, idx) => (
-                            <span key={idx} className={styles.tag}>{sdg.trim()}</span>
-                        ))
-                        : <span className={styles.value}>None</span>}
-                </p>
-
-                <p>
-                    <span className={styles.label}>QS Subject:</span>{' '}
-                    {parsePairedTags(insights.qs_subject_field_name, insights.qs_subject_code).map((tag, idx) => (
-                        <span key={idx} className={styles.tag}>{tag}</span>
-                    ))}
-                </p>
-
-                <p>
-                    <span className={styles.label}>ASJC Field:</span>{' '}
-                    {parsePairedTags(insights.asjc_field_name, insights.asjc_code).map((tag, idx) => (
-                        <span key={idx} className={styles.tag}>{tag}</span>
-                    ))}
-                </p>
-
-                <p><span className={styles.label}>Total Authors:</span> <span className={styles.value}>{insights.total_authors}</span></p>
-
-                <p>
-                    <span className={styles.label}>Countries:</span>{' '}
-                    {parseTags(insights.country_list).map((country, idx) => (
-                        <span key={idx} className={styles.tag}>{country}</span>
-                    ))}
-                </p>
-
-                <p>
-                    <span className={styles.label}>Institutions:</span>{' '}
-                    {parseTags(insights.institution_list).map((inst, idx) => (
-                        <span key={idx} className={styles.tag}>{inst}</span>
-                    ))}
-                </p>
+            {/* Back Button */}
+            <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+                <button onClick={() => navigate(-1)} className={styles.backButton}>
+                    &laquo; Back to Faculty Details
+                </button>
             </div>
-        ) : (
-            <p className={styles.errorMessage}>No advanced insights available for this paper.</p>
-        )}
 
-    </div>
-);
+            {/* Paper Info Card */}
+            <div className={styles.card}>
+                <h2>{paper.title}</h2>
+                <p><span className={styles.label}>DOI:</span> <span className={styles.value}>{paper.doi}</span></p>
+                <p><span className={styles.label}>Publication:</span> <span className={styles.value}>{paper.publication_name}</span></p>
+                <p><span className={styles.label}>Type:</span> <span className={styles.value}>{paper.type}</span></p>
+                <p><span className={styles.label}>Date:</span> <span className={styles.value}>{new Date(paper.date).toLocaleDateString()}</span></p>
 
+                {/* View Paper Button */}
+                <a
+                    href={`https://doi.org/${paper.doi}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.doiButton}
+                >
+                    🔗 View Paper on DOI.org
+                </a>
+            </div>
+
+            {/* Analytics Card */}
+            {insights ? (
+                <div className={styles.section}>
+                    <h3>Analytics</h3>
+                    <p><span className={styles.label}>First Author ID:</span> <span className={styles.value}>{insights.scopus_author_id_first}</span></p>
+                    <p><span className={styles.label}>Corresponding Author ID:</span> <span className={styles.value}>{insights.scopus_author_id_corresponding}</span></p>
+
+                    <p>
+                        <span className={styles.label}>SDGs:</span>{' '}
+                        {insights.sustainable_development_goals
+                            ? insights.sustainable_development_goals.split('|').map((sdg, idx) => (
+                                <span key={idx} className={styles.tag}>{sdg.trim()}</span>
+                            ))
+                            : <span className={styles.value}>None</span>}
+                    </p>
+
+                    <p>
+                        <span className={styles.label}>QS Subject:</span>{' '}
+                        {parsePairedTags(insights.qs_subject_field_name, insights.qs_subject_code).map((tag, idx) => (
+                            <span key={idx} className={styles.tag}>{tag}</span>
+                        ))}
+                    </p>
+
+                    <p>
+                        <span className={styles.label}>ASJC Field:</span>{' '}
+                        {parsePairedTags(insights.asjc_field_name, insights.asjc_code).map((tag, idx) => (
+                            <span key={idx} className={styles.tag}>{tag}</span>
+                        ))}
+                    </p>
+
+                    <p><span className={styles.label}>Total Authors:</span> <span className={styles.value}>{insights.total_authors}</span></p>
+
+                    <p>
+                        <span className={styles.label}>Countries:</span>{' '}
+                        {parseTags(insights.country_list).map((country, idx) => (
+                            <span key={idx} className={styles.tag}>{country}</span>
+                        ))}
+                    </p>
+
+                    <p>
+                        <span className={styles.label}>Institutions:</span>{' '}
+                        {parseTags(insights.institution_list).map((inst, idx) => (
+                            <span key={idx} className={styles.tag}>{inst}</span>
+                        ))}
+                    </p>
+                </div>
+            ) : (
+                <p className={styles.errorMessage}>No advanced insights available for this paper.</p>
+            )}
+        </div>
+    );
 };
 
 export default PaperDetailPage;
