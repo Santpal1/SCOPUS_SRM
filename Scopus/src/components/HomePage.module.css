@@ -13,6 +13,16 @@
 body,
 html {
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
+}
+
+body{
+    scroll-behavior: smooth;
+}
+
+.fullPageContainer {
+  overflow-x: hidden;
+  position: relative;
 }
 
 
@@ -130,20 +140,24 @@ html {
 
 /* HERO SECTION */
 .heroSection {
-    width: 100vw;
-    min-height: 100vh;
-    background: linear-gradient(120deg, var(--secondary) 0%, var(--background) 100%);
-    padding-top: 7rem;
-    /* increased to offset navbar */
-    padding-bottom: 3rem;
-    text-align: center;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    /* move content to top */
+    will-change: transform;
+
+  width: 100%; /* ✅ instead of 100vw */
+  min-height: calc(100vh - 5rem); /* or as needed */
+  background: linear-gradient(120deg, #5fd0f3 0%, #f9f9f9 100%);
+  box-sizing: border-box;
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
 }
+
+
 
 .heroSection h1 {
     font-size: 3.1rem;

@@ -133,7 +133,7 @@ const FacultyLandingPage = () => {
                 {/* HERO SECTION */}
                 <motion.section
                     className={styles.heroSection}
-                    initial="hidden"
+                    initial={false}
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.6 }}
                     variants={fadeInUp}
@@ -180,7 +180,8 @@ const FacultyLandingPage = () => {
                 {/* STATS SECTION (unchanged, always visible) */}
                 <motion.section
                     className={styles.statsSection}
-                    initial="hidden"
+                    initial={false}
+
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.5 }}
                     variants={stagger}
@@ -206,7 +207,7 @@ const FacultyLandingPage = () => {
                 {/* CAROUSEL SECTION */}
                 <motion.section
                     className={styles.carousel}
-                    initial="hidden"
+                    initial={false}
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.3 }}
                     variants={fadeIn}
@@ -260,7 +261,7 @@ const FacultyLandingPage = () => {
                 {/* DEVELOPERS SECTION */}
                 <motion.section
                     className={styles.developers}
-                    initial="hidden"
+                    initial={false}
                     whileInView="visible"
                     viewport={{ once: true, amount: 0.3 }}
                     variants={fadeIn}
@@ -308,7 +309,7 @@ const FacultyLandingPage = () => {
                 {/* DESCRIPTION SECTION */}
                 <motion.section
                     className={styles.description}
-                    initial={{ opacity: 0, y: 60 }}
+                    initial={false}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.4 }}
                     transition={{ duration: 0.7 }}
