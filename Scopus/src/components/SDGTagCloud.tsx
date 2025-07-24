@@ -168,11 +168,19 @@ const SDGInsightsDashboard: React.FC = () => {
   const unspecifiedProjects = data['-'] || 0;
 
   return (
-    <div style={{
-      borderRadius: '16px',
-      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.4)',
-      boxSizing: 'border-box', padding: '20px', margin: '2%', width: '70%', marginLeft: '15%'
-    }} className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden">
+    <div
+      style={{
+        width: '95%',                 // Same as SDGPieChart
+        maxWidth: '1200px',           // Same max width
+        margin: '2rem auto',          // Center align
+        borderRadius: '1rem',
+        boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.08)',
+        boxSizing: 'border-box',
+        padding: '20px',
+        backgroundColor: '#ffffff',
+      }}
+      className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-2xl overflow-hidden"
+    >
       {/* Subtle Blurred Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -261,20 +269,6 @@ const SDGInsightsDashboard: React.FC = () => {
                 border: "2px solid black",
                 barColor: "bg-blue-500",
               },
-              {
-                title: "SDG Aligned",
-                value: specifiedProjects,
-                percent: (specifiedProjects / totalProjects) * 100,
-                color: "emerald",
-                barColor: "bg-emerald-500",
-              },
-              {
-                title: "Unspecified",
-                value: unspecifiedProjects,
-                percent: (unspecifiedProjects / totalProjects) * 100,
-                color: "amber",
-                barColor: "bg-amber-500",
-              },
             ].map(({ title, value, percent, color, barColor }) => (
               <div
                 onMouseEnter={() => setHoveredButton1(title)}
@@ -302,7 +296,7 @@ const SDGInsightsDashboard: React.FC = () => {
                 key={title}
                 className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700 hover:border-slate-600 transition-all duration-300"
               >
-                <div className="flex items-center justify-between" style={{ width: '15rem' }}>
+                <div className="flex items-center justify-between" style={{ width: '20rem' }}>
                   <div>
                     <div className="text-slate-400 text-sm font-medium mb-2">{title} : {value.toLocaleString()}</div>
                     {/* <div className="text-3xl font-bold text-white mb-1">{value.toLocaleString()}</div> */}

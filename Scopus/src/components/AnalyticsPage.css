@@ -1,0 +1,29 @@
+.analytics-container {
+    background: #f3f4f6;
+    border-radius: 1rem;
+    padding: 25px;
+    max-width: 1400px;
+    margin: 40px auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #1A4D6C, #163b4d);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease, transform 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, #163b4d, #1A4D6C);
+    transform: translateY(-4px) scale(1.05);
+}

@@ -92,13 +92,14 @@ const GlobalCollabMap: React.FC = () => {
     return (
         <div
             style={{
-                maxWidth: '70%',
-                maxHeight: '50%',
-                margin: '2rem auto',
+                width: '95%',                 // Same as SDGPieChart
+                maxWidth: '1200px',          // Match max width
+                margin: '1rem auto',
                 padding: '2rem',
                 borderRadius: '1.25rem',
-                backgroundColor: '#f8fbff',
-                boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.1)',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.08)',
+                boxSizing: 'border-box'
             }}
         >
             <h2 style={{

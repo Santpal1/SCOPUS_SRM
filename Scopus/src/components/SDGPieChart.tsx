@@ -77,8 +77,8 @@ const SDGPieChart: React.FC = () => {
 
     return (
         <div style={{
-            width: '90%',
-            maxWidth: '1100px',
+            width: '95%',
+            maxWidth: '1200px',
             padding: '3rem 5%',
             backgroundColor: '#fff',
             borderRadius: '1rem',
