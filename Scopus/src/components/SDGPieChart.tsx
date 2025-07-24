@@ -78,7 +78,7 @@ const SDGPieChart: React.FC = () => {
     return (
         <div style={{
             width: '90%',
-            maxWidth: '1200px',
+            maxWidth: '1100px',
             padding: '3rem 5%',
             backgroundColor: '#fff',
             borderRadius: '1rem',
@@ -116,21 +116,90 @@ const SDGPieChart: React.FC = () => {
                             plugins: {
                                 legend: { display: false },
                                 tooltip: {
-                                    callbacks: {
-                                        title: () => '',
-                                        label: function (context) {
-                                            const label = context.label;
-                                            const value = context.formattedValue;
-                                            const info = sdgInfo[label];
-                                            return [`SDG ${info?.number || '-'}: ${info?.title || label} - ${value}`];
+                                    enabled: false, // Disable default tooltip
+                                    external: function (context) {
+                                        // Tooltip element
+                                        let tooltipEl = document.getElementById('chartjs-tooltip');
+                                        if (!tooltipEl) {
+                                            tooltipEl = document.createElement('div');
+                                            tooltipEl.id = 'chartjs-tooltip';
+                                            tooltipEl.style.background = 'white';
+                                            tooltipEl.style.border = '1px solid #ccc';
+                                            tooltipEl.style.borderRadius = '8px';
+                                            tooltipEl.style.padding = '10px';
+                                            tooltipEl.style.maxWidth = '280px';
+                                            tooltipEl.style.whiteSpace = 'normal';
+                                            tooltipEl.style.pointerEvents = 'none';
+                                            tooltipEl.style.position = 'absolute';
+                                            tooltipEl.style.transform = 'translate(-50%, -120%)'; // Position above pointer
+                                            tooltipEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                                            tooltipEl.style.transition = 'all 0.1s ease';
+                                            tooltipEl.style.opacity = '0';
+                                            tooltipEl.style.zIndex = '999';
+                                            tooltipEl.innerHTML = '';
+
+                                            // Add pointer
+                                            const caret = document.createElement('div');
+                                            caret.style.position = 'absolute';
+                                            caret.style.bottom = '-8px';
+                                            caret.style.left = '50%';
+                                            caret.style.transform = 'translateX(-50%)';
+                                            caret.style.width = '0';
+                                            caret.style.height = '0';
+                                            caret.style.borderLeft = '8px solid transparent';
+                                            caret.style.borderRight = '8px solid transparent';
+                                            caret.style.borderTop = '8px solid white';
+                                            caret.style.filter = 'drop-shadow(0 -1px 1px rgba(0,0,0,0.2))';
+                                            tooltipEl.appendChild(caret);
+
+                                            document.body.appendChild(tooltipEl);
                                         }
-                                    },
-                                    backgroundColor: 'white',
-                                    bodyColor: '#34383b',
-                                    displayColors: true,
-                                    padding: 10,
-                                    bodyFont: { size: 14, weight: 'bold' }
+
+                                        const { chart, tooltip } = context;
+
+                                        if (tooltip.opacity === 0) {
+                                            tooltipEl.style.opacity = '0';
+                                            return;
+                                        }
+
+                                        // Get data
+                                        const dataIndex = tooltip.dataPoints[0].dataIndex;
+                                        const label = chart.data.labels[dataIndex];
+                                        const value = chart.data.datasets[0].data[dataIndex];
+                                        const info = sdgInfo[label] || { number: '-', title: label };
+
+                                        // Set HTML content
+                                        tooltipEl.innerHTML = `
+                                            <div style="font-size:14px; font-weight:bold; color:#333;">
+                                                SDG ${info.number}: ${info.title}
+                                            </div>
+                                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                                                Count: ${value}
+                                            </div>
+                                        `;
+
+                                        // Re-add caret
+                                        const caret = document.createElement('div');
+                                        caret.style.position = 'absolute';
+                                        caret.style.bottom = '-8px';
+                                        caret.style.left = '50%';
+                                        caret.style.transform = 'translateX(-50%)';
+                                        caret.style.width = '0';
+                                        caret.style.height = '0';
+                                        caret.style.borderLeft = '8px solid transparent';
+                                        caret.style.borderRight = '8px solid transparent';
+                                        caret.style.borderTop = '8px solid white';
+                                        caret.style.filter = 'drop-shadow(0 -1px 1px rgba(0,0,0,0.2))';
+                                        tooltipEl.appendChild(caret);
+
+                                        // Position tooltip
+                                        const canvasRect = chart.canvas.getBoundingClientRect();
+                                        tooltipEl.style.left = canvasRect.left + window.scrollX + tooltip.caretX + 'px';
+                                        tooltipEl.style.top = canvasRect.top + window.scrollY + tooltip.caretY + 'px';
+                                        tooltipEl.style.opacity = '1';
+                                    }
                                 }
+
                             }
                         }}
                     />
