@@ -40,6 +40,8 @@ const FacultyDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
   const [quartileYear, setQuartileYear] = useState<string>('2024');
+  const [selectedQuartile, setSelectedQuartile] = useState<string | null>(null);
+
 
 
   const [quartileSummary, setQuartileSummary] = useState<{
@@ -272,7 +274,12 @@ const FacultyDetailPage: React.FC = () => {
   if (error) return <div className="error-message">{error}</div>;
   if (!facultyData) return <div className="no-records">No data found for this faculty member.</div>;
 
-  const { faculty, papers } = facultyData;
+  const { faculty, papers: allPapers } = facultyData;
+
+const filteredPapers = selectedQuartile
+  ? allPapers.filter(p => p.quartile?.toUpperCase() === selectedQuartile)
+  : allPapers;
+
 
   return (
     <div className="faculty-detail-container">
@@ -280,6 +287,15 @@ const FacultyDetailPage: React.FC = () => {
 
       <div className="faculty-card">
   <div className="faculty-info">
+    {selectedQuartile && (
+  <div className="filter-badges">
+    <strong>Quartile Filter: </strong>
+    <span className="filter-chip">
+      {selectedQuartile} <button onClick={() => setSelectedQuartile(null)}>❌</button>
+    </span>
+  </div>
+)}
+
     <h2 className="faculty-name">{faculty.name}</h2>
     <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
     {faculty.faculty_id && (
@@ -345,10 +361,19 @@ const FacultyDetailPage: React.FC = () => {
 
     <table>
       <tbody>
-        <tr><td>Q1</td><td>{quartileSummary.Q1}</td></tr>
-        <tr><td>Q2</td><td>{quartileSummary.Q2}</td></tr>
-        <tr><td>Q3</td><td>{quartileSummary.Q3}</td></tr>
-        <tr><td>Q4</td><td>{quartileSummary.Q4}</td></tr>
+        <tr onClick={() => setSelectedQuartile('Q1')} style={{ cursor: 'pointer' }}>
+  <td>Q1</td><td>{quartileSummary.Q1}</td>
+</tr>
+<tr onClick={() => setSelectedQuartile('Q2')} style={{ cursor: 'pointer' }}>
+  <td>Q2</td><td>{quartileSummary.Q2}</td>
+</tr>
+<tr onClick={() => setSelectedQuartile('Q3')} style={{ cursor: 'pointer' }}>
+  <td>Q3</td><td>{quartileSummary.Q3}</td>
+</tr>
+<tr onClick={() => setSelectedQuartile('Q4')} style={{ cursor: 'pointer' }}>
+  <td>Q4</td><td>{quartileSummary.Q4}</td>
+</tr>
+
       </tbody>
     </table>
   </div>
@@ -359,8 +384,8 @@ const FacultyDetailPage: React.FC = () => {
 
 
       <h3 className="publications-title">Publications</h3>
-      {papers.length > 0 ? (
-        papers.map((paper, index) => (
+      {filteredPapers.length > 0 ? (
+        filteredPapers.map((paper, index) => (
           <Link
             to={`/paper/${encodeURIComponent(paper.doi)}`}
             key={paper.doi || `paper-${index}`}
