@@ -164,3 +164,29 @@ exports.getFacultyDetails = (req, res) => {
         });
     });
 };
+
+exports.getFacultyQuartileSummary = (req, res) => {
+    const { scopusId } = req.params;
+    const { year } = req.query;
+
+    let query = `
+        SELECT year, q1_count, q2_count, q3_count, q4_count
+        FROM faculty_quartile_summary
+        WHERE scopus_id = ?
+    `;
+    const params = [scopusId];
+
+    if (year) {
+        query += ' AND year = ?';
+        params.push(year);
+    }
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.error("Quartile summary error:", err);
+            return res.status(500).json({ error: 'Failed to fetch quartile summary' });
+        }
+
+        res.json(results);
+    });
+};

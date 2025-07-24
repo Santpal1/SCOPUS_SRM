@@ -39,6 +39,16 @@ const FacultyDetailPage: React.FC = () => {
   const [facultyData, setFacultyData] = useState<FacultyDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
+  const [quartileYear, setQuartileYear] = useState<string>('2024');
+
+
+  const [quartileSummary, setQuartileSummary] = useState<{
+    Q1: number;
+    Q2: number;
+    Q3: number;
+    Q4: number;
+  } | null>(null);
+
 
   const [sdgFilter, setSdgFilter] = useState<string>(
     new URLSearchParams(location.search).get("sdg") || "none"
@@ -92,6 +102,24 @@ const FacultyDetailPage: React.FC = () => {
           },
         });
         setFacultyData(response.data);
+        try {
+          const year = quartileYear;
+          const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`, {
+          params: { year }
+        });
+
+        const data = quartRes.data[0] || {};
+          setQuartileSummary({
+            Q1: data.q1_count || 0,
+            Q2: data.q2_count || 0,
+            Q3: data.q3_count || 0,
+            Q4: data.q4_count || 0
+          });
+        } catch (e) {
+          console.warn("Failed to load quartile summary:", e);
+          setQuartileSummary(null);
+        }
+
       } catch (err) {
         setError('Failed to fetch faculty details');
       } finally {
@@ -100,7 +128,7 @@ const FacultyDetailPage: React.FC = () => {
     };
 
     fetchFacultyDetails();
-  }, [scopusId, sdgFilter, domainFilter, yearFilter]);
+  }, [scopusId, sdgFilter, domainFilter, yearFilter, quartileYear]);
 
   const handleIframeLoad = () => {
     setIframeLoaded(true);
@@ -246,21 +274,6 @@ const FacultyDetailPage: React.FC = () => {
 
   const { faculty, papers } = facultyData;
 
-const quartileCounts = {
-  Q1: 0,
-  Q2: 0,
-  Q3: 0,
-  Q4: 0
-};
-
-papers.forEach(p => {
-  const q = p.quartile?.toUpperCase();
-  if (q && quartileCounts[q as keyof typeof quartileCounts] !== undefined) {
-    quartileCounts[q as keyof typeof quartileCounts]++;
-  }
-});
-
-
   return (
     <div className="faculty-detail-container">
       <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
@@ -314,17 +327,33 @@ papers.forEach(p => {
       📄 Generate Report
     </button>
 
-    <div className="quartile-summary-table">
-      <h4>Quartile Summary</h4>
-      <table>
-        <tbody>
-          <tr><td>Q1</td><td>{quartileCounts.Q1}</td></tr>
-          <tr><td>Q2</td><td>{quartileCounts.Q2}</td></tr>
-          <tr><td>Q3</td><td>{quartileCounts.Q3}</td></tr>
-          <tr><td>Q4</td><td>{quartileCounts.Q4}</td></tr>
-        </tbody>
-      </table>
-    </div>
+    {quartileSummary && (
+  <div className="quartile-summary-table">
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+  <h4>Quartile Summary for {quartileYear}</h4>
+
+  <select
+    value={quartileYear}
+    onChange={(e) => setQuartileYear(e.target.value)}
+    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
+  >
+    <option value="2024">2024</option>
+    <option value="2023">2023</option>
+    <option value="2022">2022</option>
+  </select>
+</div>
+
+    <table>
+      <tbody>
+        <tr><td>Q1</td><td>{quartileSummary.Q1}</td></tr>
+        <tr><td>Q2</td><td>{quartileSummary.Q2}</td></tr>
+        <tr><td>Q3</td><td>{quartileSummary.Q3}</td></tr>
+        <tr><td>Q4</td><td>{quartileSummary.Q4}</td></tr>
+      </tbody>
+    </table>
+  </div>
+)}
+
   </div>
 </div>
 
