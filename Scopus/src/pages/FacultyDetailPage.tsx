@@ -107,10 +107,10 @@ const FacultyDetailPage: React.FC = () => {
         try {
           const year = quartileYear;
           const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`, {
-          params: { year }
-        });
+            params: { year }
+          });
 
-        const data = quartRes.data[0] || {};
+          const data = quartRes.data[0] || {};
           setQuartileSummary({
             Q1: data.q1_count || 0,
             Q2: data.q2_count || 0,
@@ -276,9 +276,9 @@ const FacultyDetailPage: React.FC = () => {
 
   const { faculty, papers: allPapers } = facultyData;
 
-const filteredPapers = selectedQuartile
-  ? allPapers.filter(p => p.quartile?.toUpperCase() === selectedQuartile)
-  : allPapers;
+  const filteredPapers = selectedQuartile
+    ? allPapers.filter(p => p.quartile?.toUpperCase() === selectedQuartile)
+    : allPapers;
 
 
   return (
@@ -286,101 +286,106 @@ const filteredPapers = selectedQuartile
       <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
 
       <div className="faculty-card">
-  <div className="faculty-info">
-    {selectedQuartile && (
-  <div className="filter-badges">
-    <strong>Quartile Filter: </strong>
-    <span className="filter-chip">
-      {selectedQuartile} <button onClick={() => setSelectedQuartile(null)}>❌</button>
-    </span>
-  </div>
-)}
+        <div className="faculty-info">
+          {selectedQuartile && (
+            <div className="filter-badges">
+              <strong>Quartile Filter: </strong>
+              <span className="filter-chip">
+                {selectedQuartile} <button onClick={() => setSelectedQuartile(null)}>❌</button>
+              </span>
+            </div>
+          )}
 
-    <h2 className="faculty-name">{faculty.name}</h2>
-    <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
-    {faculty.faculty_id && (
-      <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
-    )}
-    <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
-    <p><strong>Citations:</strong> {faculty.citation_count}</p>
-    <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
+          <h2 className="faculty-name">{faculty.name}</h2>
+          <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
+          {faculty.faculty_id && (
+            <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
+          )}
+          <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
+          <p><strong>Citations:</strong> {faculty.citation_count}</p>
+          <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
 
-    {(sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none') && (
-      <div className="filter-badges">
-        <strong>Filters Applied: </strong>
-        {sdgFilter !== 'none' && (
-          <span className="filter-chip">
-            SDG: {sdgFilter} <button onClick={() => updateQuery('sdg')}>❌</button>
-          </span>
-        )}
-        {domainFilter !== 'none' && (
-          <span className="filter-chip">
-            Domain: {domainFilter} <button onClick={() => updateQuery('domain')}>❌</button>
-          </span>
-        )}
-        {yearFilter !== 'none' && (
-          <span className="filter-chip">
-            Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
-          </span>
-        )}
+          <div className="filter-badges">
+            <strong>Filters Applied: </strong>
+            {sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' ? (
+              <span className="filter-chip">NA</span>
+            ) : (
+              <>
+                {sdgFilter !== 'none' && (
+                  <span className="filter-chip">
+                    SDG: {sdgFilter} <button onClick={() => updateQuery('sdg')}>❌</button>
+                  </span>
+                )}
+                {domainFilter !== 'none' && (
+                  <span className="filter-chip">
+                    Domain: {domainFilter} <button onClick={() => updateQuery('domain')}>❌</button>
+                  </span>
+                )}
+                {yearFilter !== 'none' && (
+                  <span className="filter-chip">
+                    Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
+                  </span>
+                )}
+              </>
+            )}
+          </div>
+
+        </div>
+
+        <div className="faculty-bottom">
+          <a
+            href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="scopus-link-button"
+          >
+            View on Scopus
+          </a>
+        </div>
+
+        <div className="faculty-actions">
+          <button onClick={generatePDF} className="generate-pdf-button">
+            📄 Generate Report
+          </button>
+
+          {quartileSummary && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
+            <div className="quartile-summary-table">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <h4>Quartile Summary for {quartileYear}</h4>
+
+                <select
+                  value={quartileYear}
+                  onChange={(e) => setQuartileYear(e.target.value)}
+                  style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+
+              <table>
+                <tbody>
+                  <tr onClick={() => setSelectedQuartile('Q1')} style={{ cursor: 'pointer' }}>
+                    <td>Q1</td><td>{quartileSummary.Q1}</td>
+                  </tr>
+                  <tr onClick={() => setSelectedQuartile('Q2')} style={{ cursor: 'pointer' }}>
+                    <td>Q2</td><td>{quartileSummary.Q2}</td>
+                  </tr>
+                  <tr onClick={() => setSelectedQuartile('Q3')} style={{ cursor: 'pointer' }}>
+                    <td>Q3</td><td>{quartileSummary.Q3}</td>
+                  </tr>
+                  <tr onClick={() => setSelectedQuartile('Q4')} style={{ cursor: 'pointer' }}>
+                    <td>Q4</td><td>{quartileSummary.Q4}</td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          )}
+
+        </div>
       </div>
-    )}
-  </div>
-
-  <div className="faculty-bottom">
-    <a
-      href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="scopus-link-button"
-    >
-      View on Scopus
-    </a>
-  </div>
-
-  <div className="faculty-actions">
-    <button onClick={generatePDF} className="generate-pdf-button">
-      📄 Generate Report
-    </button>
-
-    {quartileSummary && (
-  <div className="quartile-summary-table">
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-  <h4>Quartile Summary for {quartileYear}</h4>
-
-  <select
-    value={quartileYear}
-    onChange={(e) => setQuartileYear(e.target.value)}
-    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
-  >
-    <option value="2024">2024</option>
-    <option value="2023">2023</option>
-    <option value="2022">2022</option>
-  </select>
-</div>
-
-    <table>
-      <tbody>
-        <tr onClick={() => setSelectedQuartile('Q1')} style={{ cursor: 'pointer' }}>
-  <td>Q1</td><td>{quartileSummary.Q1}</td>
-</tr>
-<tr onClick={() => setSelectedQuartile('Q2')} style={{ cursor: 'pointer' }}>
-  <td>Q2</td><td>{quartileSummary.Q2}</td>
-</tr>
-<tr onClick={() => setSelectedQuartile('Q3')} style={{ cursor: 'pointer' }}>
-  <td>Q3</td><td>{quartileSummary.Q3}</td>
-</tr>
-<tr onClick={() => setSelectedQuartile('Q4')} style={{ cursor: 'pointer' }}>
-  <td>Q4</td><td>{quartileSummary.Q4}</td>
-</tr>
-
-      </tbody>
-    </table>
-  </div>
-)}
-
-  </div>
-</div>
 
 
       <h3 className="publications-title">Publications</h3>
@@ -392,20 +397,20 @@ const filteredPapers = selectedQuartile
             className="publication-card-link"
           >
             <div className="publication-card">
-            <div className="publication-left">
-              <h4>{paper.title}</h4>
-              <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
-              <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
-              <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
-              <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
-            </div>
-            {paper.quartile && (
-            <div className={`quartile-badge ${paper.quartile.toLowerCase()}`}>
-              <span className="quartile-text">{paper.quartile.toUpperCase()}</span>
-                <i className="badge-icon">★</i>
+              <div className="publication-left">
+                <h4>{paper.title}</h4>
+                <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
+                <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
+                <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
+                <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
               </div>
-            )}
-</div>
+              {paper.quartile && (
+                <div className={`quartile-badge ${paper.quartile.toLowerCase()}`}>
+                  <span className="quartile-text">{paper.quartile.toUpperCase()}</span>
+                  <i className="badge-icon">★</i>
+                </div>
+              )}
+            </div>
 
           </Link>
         ))
@@ -413,7 +418,7 @@ const filteredPapers = selectedQuartile
         <div className="no-records">No publications found for this faculty member.</div>
       )}
 
-      {(sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none') && (
+      {(sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
         <>
           <h3 className="publications-title">Interactive Scopus Dashboard</h3>
           <div className="highcharts-frame-container">
