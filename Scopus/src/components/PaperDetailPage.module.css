@@ -2,14 +2,36 @@
     max-width: 1000px;
     margin: 50px auto;
     padding: 40px;
-    background: linear-gradient(145deg, #f0f6fb, #d7e5f0);
+    background: #f3f4f6; 
     border-radius: 24px;
-    box-shadow: 0 12px 30px rgba(18, 52, 86, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #1e2b38;
     transition: all 0.3s ease;
-    border: 1px solid #dce6ef;
+    border: 1px solid #e0e0e0; 
 }
+
+
+.backButton {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #1A4D6C, #163b4d);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease, transform 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.backButton:hover {
+    background: linear-gradient(135deg, #163b4d, #1A4D6C);
+    transform: translateY(-4px) scale(1.05);
+}
+
 
 /* Animation Keyframes */
 @keyframes fadeSlideUp {
@@ -78,24 +100,25 @@
 
 .tag {
     display: inline-block;
-    background: linear-gradient(135deg, #345f93, #163e67);
-    color: #eef6fb;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Soft aqua gradient */
+    color: #004d40; /* Deep teal text for readability */
     padding: 8px 18px;
     border-radius: 9999px;
     font-size: 0.9rem;
     font-weight: 600;
     margin: 8px 8px 12px 0;
     cursor: default;
-    box-shadow: 0 3px 8px rgba(18, 75, 124, 0.35);
+    box-shadow: 0 3px 8px rgba(0, 77, 64, 0.15);
     transition: all 0.3s ease;
     user-select: none;
 }
 
 .tag:hover {
-    background: linear-gradient(135deg, #2a4c78, #0a2c4d);
+    background: linear-gradient(135deg, #b2ebf2, #80deea); /* Slightly deeper hover */
     transform: scale(1.03);
-    box-shadow: 0 6px 16px rgba(14, 54, 90, 0.5);
+    box-shadow: 0 6px 16px rgba(0, 77, 64, 0.25);
 }
+
 
 .doiButton {
     display: inline-block;
