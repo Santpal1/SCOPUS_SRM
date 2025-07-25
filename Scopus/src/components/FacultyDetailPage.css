@@ -40,6 +40,78 @@
   background-color: rgba(26,77,108,0.05);
 }
 
+/* Quartile table color coding */
+.quartile-summary-table tr.q1 td {
+  background-color: #4CAF50; /* green */
+  color: white;
+  font-weight: bold;
+}
+
+.quartile-summary-table tr.q2 td {
+  background-color: #2196F3; /* blue */
+  color: white;
+  font-weight: bold;
+}
+
+.quartile-summary-table tr.q3 td {
+  background-color: #FF9800; /* orange */
+  color: white;
+  font-weight: bold;
+}
+
+.quartile-summary-table tr.q4 td {
+  background-color: #F44336; /* red */
+  color: white;
+  font-weight: bold;
+}
+
+/* Hover effect for quartile rows */
+.quartile-summary-table tr:hover td {
+  filter: brightness(0.9);
+  cursor: pointer;
+}
+
+
+/* Selected quartile glitter effect with color matching */
+.quartile-summary-table tr.selected.q1 td {
+  animation: glitterGlowQ1 1.5s infinite alternate;
+  border: 2px solid #4CAF50;
+}
+.quartile-summary-table tr.selected.q2 td {
+  animation: glitterGlowQ2 1.5s infinite alternate;
+  border: 2px solid #2196F3;
+}
+.quartile-summary-table tr.selected.q3 td {
+  animation: glitterGlowQ3 1.5s infinite alternate;
+  border: 2px solid #FF9800;
+}
+.quartile-summary-table tr.selected.q4 td {
+  animation: glitterGlowQ4 1.5s infinite alternate;
+  border: 2px solid #F44336;
+}
+
+@keyframes glitterGlowQ1 {
+  0%,100% { box-shadow: 0 0 8px #4CAF50, 0 0 15px rgba(76, 175, 80, 0.6); }
+  50%     { box-shadow: 0 0 16px #4CAF50, 0 0 25px rgba(76, 175, 80, 0.8); }
+}
+
+@keyframes glitterGlowQ2 {
+  0%,100% { box-shadow: 0 0 8px #2196F3, 0 0 15px rgba(33, 150, 243, 0.6); }
+  50%     { box-shadow: 0 0 16px #2196F3, 0 0 25px rgba(33, 150, 243, 0.8); }
+}
+
+@keyframes glitterGlowQ3 {
+  0%,100% { box-shadow: 0 0 8px #FF9800, 0 0 15px rgba(255, 152, 0, 0.6); }
+  50%     { box-shadow: 0 0 16px #FF9800, 0 0 25px rgba(255, 152, 0, 0.8); }
+}
+
+@keyframes glitterGlowQ4 {
+  0%,100% { box-shadow: 0 0 8px #F44336, 0 0 15px rgba(244, 67, 54, 0.6); }
+  50%     { box-shadow: 0 0 16px #F44336, 0 0 25px rgba(244, 67, 54, 0.8); }
+}
+
+
+
 .quartile-badge {
   position: absolute;
   right: 16px;

@@ -366,21 +366,34 @@ const FacultyDetailPage: React.FC = () => {
 
               <table>
                 <tbody>
-                  <tr onClick={() => setSelectedQuartile('Q1')} style={{ cursor: 'pointer' }}>
+                  <tr
+                    className={`q1 ${selectedQuartile === 'Q1' ? 'selected' : ''}`}
+                    onClick={() => setSelectedQuartile('Q1')}
+                  >
                     <td>Q1</td><td>{quartileSummary.Q1}</td>
                   </tr>
-                  <tr onClick={() => setSelectedQuartile('Q2')} style={{ cursor: 'pointer' }}>
+                  <tr
+                    className={`q2 ${selectedQuartile === 'Q2' ? 'selected' : ''}`}
+                    onClick={() => setSelectedQuartile('Q2')}
+                  >
                     <td>Q2</td><td>{quartileSummary.Q2}</td>
                   </tr>
-                  <tr onClick={() => setSelectedQuartile('Q3')} style={{ cursor: 'pointer' }}>
+                  <tr
+                    className={`q3 ${selectedQuartile === 'Q3' ? 'selected' : ''}`}
+                    onClick={() => setSelectedQuartile('Q3')}
+                  >
                     <td>Q3</td><td>{quartileSummary.Q3}</td>
                   </tr>
-                  <tr onClick={() => setSelectedQuartile('Q4')} style={{ cursor: 'pointer' }}>
+                  <tr
+                    className={`q4 ${selectedQuartile === 'Q4' ? 'selected' : ''}`}
+                    onClick={() => setSelectedQuartile('Q4')}
+                  >
                     <td>Q4</td><td>{quartileSummary.Q4}</td>
                   </tr>
 
                 </tbody>
               </table>
+
             </div>
           )}
 
@@ -404,12 +417,14 @@ const FacultyDetailPage: React.FC = () => {
                 <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
                 <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
               </div>
-              {paper.quartile && (
+              {paper.type.toLowerCase() === "journal" && paper.quartile && paper.quartile.trim() !== "-" ? (
                 <div className={`quartile-badge ${paper.quartile.toLowerCase()}`}>
                   <span className="quartile-text">{paper.quartile.toUpperCase()}</span>
                   <i className="badge-icon">★</i>
                 </div>
-              )}
+              ) : null}
+
+
             </div>
 
           </Link>
