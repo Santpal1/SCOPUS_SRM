@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '', // change if needed
     database: 'scopus',
-    port: 3307 // default port
+    port: process.env.port || 3307 // default port
 });
 
 router.get('/sdg-count', (req, res) => {
