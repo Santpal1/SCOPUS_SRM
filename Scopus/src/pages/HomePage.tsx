@@ -6,6 +6,8 @@ import logoImg from "../assets/srmist-logo.png";
 import styles from "../components/HomePage.module.css";
 import axios from 'axios';
 import { BookOpen, Globe2, Star, Clock } from 'lucide-react';
+import { FaChartBar, FaGlobe, FaBullseye, FaHandshake } from "react-icons/fa";
+
 
 // Animation variants
 const fadeInUp = {
@@ -212,22 +214,47 @@ const statIcons = [
 
             <div className={styles.mainContent}>
                 {/* HERO SECTION */}
-                <motion.section
-                    className={styles.heroSection}
-                    initial={false}
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.6 }}
-                    variants={fadeInUp}
-                >
-                    <motion.h1 variants={fadeInUp}>
-                        Manage & Monitor Faculty Performance
-                    </motion.h1>
-                    <motion.p variants={fadeInUp}>
-                        A comprehensive platform designed to streamline the management and
-                        monitoring of faculty performance, ensuring academic excellence.
-                    </motion.p>
-                </motion.section>
-
+<motion.section
+    className={styles.heroSection}
+    initial={false}
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.6 }}
+    variants={stagger}
+>
+    <motion.h1 variants={fadeInUp}>
+        Faculty Research Analytics Dashboard
+    </motion.h1>
+    <motion.p variants={fadeInUp}>
+        Comprehensive research performance tracking powered by Scopus and SciVal data. 
+        Monitor publications, citations, collaborations, and impact metrics for academic excellence.
+    </motion.p>
+    
+    {/* Add some key feature highlights */}
+    <motion.div 
+        className={styles.heroFeatures}
+        variants={stagger}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+    >
+        <motion.div className={styles.featureItem} variants={fadeInUp}>
+            <BookOpen size={24} />
+            <span>Publication Tracking</span>
+        </motion.div>
+        <motion.div className={styles.featureItem} variants={fadeInUp}>
+            <Star size={24} />
+            <span>Citation Analysis</span>
+        </motion.div>
+        <motion.div className={styles.featureItem} variants={fadeInUp}>
+            <Globe2 size={24} />
+            <span>Global Collaboration</span>
+        </motion.div>
+        <motion.div className={styles.featureItem} variants={fadeInUp}>
+            <Clock size={24} />
+            <span>Real-time Metrics</span>
+        </motion.div>
+    </motion.div>
+</motion.section>
                 
                 {/* STATS SECTION (unchanged, always visible) */}
                 <motion.section
@@ -478,25 +505,69 @@ const statIcons = [
 </motion.section>
 
                 {/* DESCRIPTION SECTION */}
-                <motion.section
-                    className={styles.description}
-                    initial={false}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.4 }}
-                    transition={{ duration: 0.7 }}
-                >
-                    <div className={styles.footerContent}>
-                        <div>To know more</div>
-                        <div>
-                            <p>
-                                Welcome to our platform! Here you can discover detailed analytics, collaborate with peers, and access resources to help you excel. Our commitment is to empower educators and foster a thriving academic community. Stay tuned for more updates and features coming soon.
-                            </p>
-                            <p>
-                                For further inquiries, please reach out to our support team or check back as we expand our documentation and resources to serve you better.
-                            </p>
-                        </div>
-                    </div>
-                </motion.section>
+<motion.section
+    className={styles.description}
+    initial={false}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.4 }}
+    transition={{ duration: 0.7 }}
+>
+    <div className={styles.footerContent}>
+        <motion.div 
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+        >
+            Discover Research Excellence
+        </motion.div>
+        
+        <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+        >
+            <motion.p variants={fadeInUp}>
+                Our platform leverages Scopus and SciVal databases to provide comprehensive research analytics. 
+                Track publication trends, analyze citation patterns, identify collaboration opportunities, and measure 
+                research impact across multiple dimensions including SDG contributions and global partnerships.
+            </motion.p>
+            <motion.p variants={fadeInUp}>
+                Stay ahead in academic research with real-time metrics, competitive benchmarking, and detailed 
+                performance insights that help drive strategic decisions for faculty development and institutional growth.
+            </motion.p>
+        </motion.div>
+        
+        {/* Add key benefits section */}
+        <motion.div 
+  className={styles.benefitsGrid}
+  variants={stagger}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+>
+  <motion.div className={styles.benefitCard} variants={fadeInUp}>
+    <div className={styles.benefitIcon}><FaChartBar size={32} color="#0077cc" /></div>
+    <h4>Advanced Analytics</h4>
+    <p>Deep insights into research performance with customizable dashboards and reports</p>
+  </motion.div>
+
+  <motion.div className={styles.benefitCard} variants={fadeInUp}>
+    <div className={styles.benefitIcon}><FaBullseye size={32} color="#0077cc" /></div>
+    <h4>SDG Mapping</h4>
+    <p>Track contributions to UN Sustainable Development Goals through research impact</p>
+  </motion.div>
+
+  <motion.div className={styles.benefitCard} variants={fadeInUp}>
+    <div className={styles.benefitIcon}><FaHandshake size={32} color="#0077cc" /></div>
+    <h4>Collaboration Networks</h4>
+    <p>Visualize and expand research partnerships across institutions and countries</p>
+  </motion.div>
+</motion.div>
+
+    </div>
+</motion.section>
             </div>
 
             {/* FOOTER SECTION */}
