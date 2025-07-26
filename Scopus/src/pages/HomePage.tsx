@@ -402,38 +402,18 @@ const statIcons = [
 
             {/* FOOTER SECTION */}
             <motion.footer
-                className={styles.footer}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
-            >
-                <div className={styles.footerLinksContainer}>
-                    <div className={styles.footerLeft}>
-                        <a href="#">© 2025 SRM SP. All rights reserved.</a>
-                    </div>
-                    <div className={styles.footerRight}>
-                        <a
-                            href="https://linkedin.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="LinkedIn"
-                        >
-                            <svg
-                                width="22"
-                                height="22"
-                                fill="#0061a8"
-                                style={{ verticalAlign: "middle" }}
-                            >
-                                <path d="M19 0h-16c-1.65 0-3 1.35-3 3v16c0 1.65 1.35 3 3 3h16c1.65 0 3-1.35 3-3v-16c0-1.65-1.35-3-3-3zm-11 19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm13.5 10.29h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.89v1.23h.04c.4-.76 1.36-1.56 2.8-1.56 3 0 3.56 1.97 3.56 4.53v4.8z" />
-                            </svg>
-                        </a>
-                        <a href="#" style={{ marginLeft: "1.2rem", color: "#0061a8" }}>
-                            Visit Us
-                        </a>
-                    </div>
-                </div>
-            </motion.footer>
+  className={styles.footer}
+  initial={{ opacity: 0, y: 30 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.7 }}
+>
+  <div className={styles.centeredFooterText}>
+    © 2025 SRM SP. All rights reserved.
+  </div>
+</motion.footer>
+
+
         </div>
     );
 };
