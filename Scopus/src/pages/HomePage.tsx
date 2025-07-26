@@ -52,22 +52,23 @@ const useCountUp = (end: number, duration: number = 1.5): number => {
 
 // Developer Data
 const developers = [
-    {
-        name: "Niranjan",
-        img: dev1,
-        quote: "Turning code into impact, one line at a time.",
-    },
-    {
-        name: "Piyush",
-        img: dev2,
-        quote: "Design is intelligence made visible.",
-    },
-    {
-        name: "Santpal",
-        img: dev3,
-        quote: "Innovation distinguishes between a leader and a follower.",
-    },
+  {
+    name: "Piyush",
+    img: dev2,
+    role: "Frontend & Backend",
+    linkedin: "https://linkedin.com/in/-piyush-raj",
+    github: "https://github.com/Piyush7R"
+  },
+  {
+    name: "Santpal",
+    img: dev3,
+    role: "Frontend & Backend",
+    linkedin: "https://linkedin.com/in/santpal",
+    github: "https://github.com/Santpal1"
+  }
 ];
+
+
 
 const FacultyLandingPage = () => {
     const navigate = useNavigate();
@@ -311,52 +312,71 @@ const statIcons = [
 
 
                 {/* DEVELOPERS SECTION */}
-                <motion.section
-                    className={styles.developers}
-                    initial={false}
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.3 }}
-                    variants={fadeIn}
-                >
-                    <div className={styles.devContentWrapper}>
-                        <motion.div
-                            className={styles.devTitleWrapper}
-                            initial={{ x: 0, opacity: 0 }}
-                            whileInView={{ x: 0, opacity: 1 }}
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.6, ease: "easeOut" }}
-                        >
-                            <h2 className={styles.verticalText}>Meet The Developers</h2>
-                        </motion.div>
+<motion.section
+  className={styles.developers}
+  initial={false}
+  whileInView="visible"
+  viewport={{ once: true, amount: 0.3 }}
+  variants={fadeIn}
+>
+  <div className={styles.devContentWrapper}>
+    <motion.div
+      className={styles.devTitleWrapper}
+      initial={{ x: 0, opacity: 0 }}
+      whileInView={{ x: 0, opacity: 1 }}
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <h2 className={styles.verticalText}>Meet The Developers</h2>
+    </motion.div>
 
-                        <motion.div className={styles.devCards} variants={stagger}>
-                            {developers.map((dev, i) => (
-                                <motion.div
-                                    key={i}
-                                    className={styles.devCard}
-                                    variants={fadeInUp}
-                                    whileHover={{
-                                        scale: 1.07,
-                                        boxShadow: "0 12px 40px rgba(0,97,168,0.22)",
-                                        transition: { duration: 0.3 },
-                                    }}
-                                >
-                                    <div className={styles.devImageWrapper}>
-                                        <img
-                                            src={dev.img}
-                                            alt={dev.name}
-                                            className={styles.devImage}
-                                        />
-                                        <div className={styles.devOverlay}>{dev.name}</div>
-                                    </div>
-                                    <div className={styles.devCardContent}>
-                                        <div className={styles.devQuote}>"{dev.quote}"</div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </div>
-                </motion.section>
+    <motion.div className={styles.devCards} variants={stagger}>
+      {developers.map((dev, i) => (
+        <motion.div
+          key={i}
+          className={styles.devCard}
+          variants={fadeInUp}
+          whileHover={{ scale: 1.07 }}
+        >
+          <div className={styles.devImageWrapper}>
+            <img
+              src={dev.img}
+              alt={dev.name}
+              className={styles.devImage}
+            />
+
+            <div className={styles.devOverlay}>
+              <div className={styles.socialIcons}>
+                <a
+                  href={dev.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${dev.name} LinkedIn`}
+                >
+                  <i className="fab fa-linkedin"></i>
+                </a>
+                <a
+                  href={dev.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${dev.name} GitHub`}
+                >
+                  <i className="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.devCardContent}>
+            <div className={styles.devName}>{dev.name}</div>
+            <div className={styles.devRole}>{dev.role}</div>
+          </div>
+        </motion.div>
+      ))}
+    </motion.div>
+  </div>
+</motion.section>
+
 
                 {/* DESCRIPTION SECTION */}
                 <motion.section
