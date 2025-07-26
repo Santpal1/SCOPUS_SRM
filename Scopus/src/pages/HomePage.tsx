@@ -80,7 +80,6 @@ const FacultyLandingPage = () => {
     // Animated stats
     const departments = ("C.Tech");
     const faculties = useCountUp(200);
-    const users = useCountUp(200);
     const papers = useCountUp(4000);
 
 
@@ -147,36 +146,7 @@ const FacultyLandingPage = () => {
                     </motion.p>
                 </motion.section>
 
-                {/* Faculty Images - moved down to avoid overlap */}
-                <section className={styles.facultyImagesSection}>
-                    <div className={styles.facultyImages}>
-                        <motion.img
-                            src={faculty1}
-                            alt="Faculty 1"
-                            className={styles.facultyImg}
-                            variants={scaleIn}
-                            initial="hidden"
-                            whileInView="visible"
-                        />
-                        <motion.img
-                            src={faculty2}
-                            alt="Faculty 2"
-                            className={styles.facultyImg}
-                            variants={scaleIn}
-                            initial="hidden"
-                            whileInView="visible"
-                        />
-                        <motion.img
-                            src={faculty3}
-                            alt="Faculty 3"
-                            className={styles.facultyImg}
-                            variants={scaleIn}
-                            initial="hidden"
-                            whileInView="visible"
-                        />
-                    </div>
-                </section>
-
+                
                 {/* STATS SECTION (unchanged, always visible) */}
                 <motion.section
                     className={styles.statsSection}
@@ -188,15 +158,11 @@ const FacultyLandingPage = () => {
                 >
                     <motion.div variants={fadeInUp}>
                         <span>{departments}</span>
-                        Departments
+                        Department
                     </motion.div>
                     <motion.div variants={fadeInUp}>
                         <span>{faculties}+</span>
                         Faculties
-                    </motion.div>
-                    <motion.div variants={fadeInUp}>
-                        <span>{users}+</span>
-                        Total Users
                     </motion.div>
                     <motion.div variants={fadeInUp}>
                         <span>{papers}+</span>
