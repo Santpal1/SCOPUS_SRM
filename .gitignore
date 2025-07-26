@@ -6,3 +6,4 @@ scopus_charts
 scopus_data
 *.xlsx
 *.csv
+.env
