@@ -1,4 +1,4 @@
-import {  AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { default as dev1, default as dev2, default as dev3 } from "../assets/react.svg";
@@ -25,9 +25,9 @@ const scaleIn = {
 };
 
 const slideVariant = {
-  initial: { x: 100, opacity: 0 },
-  animate: { x: 0, opacity: 1, transition: { duration: 0.6 } },
-  exit: { x: -100, opacity: 0, transition: { duration: 0.5 } },
+    initial: { x: 100, opacity: 0 },
+    animate: { x: 0, opacity: 1, transition: { duration: 0.6 } },
+    exit: { x: -100, opacity: 0, transition: { duration: 0.5 } },
 };
 
 // Animated counter hook
@@ -54,20 +54,20 @@ const useCountUp = (end: number, duration: number = 1.5): number => {
 
 // Developer Data
 const developers = [
-  {
-    name: "Piyush",
-    img: dev2,
-    role: "Frontend & Backend",
-    linkedin: "https://linkedin.com/in/-piyush-raj",
-    github: "https://github.com/Piyush7R"
-  },
-  {
-    name: "Santpal",
-    img: dev3,
-    role: "Frontend & Backend",
-    linkedin: "https://linkedin.com/in/santpal",
-    github: "https://github.com/Santpal1"
-  }
+    {
+        name: "Piyush",
+        img: dev2,
+        role: "Frontend & Backend",
+        linkedin: "https://linkedin.com/in/-piyush-raj",
+        github: "https://github.com/Piyush7R"
+    },
+    {
+        name: "Santpal",
+        img: dev3,
+        role: "Frontend & Backend",
+        linkedin: "https://linkedin.com/in/santpal",
+        github: "https://github.com/Santpal1"
+    }
 ];
 
 
@@ -81,101 +81,101 @@ const FacultyLandingPage = () => {
     const papers = useCountUp(4000);
     const [carouselStats, setCarouselStats] = useState<{ title: string, description: string }[]>([]);
 
-    
+
     useEffect(() => {
-  axios.get('http://localhost:5001/api/homepage-stats')
-    .then(({ data }) => {
-      const stats = [
-        {
-          title: "Total Citations",
-          description: `${data.totalCitations.toLocaleString()} citations received by our faculty publications.`,
-        },
-        {
-          title: "Top SDGs",
-          description: data.topSDGs.map(s => `${s.sdg} (${s.count})`).join(', '),
-        },
-        {
-          title: "Top Collaborating Countries",
-          description: data.topCountries.map(c => `${c.country} (${c.count})`).join(', '),
-        },
-        {
-          title: "Q1 Publications (Last 3 Years)",
-          description: `${data.recentQ1Papers} Q1 papers published in the last 3 years.`,
-        },
-        {
-          title: "Recent Publications (Last 1 Year)",
-          description: `${data.recentPublications} total papers published in the last 1 year.`,
-        },
-        {
-          title: "Top Journal",
-          description: `${data.topJournal.publication_name} with ${data.topJournal.count} publications.`,
-        },
-      ];
-      setCarouselStats(stats);
-    })
-    .catch(err => {
-      console.error('Failed to fetch homepage stats:', err);
-    });
-}, []);
+        axios.get('http://localhost:5001/api/homepage-stats')
+            .then(({ data }) => {
+                const stats = [
+                    {
+                        title: "Total Citations",
+                        description: `${data.totalCitations.toLocaleString()} citations received by our faculty publications.`,
+                    },
+                    {
+                        title: "Top SDGs",
+                        description: data.topSDGs.map(s => `${s.sdg} (${s.count})`).join(', '),
+                    },
+                    {
+                        title: "Top Collaborating Countries",
+                        description: data.topCountries.map(c => `${c.country} (${c.count})`).join(', '),
+                    },
+                    {
+                        title: "Q1 Publications (Last 3 Years)",
+                        description: `${data.recentQ1Papers} Q1 papers published in the last 3 years.`,
+                    },
+                    {
+                        title: "Recent Publications (Last 1 Year)",
+                        description: `${data.recentPublications} total papers published in the last 1 year.`,
+                    },
+                    {
+                        title: "Top Journal",
+                        description: `${data.topJournal.publication_name} with ${data.topJournal.count} publications.`,
+                    },
+                ];
+                setCarouselStats(stats);
+            })
+            .catch(err => {
+                console.error('Failed to fetch homepage stats:', err);
+            });
+    }, []);
 
     // Carousel
-   const [carouselIdx, setCarouselIdx] = useState(0);
-   const carouselIdxRef = useRef(0);
+    const [carouselIdx, setCarouselIdx] = useState(0);
+    const carouselIdxRef = useRef(0);
 
 
-const nextCarousel = () => {
-  const newIdx = (carouselIdxRef.current + 1) % carouselStats.length;
-  carouselIdxRef.current = newIdx;
-  setCarouselIdx(newIdx);
-};
+    const nextCarousel = () => {
+        const newIdx = (carouselIdxRef.current + 1) % carouselStats.length;
+        carouselIdxRef.current = newIdx;
+        setCarouselIdx(newIdx);
+    };
 
-const prevCarousel = () => {
-  const newIdx = (carouselIdxRef.current - 1 + carouselStats.length) % carouselStats.length;
-  carouselIdxRef.current = newIdx;
-  setCarouselIdx(newIdx);
-};
-
-
-const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-useEffect(() => {
-  if (carouselStats.length === 0) return;
-
- intervalRef.current = setInterval(() => {
-  nextCarousel();
-}, 3000);
-
-return () => {
-  if (intervalRef.current) {
-    clearInterval(intervalRef.current);
-    intervalRef.current = null;
-  }
-};
-
-}, [carouselStats.length]);
+    const prevCarousel = () => {
+        const newIdx = (carouselIdxRef.current - 1 + carouselStats.length) % carouselStats.length;
+        carouselIdxRef.current = newIdx;
+        setCarouselIdx(newIdx);
+    };
 
 
-const pauseAutoScroll = () => {
-  if (intervalRef.current) clearInterval(intervalRef.current);
-};
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-const resumeAutoScroll = () => {
-  if (intervalRef.current) clearInterval(intervalRef.current);
-  intervalRef.current = setInterval(() => {
-    nextCarousel();
-  }, 3000); // match with your default speed
-};
+    useEffect(() => {
+        if (carouselStats.length === 0) return;
+
+        intervalRef.current = setInterval(() => {
+            nextCarousel();
+        }, 3000);
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+
+    }, [carouselStats.length]);
+
+
+    const pauseAutoScroll = () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+
+    const resumeAutoScroll = () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(() => {
+            nextCarousel();
+        }, 3000); // match with your default speed
+    };
 
 
 
-const statIcons = [
-  <BookOpen size={28} key="icon-0" />,    // Total Citations
-  <Globe2 size={28} key="icon-1" />,       // Top SDGs
-  <Star size={28} key="icon-2" />,         // Top Collaborating Countries
-  <Clock size={28} key="icon-3" />,        // Q1 Publications (Last 3 Years)
-  <BookOpen size={28} key="icon-4" />,     // Recent Publications (reuse or swap)
-  <Globe2 size={28} key="icon-5" />,       // Top Journal (reuse or swap)
-];
+    const statIcons = [
+        <BookOpen size={28} key="icon-0" />,    // Total Citations
+        <Globe2 size={28} key="icon-1" />,       // Top SDGs
+        <Star size={28} key="icon-2" />,         // Top Collaborating Countries
+        <Clock size={28} key="icon-3" />,        // Q1 Publications (Last 3 Years)
+        <BookOpen size={28} key="icon-4" />,     // Recent Publications (reuse or swap)
+        <Globe2 size={28} key="icon-5" />,       // Top Journal (reuse or swap)
+    ];
     return (
         <div className={styles.fullPageContainer}>
             {/* NAVBAR */}
@@ -280,229 +280,229 @@ const statIcons = [
                 </motion.section>
 
                 {/* CAROUSEL SECTION */}
-{carouselStats.length > 0 && (
- <motion.section
-  className={styles.carousel}
-  initial={false}
-  whileInView="visible"
-  viewport={{ once: true, amount: 0.3 }}
-  variants={fadeIn}
-  onMouseEnter={pauseAutoScroll}
-  onMouseLeave={resumeAutoScroll}
->
+                {carouselStats.length > 0 && (
+                    <motion.section
+                        className={styles.carousel}
+                        initial={false}
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.3 }}
+                        variants={fadeIn}
+                        onMouseEnter={pauseAutoScroll}
+                        onMouseLeave={resumeAutoScroll}
+                    >
 
-    <motion.button
-      className={styles.carouselBtn}
-      whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
-      whileTap={{ scale: 0.95 }}
-      onClick={prevCarousel}
-    >
-      ← Previous
-    </motion.button>
+                        <motion.button
+                            className={styles.carouselBtn}
+                            whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={prevCarousel}
+                        >
+                            ← Previous
+                        </motion.button>
 
-    <div className={styles.carouselContent}>
-      <AnimatePresence mode="wait">
-  <motion.div
-    key={carouselIdx} // triggers exit/enter on index change
-    className={styles.carouselQuoteBox}
-    variants={slideVariant}
-    initial="initial"
-    animate="animate"
-    exit="exit"
-  >
-    <div className={styles.leftAccent}></div>
-    <div className={styles.carouselQuote}>
-      <div className={styles.statIcon}>
-        {statIcons[carouselIdx]}
-      </div>
-      <h3>{carouselStats[carouselIdx].title}</h3>
-      <hr className={styles.quoteDivider} />
-      <p>{carouselStats[carouselIdx].description}</p>
-    </div>
-  </motion.div>
-</AnimatePresence>
+                        <div className={styles.carouselContent}>
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={carouselIdx} // triggers exit/enter on index change
+                                    className={styles.carouselQuoteBox}
+                                    variants={slideVariant}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                >
+                                    <div className={styles.leftAccent}></div>
+                                    <div className={styles.carouselQuote}>
+                                        <div className={styles.statIcon}>
+                                            {statIcons[carouselIdx]}
+                                        </div>
+                                        <h3>{carouselStats[carouselIdx].title}</h3>
+                                        <hr className={styles.quoteDivider} />
+                                        <p>{carouselStats[carouselIdx].description}</p>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
 
-    </div>
+                        </div>
 
-    <motion.button
-      className={styles.carouselBtn}
-      whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
-      whileTap={{ scale: 0.95 }}
-      onClick={nextCarousel}
-    >
-      Next →
-    </motion.button>
-  </motion.section>
-)}
+                        <motion.button
+                            className={styles.carouselBtn}
+                            whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={nextCarousel}
+                        >
+                            Next →
+                        </motion.button>
+                    </motion.section>
+                )}
 
-{/* DEVELOPERS SECTION */}
-<motion.section
-  className={styles.developers}
-  initial={false}
-  whileInView="visible"
-  viewport={{ once: true, amount: 0.3 }}
-  variants={fadeIn}
->
-  {/* Animated background elements */}
-  <div className={styles.backgroundElements}>
-    <div className={styles.floatingCircle1}></div>
-    <div className={styles.floatingCircle2}></div>
-    <div className={styles.floatingCircle3}></div>
-    <div className={styles.gridPattern}></div>
-  </div>
+                {/* DEVELOPERS SECTION */}
+                <motion.section
+                    className={styles.developers}
+                    initial={false}
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                    variants={fadeIn}
+                >
+                    {/* Animated background elements */}
+                    <div className={styles.backgroundElements}>
+                        <div className={styles.floatingCircle1}></div>
+                        <div className={styles.floatingCircle2}></div>
+                        <div className={styles.floatingCircle3}></div>
+                        <div className={styles.gridPattern}></div>
+                    </div>
 
-  <div className={styles.devContentWrapper}>
-    <motion.div
-      className={styles.devTitleWrapper}
-      initial={{ y: 50, opacity: 0 }}
-      whileInView={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
-      <div className={styles.titleContainer}>
-        <motion.div 
-          className={styles.titleAccent}
-          initial={{ width: 0 }}
-          whileInView={{ width: "100%" }}
-          transition={{ duration: 1, delay: 0.3 }}
-        ></motion.div>
-        <h2 className={styles.verticalText}>Meet The Developers</h2>
+                    <div className={styles.devContentWrapper}>
+                        <motion.div
+                            className={styles.devTitleWrapper}
+                            initial={{ y: 50, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                        >
+                            <div className={styles.titleContainer}>
+                                <motion.div
+                                    className={styles.titleAccent}
+                                    initial={{ width: 0 }}
+                                    whileInView={{ width: "100%" }}
+                                    transition={{ duration: 1, delay: 0.3 }}
+                                ></motion.div>
+                                <h2 className={styles.verticalText}>Meet The Developers</h2>
 
-      </div>
-    </motion.div>
+                            </div>
+                        </motion.div>
 
-    <motion.div className={styles.devCards} variants={stagger}>
-      {developers.map((dev, i) => (
-        <motion.div
-          key={i}
-          className={styles.devCard}
-          variants={fadeInUp}
-          whileHover={{ 
-            scale: 1.08, 
-            rotateY: 5,
-            transition: { duration: 0.3 }
-          }}
-          initial={{ rotateX: 0, rotateY: 0 }}
-        >
-          {/* Card glow effect */}
-          <div className={styles.cardGlow}></div>
-          
-          {/* Floating particles */}
-          <div className={styles.particles}>
-            <div className={styles.particle1}></div>
-            <div className={styles.particle2}></div>
-            <div className={styles.particle3}></div>
-          </div>
+                        <motion.div className={styles.devCards} variants={stagger}>
+                            {developers.map((dev, i) => (
+                                <motion.div
+                                    key={i}
+                                    className={styles.devCard}
+                                    variants={fadeInUp}
+                                    whileHover={{
+                                        scale: 1.08,
+                                        rotateY: 5,
+                                        transition: { duration: 0.3 }
+                                    }}
+                                    initial={{ rotateX: 0, rotateY: 0 }}
+                                >
+                                    {/* Card glow effect */}
+                                    <div className={styles.cardGlow}></div>
 
-          <div className={styles.devImageWrapper}>
-            <motion.div 
-              className={styles.imageContainer}
-              whileHover={{ rotate: 360 }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-            >
-              <div className={styles.imageBorder}>
-                <img
-                  src={dev.img}
-                  alt={dev.name}
-                  className={styles.devImage}
-                />
-              </div>
-            </motion.div>
+                                    {/* Floating particles */}
+                                    <div className={styles.particles}>
+                                        <div className={styles.particle1}></div>
+                                        <div className={styles.particle2}></div>
+                                        <div className={styles.particle3}></div>
+                                    </div>
 
-            {/* Status indicator */}
-            <motion.div 
-              className={styles.statusIndicator}
-              animate={{ 
-                scale: [1, 1.2, 1],
-                opacity: [0.7, 1, 0.7]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            ></motion.div>
-          </div>
+                                    <div className={styles.devImageWrapper}>
+                                        <motion.div
+                                            className={styles.imageContainer}
+                                            whileHover={{ rotate: 360 }}
+                                            transition={{ duration: 0.8, ease: "easeInOut" }}
+                                        >
+                                            <div className={styles.imageBorder}>
+                                                <img
+                                                    src={dev.img}
+                                                    alt={dev.name}
+                                                    className={styles.devImage}
+                                                />
+                                            </div>
+                                        </motion.div>
 
-          <motion.div 
-            className={styles.devCardContent}
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-          >
-            <div className={styles.nameContainer}>
-              <motion.div 
-                className={styles.devName}
-                whileHover={{ scale: 1.05 }}
-              >
-                {dev.name}
-              </motion.div>
-              <motion.div 
-                className={styles.nameUnderline}
-                initial={{ width: 0 }}
-                whileInView={{ width: "100%" }}
-                transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
-              ></motion.div>
-            </div>
-            
-            <motion.div 
-              className={styles.devRole}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 1 + i * 0.1 }}
-            >
-              <span className={styles.roleIcon}>⚡</span>
-              {dev.role}
-            </motion.div>
+                                        {/* Status indicator */}
+                                        <motion.div
+                                            className={styles.statusIndicator}
+                                            animate={{
+                                                scale: [1, 1.2, 1],
+                                                opacity: [0.7, 1, 0.7]
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                        ></motion.div>
+                                    </div>
 
-            {/* Skill badges */}
-            <motion.div 
-              className={styles.skillBadges}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1.2 + i * 0.1 }}
-            >
-              <span className={styles.skillBadge}>React</span>
-              <span className={styles.skillBadge}>Node.js</span>
-              <span className={styles.skillBadge}>TypeScript</span>
-            </motion.div>
+                                    <motion.div
+                                        className={styles.devCardContent}
+                                        initial={{ y: 20, opacity: 0 }}
+                                        whileInView={{ y: 0, opacity: 1 }}
+                                        transition={{ duration: 0.5, delay: i * 0.1 }}
+                                    >
+                                        <div className={styles.nameContainer}>
+                                            <motion.div
+                                                className={styles.devName}
+                                                whileHover={{ scale: 1.05 }}
+                                            >
+                                                {dev.name}
+                                            </motion.div>
+                                            <motion.div
+                                                className={styles.nameUnderline}
+                                                initial={{ width: 0 }}
+                                                whileInView={{ width: "100%" }}
+                                                transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
+                                            ></motion.div>
+                                        </div>
 
-            {/* Social Icons */}
-            <motion.div 
-              className={styles.socialIcons}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1.4 + i * 0.1 }}
-            >
-              <motion.a
-                href={dev.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${dev.name} LinkedIn`}
-                whileHover={{ scale: 1.3, rotate: 15 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <i className="fab fa-linkedin"></i>
-              </motion.a>
-              <motion.a
-                href={dev.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${dev.name} GitHub`}
-                whileHover={{ scale: 1.3, rotate: -15 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <i className="fab fa-github"></i>
-              </motion.a>
-            </motion.div>
-          </motion.div>
+                                        <motion.div
+                                            className={styles.devRole}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.5, delay: 1 + i * 0.1 }}
+                                        >
+                                            <span className={styles.roleIcon}>⚡</span>
+                                            {dev.role}
+                                        </motion.div>
 
-          {/* Hover effect overlay */}
-          <div className={styles.hoverOverlay}></div>
-        </motion.div>
-      ))}
-    </motion.div>
-  </div>
-</motion.section>
+                                        {/* Skill badges */}
+                                        <motion.div
+                                            className={styles.skillBadges}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5, delay: 1.2 + i * 0.1 }}
+                                        >
+                                            <span className={styles.skillBadge}>React</span>
+                                            <span className={styles.skillBadge}>Node.js</span>
+                                            <span className={styles.skillBadge}>TypeScript</span>
+                                        </motion.div>
+
+                                        {/* Social Icons */}
+                                        <motion.div
+                                            className={styles.socialIcons}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5, delay: 1.4 + i * 0.1 }}
+                                        >
+                                            <motion.a
+                                                href={dev.linkedin}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                aria-label={`${dev.name} LinkedIn`}
+                                                whileHover={{ scale: 1.3, rotate: 15 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <i className="fab fa-linkedin"></i>
+                                            </motion.a>
+                                            <motion.a
+                                                href={dev.github}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                aria-label={`${dev.name} GitHub`}
+                                                whileHover={{ scale: 1.3, rotate: -15 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <i className="fab fa-github"></i>
+                                            </motion.a>
+                                        </motion.div>
+                                    </motion.div>
+
+                                    {/* Hover effect overlay */}
+                                    <div className={styles.hoverOverlay}></div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </motion.section>
 
                 {/* DESCRIPTION SECTION */}
 <motion.section
@@ -572,16 +572,16 @@ const statIcons = [
 
             {/* FOOTER SECTION */}
             <motion.footer
-  className={styles.footer}
-  initial={{ opacity: 0, y: 30 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
-  transition={{ duration: 0.7 }}
->
-  <div className={styles.centeredFooterText}>
-    © 2025 SRM SP. All rights reserved.
-  </div>
-</motion.footer>
+                className={styles.footer}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+            >
+                <div className={styles.centeredFooterText}>
+                    © 2025 SRM SP. All rights reserved.
+                </div>
+            </motion.footer>
 
 
         </div>

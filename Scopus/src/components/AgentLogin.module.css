@@ -44,12 +44,6 @@ body.reloading {
     }
 }
 
-.navbar {
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-}
-
 .logo1 {
     display: flex;
     align-items: center;
@@ -57,6 +51,10 @@ body.reloading {
     font-size: 22px;
     font-weight: bold;
     color: #333;
+}
+
+.logo1 span {
+    color: #1A4D6C;
 }
 
 .navLogo {
@@ -132,7 +130,7 @@ a {
 .logo {
     font-size: 1.8rem;
     font-weight: 700;
-    color: black;
+    color: #1A4D6C;
     margin-left: 2rem;
     transition: transform 0.3s ease
 }

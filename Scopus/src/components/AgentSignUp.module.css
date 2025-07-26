@@ -35,6 +35,25 @@ body {
     animation: slideDown 0.8s ease-out;
 }
 
+.logo1 {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.logo1 span {
+    color: #1A4D6C;
+}
+
+.navLogo {
+    height: 45px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
 .logo {
     font-size: 1.8rem;
     font-weight: 700;
@@ -217,19 +236,18 @@ a {
 }
 
 .bannerImage {
-    width: 100%;
-    max-width: 500px;
+    width: 80%;
+    max-width: 350px;
     height: auto;
-    border-radius: 20px;
-    margin-top: 1rem;
+    border-radius: 30px;
+    margin: 1rem auto 0;
     display: block;
     align-self: center;
-    transition: transform 0.3s ease-in-out; /* Added smooth transition */
 }
 
 .bannerImage:hover {
     transform: scale(1.05);
-    /* transition: pulse 0.3s ease-in-out; */
+    transition: transform 0.3s ease-in-out;
 }
 
 .passwordWrapper {
