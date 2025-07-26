@@ -1,13 +1,10 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import faculty1 from "../assets/faculty1.png";
-import faculty2 from "../assets/faculty2.png";
-import faculty3 from "../assets/faculty3.png";
-import carouselImg from "../assets/image-1.avif";
 import { default as dev1, default as dev2, default as dev3 } from "../assets/react.svg";
 import logoImg from "../assets/srm_logo.png";
 import styles from "../components/HomePage.module.css";
+import axios from 'axios';
 
 
 // Animation variants
@@ -47,14 +44,6 @@ const useCountUp = (end: number, duration: number = 1.5): number => {
     return count;
 };
 
-// Quotes for the carousel
-const carouselQuotes = [
-    { quote: "Empowering educators, inspiring excellence.", image: carouselImg },
-    { quote: "Great teachers ignite the future.", image: faculty1 },
-    { quote: "Innovation in education starts here.", image: faculty2 },
-    { quote: "Together, we achieve academic brilliance.", image: faculty3 },
-];
-
 // Developer Data
 const developers = [
     {
@@ -81,16 +70,56 @@ const FacultyLandingPage = () => {
     const departments = ("C.Tech");
     const faculties = useCountUp(200);
     const papers = useCountUp(4000);
+    const [carouselStats, setCarouselStats] = useState<{ title: string, description: string }[]>([]);
+
+    
+    useEffect(() => {
+  axios.get('http://localhost:5001/api/homepage-stats')
+    .then(({ data }) => {
+      const stats = [
+        {
+          title: "Total Citations",
+          description: `${data.totalCitations.toLocaleString()} citations received by our faculty publications.`,
+        },
+        {
+          title: "Top SDGs",
+          description: data.topSDGs.map(s => `${s.sdg} (${s.count})`).join(', '),
+        },
+        {
+          title: "Top Collaborating Countries",
+          description: data.topCountries.map(c => `${c.country} (${c.count})`).join(', '),
+        },
+        {
+          title: "Q1 Publications (Last 3 Years)",
+          description: `${data.recentQ1Papers} Q1 papers published in the last 3 years.`,
+        },
+        {
+          title: "Recent Publications (Last 1 Year)",
+          description: `${data.recentPublications} total papers published in the last 1 year.`,
+        },
+        {
+          title: "Top Journal",
+          description: `${data.topJournal.publication_name} with ${data.topJournal.count} publications.`,
+        },
+      ];
+      setCarouselStats(stats);
+    })
+    .catch(err => {
+      console.error('Failed to fetch homepage stats:', err);
+    });
+}, []);
+
 
 
     // Carousel
-    const [carouselIdx, setCarouselIdx] = useState(0);
-    const nextCarousel = () =>
-        setCarouselIdx((carouselIdx + 1) % carouselQuotes.length);
-    const prevCarousel = () =>
-        setCarouselIdx(
-            (carouselIdx - 1 + carouselQuotes.length) % carouselQuotes.length
-        );
+   const [carouselIdx, setCarouselIdx] = useState(0);
+
+const nextCarousel = () =>
+  setCarouselIdx((carouselIdx + 1) % carouselStats.length);
+
+const prevCarousel = () =>
+  setCarouselIdx((carouselIdx - 1 + carouselStats.length) % carouselStats.length);
+
 
     return (
         <div className={styles.fullPageContainer}>
@@ -171,58 +200,55 @@ const FacultyLandingPage = () => {
                 </motion.section>
 
                 {/* CAROUSEL SECTION */}
-                <motion.section
-                    className={styles.carousel}
-                    initial={false}
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.3 }}
-                    variants={fadeIn}
-                    style={{ position: "relative" }}
-                >
-                    <motion.button
-                        className={styles.carouselBtn}
-                        whileHover={{
-                            scale: 1.1,
-                            backgroundColor: "#5fd0f3",
-                            color: "#ffe066",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={prevCarousel}
-                    >
-                        ← Previous
-                    </motion.button>
-                    <div className={styles.carouselContent}>
-                        <img
-                            src={carouselQuotes[carouselIdx].image}
-                            alt="Carousel"
-                            className={styles.carouselImage}
-                        />
-                        <div className={styles.carouselQuote}>
-                            {carouselQuotes[carouselIdx].quote}
-                        </div>
-                    </div>
-                    <motion.button
-                        className={styles.carouselBtn}
-                        whileHover={{
-                            scale: 1.1,
-                            backgroundColor: "#5fd0f3",
-                            color: "#ffe066",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={nextCarousel}
-                    >
-                        Next →
-                    </motion.button>
-                    {/* <div className={styles.carouselIndicators}>
-                        {carouselQuotes.map((_, idx) => (
-                            <span
-                                key={idx}
-                                className={carouselIdx === idx ? "active" : ""}
-                                onClick={() => setCarouselIdx(idx)}
-                            />
-                        ))}
-                    </div> */}
-                </motion.section>
+{carouselStats.length > 0 && (
+  <motion.section
+    className={styles.carousel}
+    initial={false}
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.3 }}
+    variants={fadeIn}
+    style={{ position: "relative" }}
+  >
+    <motion.button
+      className={styles.carouselBtn}
+      whileHover={{
+        scale: 1.1,
+        backgroundColor: "#5fd0f3",
+        color: "#ffe066",
+      }}
+      whileTap={{ scale: 0.95 }}
+      onClick={prevCarousel}
+    >
+      ← Previous
+    </motion.button>
+
+    <div className={styles.carouselContent}>
+      <div className={styles.carouselQuote}>
+        <h3>
+          {carouselStats[carouselIdx].title}
+        </h3>
+        <hr className={styles.quoteDivider} />
+        <p>
+          {carouselStats[carouselIdx].description}
+        </p>
+      </div>
+    </div>
+
+    <motion.button
+      className={styles.carouselBtn}
+      whileHover={{
+        scale: 1.1,
+        backgroundColor: "#5fd0f3",
+        color: "#ffe066",
+      }}
+      whileTap={{ scale: 0.95 }}
+      onClick={nextCarousel}
+    >
+      Next →
+    </motion.button>
+  </motion.section>
+)}
+
 
                 {/* DEVELOPERS SECTION */}
                 <motion.section
