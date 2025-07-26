@@ -1,11 +1,11 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {  AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { default as dev1, default as dev2, default as dev3 } from "../assets/react.svg";
 import logoImg from "../assets/srm_logo.png";
 import styles from "../components/HomePage.module.css";
 import axios from 'axios';
-
+import { BookOpen, Globe2, Star, Clock } from 'lucide-react';
 
 // Animation variants
 const fadeInUp = {
@@ -20,6 +20,12 @@ const fadeIn = {
 const scaleIn = {
     hidden: { opacity: 0, scale: 0.7 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.7 } },
+};
+
+const slideVariant = {
+  initial: { x: 100, opacity: 0 },
+  animate: { x: 0, opacity: 1, transition: { duration: 0.6 } },
+  exit: { x: -100, opacity: 0, transition: { duration: 0.5 } },
 };
 
 // Animated counter hook
@@ -109,18 +115,64 @@ const FacultyLandingPage = () => {
     });
 }, []);
 
-
-
     // Carousel
    const [carouselIdx, setCarouselIdx] = useState(0);
-
-const nextCarousel = () =>
-  setCarouselIdx((carouselIdx + 1) % carouselStats.length);
-
-const prevCarousel = () =>
-  setCarouselIdx((carouselIdx - 1 + carouselStats.length) % carouselStats.length);
+   const carouselIdxRef = useRef(0);
 
 
+const nextCarousel = () => {
+  const newIdx = (carouselIdxRef.current + 1) % carouselStats.length;
+  carouselIdxRef.current = newIdx;
+  setCarouselIdx(newIdx);
+};
+
+const prevCarousel = () => {
+  const newIdx = (carouselIdxRef.current - 1 + carouselStats.length) % carouselStats.length;
+  carouselIdxRef.current = newIdx;
+  setCarouselIdx(newIdx);
+};
+
+
+const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+useEffect(() => {
+  if (carouselStats.length === 0) return;
+
+ intervalRef.current = setInterval(() => {
+  nextCarousel();
+}, 3000);
+
+return () => {
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }
+};
+
+}, [carouselStats.length]);
+
+
+const pauseAutoScroll = () => {
+  if (intervalRef.current) clearInterval(intervalRef.current);
+};
+
+const resumeAutoScroll = () => {
+  if (intervalRef.current) clearInterval(intervalRef.current);
+  intervalRef.current = setInterval(() => {
+    nextCarousel();
+  }, 3000); // match with your default speed
+};
+
+
+
+const statIcons = [
+  <BookOpen size={28} key="icon-0" />,    // Total Citations
+  <Globe2 size={28} key="icon-1" />,       // Top SDGs
+  <Star size={28} key="icon-2" />,         // Top Collaborating Countries
+  <Clock size={28} key="icon-3" />,        // Q1 Publications (Last 3 Years)
+  <BookOpen size={28} key="icon-4" />,     // Recent Publications (reuse or swap)
+  <Globe2 size={28} key="icon-5" />,       // Top Journal (reuse or swap)
+];
     return (
         <div className={styles.fullPageContainer}>
             {/* NAVBAR */}
@@ -201,21 +253,19 @@ const prevCarousel = () =>
 
                 {/* CAROUSEL SECTION */}
 {carouselStats.length > 0 && (
-  <motion.section
-    className={styles.carousel}
-    initial={false}
-    whileInView="visible"
-    viewport={{ once: true, amount: 0.3 }}
-    variants={fadeIn}
-    style={{ position: "relative" }}
-  >
+ <motion.section
+  className={styles.carousel}
+  initial={false}
+  whileInView="visible"
+  viewport={{ once: true, amount: 0.3 }}
+  variants={fadeIn}
+  onMouseEnter={pauseAutoScroll}
+  onMouseLeave={resumeAutoScroll}
+>
+
     <motion.button
       className={styles.carouselBtn}
-      whileHover={{
-        scale: 1.1,
-        backgroundColor: "#5fd0f3",
-        color: "#ffe066",
-      }}
+      whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
       whileTap={{ scale: 0.95 }}
       onClick={prevCarousel}
     >
@@ -223,24 +273,32 @@ const prevCarousel = () =>
     </motion.button>
 
     <div className={styles.carouselContent}>
-      <div className={styles.carouselQuote}>
-        <h3>
-          {carouselStats[carouselIdx].title}
-        </h3>
-        <hr className={styles.quoteDivider} />
-        <p>
-          {carouselStats[carouselIdx].description}
-        </p>
+      <AnimatePresence mode="wait">
+  <motion.div
+    key={carouselIdx} // triggers exit/enter on index change
+    className={styles.carouselQuoteBox}
+    variants={slideVariant}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+  >
+    <div className={styles.leftAccent}></div>
+    <div className={styles.carouselQuote}>
+      <div className={styles.statIcon}>
+        {statIcons[carouselIdx]}
       </div>
+      <h3>{carouselStats[carouselIdx].title}</h3>
+      <hr className={styles.quoteDivider} />
+      <p>{carouselStats[carouselIdx].description}</p>
+    </div>
+  </motion.div>
+</AnimatePresence>
+
     </div>
 
     <motion.button
       className={styles.carouselBtn}
-      whileHover={{
-        scale: 1.1,
-        backgroundColor: "#5fd0f3",
-        color: "#ffe066",
-      }}
+      whileHover={{ scale: 1.1, backgroundColor: "#5fd0f3", color: "#ffe066" }}
       whileTap={{ scale: 0.95 }}
       onClick={nextCarousel}
     >
@@ -248,6 +306,8 @@ const prevCarousel = () =>
     </motion.button>
   </motion.section>
 )}
+
+
 
 
                 {/* DEVELOPERS SECTION */}
