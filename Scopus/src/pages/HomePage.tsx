@@ -2,7 +2,7 @@ import {  AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import { default as dev1, default as dev2, default as dev3 } from "../assets/react.svg";
-import logoImg from "../assets/srm_logo.png";
+import logoImg from "../assets/srmist-logo.png";
 import styles from "../components/HomePage.module.css";
 import axios from 'axios';
 import { BookOpen, Globe2, Star, Clock } from 'lucide-react';
