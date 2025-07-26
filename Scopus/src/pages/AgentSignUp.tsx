@@ -2,6 +2,7 @@ import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import srmLogo from "../assets/srmist-logo.png";
+import srmLogoN from "../assets/srmist-logo.png"; 
 import styles from "../components/AgentSignUp.module.css";
 
 const AgentSignUp: React.FC = () => {
@@ -32,17 +33,25 @@ const AgentSignUp: React.FC = () => {
     }
   };
 
+  // Handle Enter key press
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSignUp();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
-        <a className={styles.logo} href="http://localhost:5173/">
-          SRM SP
+        <a className={styles.logo1}>
+          <img src={srmLogoN} alt="SRM Logo" className={styles.navLogo} /> 
+          <span>SRM SP</span>
         </a>
       </div>
 
       <div className={styles.mainContainer}>
         <div className={styles.leftSide}>
-          <div className={styles.loginBox}>
+          <div className={styles.loginBox} onKeyDown={handleKeyDown}>
             <h2 className={styles.loginTitle}>Faculty Sign Up</h2>
             <p className={styles.loginSubtitle}>
               Enter your details to sign in to your account

@@ -3,31 +3,42 @@ import { Link } from 'react-router-dom';
 import GlobalCollabMap from '../components/GlobalCollabMap';
 import SDGPieChart from '../components/SDGPieChart';
 import SDGTagCloud from '../components/SDGTagCloud';
+import srmLogo from "../assets/srmist-logo.png";
 import '../components/AnalyticsPage.css';
 
 const AnalyticsPage: React.FC = () => {
     return (
-        <div className="analytics-container">
-            {/* Back Button */}
-            <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
-                <Link to="/dashboard" className="back-button">
-                    &laquo; Back to Dashboard
-                </Link>
+        <div>
+            {/* Navbar */}
+            <div className="analytics-navbar">
+                <a className="analytics-logo">
+                    <img src={srmLogo} alt="SRM Logo" className="analytics-navLogo" />
+                    <span>SRM SP</span>
+                </a>
             </div>
 
-            <h1 style={{ textAlign: 'center', fontSize: 50, color: '#2980b9' }}>
-                ANALYTICS DASHBOARD
-            </h1>
+            <div className="analytics-container">
+                {/* Back Button */}
+                <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+                    <Link to="/dashboard" className="back-button">
+                        &laquo; Back to Dashboard
+                    </Link>
+                </div>
 
-            <section style={{ marginBottom: 40 }}>
-                <GlobalCollabMap />
-            </section>
-            <section style={{ marginBottom: 40 }}>
-                <SDGPieChart />
-            </section>
-            <section className="mt-6">
-                <SDGTagCloud />
-            </section>
+                <h1 style={{ textAlign: 'center', fontSize: 50, color: '#2980b9' }}>
+                    ANALYTICS DASHBOARD
+                </h1>
+
+                <section style={{ marginBottom: 40 }}>
+                    <GlobalCollabMap />
+                </section>
+                <section style={{ marginBottom: 40 }}>
+                    <SDGPieChart />
+                </section>
+                <section className="mt-6">
+                    <SDGTagCloud />
+                </section>
+            </div>
         </div>
     );
 };

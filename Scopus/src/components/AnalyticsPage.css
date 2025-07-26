@@ -1,12 +1,65 @@
-.analytics-container {
-    background: #f3f4f6;
-    border-radius: 1rem;
-    padding: 25px;
-    max-width: 1400px;
-    margin: 40px auto;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.analytics-navbar {
+    width: 100%;
+    background: #f3f4f6;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    animation: slideDown 0.8s ease-out;
+}
+
+
+.analytics-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.analytics-logo span {
+    color: #1A4D6C;
+}
+
+.analytics-navLogo {
+    height: 45px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Container */
+.analytics-container {
+    background: #ffffff;
+    border-radius: 1rem;
+    padding: 25px;
+    max-width: 1100px;
+    margin: 6rem auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 
 .back-button {
     display: inline-block;
@@ -19,8 +72,6 @@
     font-size: 16px;
     font-weight: 500;
     transition: all 0.3s ease, transform 0.2s ease;
-    border: none;
-    cursor: pointer;
 }
 
 .back-button:hover {
