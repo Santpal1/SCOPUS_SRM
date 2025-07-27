@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import srmLogo from "../assets/srmist-logo.png";
 import "../components/FacultyListPage.css";
 
 interface Faculty {
@@ -27,7 +28,7 @@ const FacultyListPage: React.FC = () => {
   const [sdgFilter, setSdgFilter] = useState<string>("none");
   const [domainFilter, setDomainFilter] = useState<string>("none");
   const [lowPaperFilter, setLowPaperFilter] = useState<string>("none");
-  
+
 
   const currentYear = new Date().getFullYear();
   const previousYear = currentYear - 1;
@@ -193,158 +194,167 @@ const FacultyListPage: React.FC = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="faculty-container">
-      <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
-        <Link to="/dashboard" className="back-button">&laquo; Back to Dashboard</Link>
+    <div>
+      {/* NAVBAR */}
+      <div className="faculty-navbar">
+        <a className="faculty-logo">
+          <img src={srmLogo} alt="SRM Logo" className="faculty-navLogo" />
+          <span>SRM SP</span>
+        </a>
       </div>
-
-      <h1 className="title">Faculty List</h1>
-
-      {/* Filter Bar */}
-      <div className="filter-bar">
-        <select
-          value={timeframe}
-          onChange={(e) => fetchFacultyByTimeframe(e.target.value)}
-          className="dropdown"
-          disabled={lowPaperFilter !== "none"}
-        >
-          <option value="none" disabled hidden>Year Filter</option>
-          <option value="none">None</option>
-          <option value={currentYear.toString()}>{currentYear}</option>
-          <option value={previousYear.toString()}>{previousYear}</option>
-        </select>
-
-        <select
-          value={sdgFilter}
-          onChange={(e) => {
-            setSdgFilter(e.target.value);
-            setLowPaperFilter("none");
-          }}
-          className="dropdown"
-          disabled={lowPaperFilter !== "none"}
-        >
-          <option value="none" disabled hidden>SDG Filter</option>
-          <option value="none">None</option>
-          {[...Array(17)].map((_, i) => (
-            <option key={i + 1} value={`SDG${i + 1}`}>{`SDG ${i + 1}`}</option>
-          ))}
-        </select>
-
-
-        <select
-          value={domainFilter}
-          onChange={(e) => {
-            setDomainFilter(e.target.value);
-            setLowPaperFilter("none");
-          }}
-          className="dropdown"
-          disabled={lowPaperFilter !== "none"}
-        >
-          <option value="none" disabled hidden>Domain Filter</option>
-          <option value="none">None</option>
-          {[
-            "Agriculture & Forestry", "Architecture", "Biological Sciences", "Business & Management Studies", "Chemistry",
-            "Communication & Media Studies", "Computer Science & Information Systems", "Data Science", "Development Studies",
-            "Earth & Marine Sciences", "Economics & Econometrics", "Education & Training", "Engineering - Chemical",
-            "Engineering - Civil & Structural", "Engineering - Electrical & Electronic", "Engineering - Mechanical",
-            "Engineering - Mineral & Mining", "Engineering - Petroleum", "Environmental Sciences", "Geography", "Geology",
-            "Geophysics", "Law and Legal Studies", "Library & Information Management", "Linguistics", "Materials Science",
-            "Mathematics", "Medicine", "Nursing", "Pharmacy & Pharmacology", "Physics & Astronomy", "Psychology",
-            "Statistics & Operational Research"
-          ].map(domain => (
-            <option key={domain} value={domain}>{domain}</option>
-          ))}
-        </select>
-
-        <select
-          className="dropdown"
-          value={lowPaperFilter}
-          onChange={(e) => handleLowPaperSelect(e.target.value)}
-        >
-          <option value="none" disabled hidden>Criteria Filter</option>
-          <option value="none">None</option>
-          <option value="1">Show Faculty with &lt; 4 Papers in 1 Year</option>
-          <option value="2">Show Faculty with &lt; 4 Papers in 2 Years</option>
-          <option value="3">Show Faculty with &lt; 4 Papers in 3 Years</option>
-          <option value="4">Show Faculty with &lt; 4 Papers in 4 Years</option>
-          <option value="5">Show Faculty with &lt; 4 Papers in 5 Years</option>
-        </select>
-
-      </div>
-
-      {/* Search Bar */}
-      <div className="search-bar">
-        <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "400px" }}>
-          <input
-            type="text"
-            placeholder="Search by Name or Scopus ID..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="search-input"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setFilteredFaculty(currentFaculty);
-              }}
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
-                fontSize: "16px",
-                cursor: "pointer",
-                color: "red",
-              }}
-            >
-              ❌
-            </button>
-          )}
+      <div className="faculty-container">
+        <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+          <Link to="/dashboard" className="back-button">&laquo; Back to Dashboard</Link>
         </div>
-      </div>
 
-      {/* Table */}
-      <div className="table-wrapper">
-        <table className="faculty-table">
-          <thead>
-            <tr>
-              <th>Faculty ID</th>
-              <th>Scopus ID</th>
-              <th>Name</th>
-              <th>Documents</th>
-              <th>Filtered Documents</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredFaculty.map(member => (
-              <tr key={member.scopus_id}>
-                <td>{member.faculty_id || "Not Available"}</td>
-                <td>{member.scopus_id}</td>
-                <td>{member.name}</td>
-                <td>{member.docs_count}</td>
-                <td>{member.docs_in_timeframe !== undefined ? member.docs_in_timeframe : "N/A"}</td>
-                <td>
-                  <Link
-                    to={{
-                      pathname: `/faculty/${member.scopus_id}`,
-                      search: `?sdg=${sdgFilter}&domain=${domainFilter}&year=${timeframe}`,
-                    }}
-                    className="view-button"
-                  >
-                    View Details
-                  </Link>
-                </td>
-              </tr>
+        <h1 className="title">Faculty List</h1>
+
+        {/* Filter Bar */}
+        <div className="filter-bar">
+          <select
+            value={timeframe}
+            onChange={(e) => fetchFacultyByTimeframe(e.target.value)}
+            className="dropdown"
+            disabled={lowPaperFilter !== "none"}
+          >
+            <option value="none" disabled hidden>Year Filter</option>
+            <option value="none">None</option>
+            <option value={currentYear.toString()}>{currentYear}</option>
+            <option value={previousYear.toString()}>{previousYear}</option>
+          </select>
+
+          <select
+            value={sdgFilter}
+            onChange={(e) => {
+              setSdgFilter(e.target.value);
+              setLowPaperFilter("none");
+            }}
+            className="dropdown"
+            disabled={lowPaperFilter !== "none"}
+          >
+            <option value="none" disabled hidden>SDG Filter</option>
+            <option value="none">None</option>
+            {[...Array(17)].map((_, i) => (
+              <option key={i + 1} value={`SDG${i + 1}`}>{`SDG ${i + 1}`}</option>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </select>
 
-      {filteredFaculty.length === 0 && <div className="no-records">No faculty records found.</div>}
+
+          <select
+            value={domainFilter}
+            onChange={(e) => {
+              setDomainFilter(e.target.value);
+              setLowPaperFilter("none");
+            }}
+            className="dropdown"
+            disabled={lowPaperFilter !== "none"}
+          >
+            <option value="none" disabled hidden>Domain Filter</option>
+            <option value="none">None</option>
+            {[
+              "Agriculture & Forestry", "Architecture", "Biological Sciences", "Business & Management Studies", "Chemistry",
+              "Communication & Media Studies", "Computer Science & Information Systems", "Data Science", "Development Studies",
+              "Earth & Marine Sciences", "Economics & Econometrics", "Education & Training", "Engineering - Chemical",
+              "Engineering - Civil & Structural", "Engineering - Electrical & Electronic", "Engineering - Mechanical",
+              "Engineering - Mineral & Mining", "Engineering - Petroleum", "Environmental Sciences", "Geography", "Geology",
+              "Geophysics", "Law and Legal Studies", "Library & Information Management", "Linguistics", "Materials Science",
+              "Mathematics", "Medicine", "Nursing", "Pharmacy & Pharmacology", "Physics & Astronomy", "Psychology",
+              "Statistics & Operational Research"
+            ].map(domain => (
+              <option key={domain} value={domain}>{domain}</option>
+            ))}
+          </select>
+
+          <select
+            className="dropdown"
+            value={lowPaperFilter}
+            onChange={(e) => handleLowPaperSelect(e.target.value)}
+          >
+            <option value="none" disabled hidden>Criteria Filter</option>
+            <option value="none">None</option>
+            <option value="1">Show Faculty with &lt; 4 Papers in 1 Year</option>
+            <option value="2">Show Faculty with &lt; 4 Papers in 2 Years</option>
+            <option value="3">Show Faculty with &lt; 4 Papers in 3 Years</option>
+            <option value="4">Show Faculty with &lt; 4 Papers in 4 Years</option>
+            <option value="5">Show Faculty with &lt; 4 Papers in 5 Years</option>
+          </select>
+
+        </div>
+
+        {/* Search Bar */}
+        <div className="search-bar">
+          <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "400px" }}>
+            <input
+              type="text"
+              placeholder="Search by Name or Scopus ID..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="search-input"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilteredFaculty(currentFaculty);
+                }}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  color: "red",
+                }}
+              >
+                ❌
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="table-wrapper">
+          <table className="faculty-table">
+            <thead>
+              <tr>
+                <th>Faculty ID</th>
+                <th>Scopus ID</th>
+                <th>Name</th>
+                <th>Documents</th>
+                <th>Filtered Documents</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredFaculty.map(member => (
+                <tr key={member.scopus_id}>
+                  <td>{member.faculty_id || "Not Available"}</td>
+                  <td>{member.scopus_id}</td>
+                  <td>{member.name}</td>
+                  <td>{member.docs_count}</td>
+                  <td>{member.docs_in_timeframe !== undefined ? member.docs_in_timeframe : "N/A"}</td>
+                  <td>
+                    <Link
+                      to={{
+                        pathname: `/faculty/${member.scopus_id}`,
+                        search: `?sdg=${sdgFilter}&domain=${domainFilter}&year=${timeframe}`,
+                      }}
+                      className="view-button"
+                    >
+                      View Details
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredFaculty.length === 0 && <div className="no-records">No faculty records found.</div>}
+      </div>
     </div>
   );
 };

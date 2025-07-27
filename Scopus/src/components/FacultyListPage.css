@@ -18,10 +18,48 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: var(--background-light);
-  color: var(--text-color);
-  padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #e8f5e9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.faculty-navbar {
+    width: 100%;
+    background: #f3f4f6;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.faculty-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.faculty-logo span {
+    color: #1A4D6C;
+}
+
+.faculty-navLogo {
+    height: 45px;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 .back-button {
@@ -42,9 +80,22 @@ body {
   transform: translateY(-4px) scale(1.05);
 }
 
+/* Animation Keyframes */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animation on page load */
 .faculty-container {
-  max-width: 1100px;  /* Increased max-width for more space */
-  margin: 40px auto;
+  max-width: 1100px;
+  margin: 6rem auto;
   padding: 20px;
   background-color: white;
   box-shadow: var(--card-shadow);
@@ -52,7 +103,12 @@ body {
   transition: all var(--transition-speed) ease-in-out;
   display: flex;
   flex-direction: column;
+
+  /* Animation */
+  opacity: 0;
+  animation: fadeSlideIn 0.7s ease-out forwards;
 }
+
 
 .title {
   text-align: center;
