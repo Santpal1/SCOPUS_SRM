@@ -325,7 +325,7 @@ const SDGInsightsDashboard: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" >
             {/* Bar Chart */}
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-6 border border-slate-700">
-              <h3 style={{ margin: '50px', marginLeft: '27rem' }} className="text-xl font-bold text-white mb-6 flex items-center">
+              <h3 style={{ margin: '50px', textAlign: 'center', justifyContent: 'center' }} className="text-xl font-bold text-white mb-6 flex items-center">
                 <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
                   <div className="w-4 h-4 bg-white rounded-sm"></div>
                 </div>
@@ -362,14 +362,7 @@ const SDGInsightsDashboard: React.FC = () => {
           /* Detailed Breakdown View */
           <div className="bg-slate-800/60 backdrop-blur-md rounded-3xl p-8 border border-slate-700 shadow-md">
             <h3
-              style={{
-                margin: "2rem",
-                marginLeft: "21.5rem",
-                fontSize: "28px",
-                color: "#124b7c",
-              }}
-              className="text-2xl font-bold text-white mb-10 flex items-center"
-            >
+              style={{ margin: '50px', textAlign: 'center', justifyContent: 'center' }} className="text-2xl font-bold text-white mb-10 flex items-center">
               <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center mr-4">
                 <div className="w-4 h-4 bg-white rounded-sm"></div>
               </div>
