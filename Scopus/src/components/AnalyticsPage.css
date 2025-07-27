@@ -6,11 +6,11 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f3f4f6;
+    background: linear-gradient(135deg, #f0f4f8, #e8f5e9);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     animation: fadeIn 1s ease-in-out;
 }
@@ -28,7 +28,7 @@ body {
     left: 0;
     right: 0;
     z-index: 1000;
-    animation: slideDown 0.6s ease-out;
+    animation: slideDown 0.3s ease-out;
 }
 
 
@@ -59,6 +59,7 @@ body {
     max-width: 1100px;
     margin: 6rem auto;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: contentFadeUp 0.6s ease-out;
 }
 
 .back-button {
@@ -71,10 +72,21 @@ body {
     border-radius: 8px;
     font-size: 16px;
     font-weight: 500;
-    transition: all 0.3s ease, transform 0.2s ease;
+    transition: all 0.5s ease, transform 0.2s ease;
 }
 
 .back-button:hover {
     background: linear-gradient(135deg, #163b4d, #1A4D6C);
     transform: translateY(-4px) scale(1.05);
+}
+
+@keyframes contentFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

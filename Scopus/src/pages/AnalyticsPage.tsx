@@ -6,7 +6,14 @@ import SDGTagCloud from '../components/SDGTagCloud';
 import srmLogo from "../assets/srmist-logo.png";
 import '../components/AnalyticsPage.css';
 
+import { useEffect } from 'react';
+
+
 const AnalyticsPage: React.FC = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+    
     return (
         <div>
             {/* Navbar */}

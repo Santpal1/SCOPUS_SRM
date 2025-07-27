@@ -110,7 +110,7 @@ body {
 .container {
     max-width: 1100px;
     width: 100%;
-    margin: 8rem auto 4rem;
+    margin: 6rem auto;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(12px);
     border-radius: 1rem;
