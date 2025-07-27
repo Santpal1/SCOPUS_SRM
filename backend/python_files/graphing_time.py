@@ -662,10 +662,8 @@ if __name__ == "__main__":
         "57191960194", "6602875353", "57213089519", "57211160113", "56578438800", "57210343217", 
         "56911467900", "57214415472", "57222616675", "57204562624", "55436730800"
     ]
-    missing_ids = ['55780773500', '84939519267', '57215654953', '57206497663', '57216357144', '543784062700']
-    final_ids = set(scopus_ids) - set(missing_ids)
     # print(len(final_ids))
-    for id in final_ids:
+    for id in scopus_ids:
         # print(id)
         scrape_scopus_author_metrics(id)
    

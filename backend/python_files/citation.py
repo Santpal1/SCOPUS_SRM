@@ -23,7 +23,7 @@ except mysql.connector.errors.ProgrammingError:
     pass  # Column probably already exists
 
 # Step 2: Path to folder with CSV files
-folder_path = r'C:\Users\Anant Kumar\OneDrive\Desktop\SCOPUS_SRM-main\backend\scopus_data'
+folder_path = r'backend\scopus_data'
 
 # Step 3: Process each file and update citations
 for file_name in os.listdir(folder_path):

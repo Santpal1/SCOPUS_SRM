@@ -5,7 +5,7 @@ import time
 
 # ── CONFIG ──
 dry_run   = False                          # False → actually write back to DB
-HF_TOKEN  = "token"           # ← your Hugging Face token
+HF_TOKEN  = "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"           # ← your Hugging Face token
 API_URL   = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
 HEADERS   = {"Authorization": f"Bearer {HF_TOKEN}"}
 
