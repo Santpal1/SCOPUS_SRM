@@ -274,7 +274,14 @@ const FacultyDetailPage: React.FC = () => {
   if (error) return <div className="error-message">{error}</div>;
   if (!facultyData) return <div className="no-records">No data found for this faculty member.</div>;
 
-  const { faculty, papers: allPapers } = facultyData;
+  const { faculty, papers: unsortedPapers } = facultyData;
+
+  const allPapers = [...unsortedPapers].sort((a, b) => {
+    const dateA = new Date(a.date || '').getTime();
+    const dateB = new Date(b.date || '').getTime();
+    return dateB - dateA; // Sort from latest to oldest
+  });
+
 
   const filteredPapers = selectedQuartile
     ? allPapers.filter(p => p.quartile?.toUpperCase() === selectedQuartile)
