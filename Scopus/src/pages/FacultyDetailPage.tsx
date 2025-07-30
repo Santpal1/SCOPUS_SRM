@@ -23,6 +23,8 @@ interface Paper {
   publication_name: string;
   date: string;
   quartile?: string;
+  quartile_year?: string;
+  quartiles?: Record<string, string>;
 }
 
 interface FacultyDetailResponse {
@@ -39,17 +41,14 @@ const FacultyDetailPage: React.FC = () => {
   const [facultyData, setFacultyData] = useState<FacultyDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [iframeLoaded, setIframeLoaded] = useState<boolean>(false);
-  const [quartileYear, setQuartileYear] = useState<string>('2024');
+  const [quartileYear, setQuartileYear] = useState<string>('');
   const [selectedQuartile, setSelectedQuartile] = useState<string | null>(null);
-
-
-
-  const [quartileSummary, setQuartileSummary] = useState<{
-    Q1: number;
-    Q2: number;
-    Q3: number;
-    Q4: number;
-  } | null>(null);
+  const [quartileSummaryAllYears, setQuartileSummaryAllYears] = useState<Record<string, {
+  q1_count: number;
+  q2_count: number;
+  q3_count: number;
+  q4_count: number;
+}> | null>(null);
 
 
   const [sdgFilter, setSdgFilter] = useState<string>(
@@ -101,26 +100,27 @@ const FacultyDetailPage: React.FC = () => {
             sdg: sdgFilter !== "none" ? sdgFilter : undefined,
             domain: domainFilter !== "none" ? domainFilter : undefined,
             year: yearFilter !== "none" ? yearFilter : undefined,
+            quartileYear: quartileYear || undefined,
           },
         });
         setFacultyData(response.data);
-        try {
-          const year = quartileYear;
-          const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`, {
-            params: { year }
-          });
+       try {
+  const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`);
+  const summaryData = quartRes.data || {};
+  setQuartileSummaryAllYears(summaryData);
 
-          const data = quartRes.data[0] || {};
-          setQuartileSummary({
-            Q1: data.q1_count || 0,
-            Q2: data.q2_count || 0,
-            Q3: data.q3_count || 0,
-            Q4: data.q4_count || 0
-          });
-        } catch (e) {
-          console.warn("Failed to load quartile summary:", e);
-          setQuartileSummary(null);
-        }
+  // Dynamically set default quartile year if not already set
+  const allYears = Object.keys(summaryData);
+  if (!quartileYear && allYears.length > 0) {
+    const latestYear = allYears.sort((a, b) => Number(b) - Number(a))[0];
+    setQuartileYear(latestYear);
+  }
+
+} catch (e) {
+  console.warn("Failed to load quartile summary:", e);
+  setQuartileSummaryAllYears(null);
+}
+
 
       } catch (err) {
         setError('Failed to fetch faculty details');
@@ -131,6 +131,10 @@ const FacultyDetailPage: React.FC = () => {
 
     fetchFacultyDetails();
   }, [scopusId, sdgFilter, domainFilter, yearFilter, quartileYear]);
+const yearSummary =
+  quartileSummaryAllYears && quartileYear && quartileSummaryAllYears[quartileYear]
+    ? quartileSummaryAllYears[quartileYear]
+    : { q1_count: 0, q2_count: 0, q3_count: 0, q4_count: 0 };
 
   const handleIframeLoad = () => {
     setIframeLoaded(true);
@@ -283,9 +287,13 @@ const FacultyDetailPage: React.FC = () => {
   });
 
 
-  const filteredPapers = selectedQuartile
-    ? allPapers.filter(p => p.quartile?.toUpperCase() === selectedQuartile)
-    : allPapers;
+ const filteredPapers = selectedQuartile
+  ? allPapers.filter(
+      (p) =>
+        p.quartiles?.[quartileYear] &&
+        p.quartiles[quartileYear].toUpperCase() === selectedQuartile
+    )
+  : allPapers;
 
 
   return (
@@ -355,20 +363,27 @@ const FacultyDetailPage: React.FC = () => {
             📄 Generate Report
           </button>
 
-          {quartileSummary && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
+          {quartileSummaryAllYears && quartileSummaryAllYears[quartileYear] && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
             <div className="quartile-summary-table">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                 <h4>Quartile Summary for {quartileYear}</h4>
 
-                <select
-                  value={quartileYear}
-                  onChange={(e) => setQuartileYear(e.target.value)}
-                  style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                >
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                </select>
+                {quartileSummaryAllYears && (
+  <select
+    value={quartileYear}
+    onChange={(e) => setQuartileYear(e.target.value)}
+    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
+  >
+    {Object.keys(quartileSummaryAllYears)
+      .sort((a, b) => Number(b) - Number(a)) // optional: show latest year first
+      .map((year) => (
+        <option key={year} value={year}>
+          {year}
+        </option>
+      ))}
+  </select>
+)}
+
               </div>
 
               <table>
@@ -377,25 +392,25 @@ const FacultyDetailPage: React.FC = () => {
                     className={`q1 ${selectedQuartile === 'Q1' ? 'selected' : ''}`}
                     onClick={() => setSelectedQuartile('Q1')}
                   >
-                    <td>Q1</td><td>{quartileSummary.Q1}</td>
+                    <td>Q1</td><td>{yearSummary.q1_count}</td>
                   </tr>
                   <tr
                     className={`q2 ${selectedQuartile === 'Q2' ? 'selected' : ''}`}
                     onClick={() => setSelectedQuartile('Q2')}
                   >
-                    <td>Q2</td><td>{quartileSummary.Q2}</td>
+                    <td>Q2</td><td>{yearSummary.q2_count}</td>
                   </tr>
                   <tr
                     className={`q3 ${selectedQuartile === 'Q3' ? 'selected' : ''}`}
                     onClick={() => setSelectedQuartile('Q3')}
                   >
-                    <td>Q3</td><td>{quartileSummary.Q3}</td>
+                    <td>Q3</td><td>{yearSummary.q3_count}</td>
                   </tr>
                   <tr
                     className={`q4 ${selectedQuartile === 'Q4' ? 'selected' : ''}`}
                     onClick={() => setSelectedQuartile('Q4')}
                   >
-                    <td>Q4</td><td>{quartileSummary.Q4}</td>
+                    <td>Q4</td><td>{yearSummary.q4_count}</td>
                   </tr>
 
                 </tbody>
@@ -424,12 +439,42 @@ const FacultyDetailPage: React.FC = () => {
                 <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
                 <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
               </div>
-              {paper.type.toLowerCase() === "journal" && paper.quartile && paper.quartile.trim() !== "-" ? (
-                <div className={`quartile-badge ${paper.quartile.toLowerCase()}`}>
-                  <span className="quartile-text">{paper.quartile.toUpperCase()}</span>
-                  <i className="badge-icon">★</i>
-                </div>
-              ) : null}
+  {paper.quartiles && paper.type?.toLowerCase().includes("journal") && (
+  <div className="quartile-badge-container">
+    {selectedQuartile
+      ? (() => {
+          const q = paper.quartiles?.[quartileYear];
+          return q &&
+            q.trim() !== "-" &&
+            q.toUpperCase() === selectedQuartile ? (
+              <div
+                className={`quartile-badge ${q.toLowerCase()}`}
+                key={`${paper.doi}-${quartileYear}`}
+              >
+                <span className="quartile-text">
+                  {q.toUpperCase()} {quartileYear}
+                </span>
+                <i className="badge-icon">★</i>
+              </div>
+            ) : null;
+        })()
+      : Object.entries(paper.quartiles).map(([year, quartile]) =>
+          quartile && quartile.trim() !== "-" ? (
+            <div
+              key={`${paper.doi}-${year}`}
+              className={`quartile-badge ${quartile.toLowerCase()}`}
+            >
+              <span className="quartile-text">
+                {quartile.toUpperCase()} {year}
+              </span>
+              <i className="badge-icon">★</i>
+            </div>
+          ) : null
+        )}
+  </div>
+)}
+
+
 
 
             </div>

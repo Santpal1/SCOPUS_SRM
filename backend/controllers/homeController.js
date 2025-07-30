@@ -48,9 +48,10 @@ exports.getHomepageStats = async (req, res) => {
 
     // Q1 paper count from past 3 years
     const [q1Data] = await con.query(`
-      SELECT SUM(q1_count) AS total FROM faculty_quartile_summary
-      WHERE year >= YEAR(CURDATE()) - 2
-    `);
+  SELECT COUNT(*) AS total FROM faculty_quartile_summary
+  WHERE quartile_2024 = 'Q1'
+`);
+
 
     // Total publications in the last 1 year
     const [recentPapers] = await con.query(`

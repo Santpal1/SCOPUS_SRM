@@ -124,71 +124,120 @@ exports.getCriteriaFilteredFaculty = (req, res) => {
 
 
 exports.getFacultyDetails = (req, res) => {
-    const { scopusId } = req.params;
-    const { sdg, domain, year } = req.query;
+  const { scopusId } = req.params;
+  const { sdg, domain, year, quartileYear } = req.query;
 
-    db.query('SELECT * FROM users WHERE scopus_id = ?', [scopusId], (err, facultyResults) => {
-        if (err) return res.status(500).json({ error: 'Failed to fetch faculty details' });
-        if (!facultyResults.length) return res.status(404).json({ error: 'Faculty not found' });
+  db.query('SELECT * FROM users WHERE scopus_id = ?', [scopusId], (err, facultyResults) => {
+    if (err) return res.status(500).json({ error: 'Failed to fetch faculty details' });
+    if (!facultyResults.length) return res.status(404).json({ error: 'Faculty not found' });
 
-        let papersQuery = `
-            SELECT p.*, pi.sustainable_development_goals AS sdg, pi.qs_subject_field_name AS domain
-            FROM papers p
-            LEFT JOIN paper_insights pi ON p.doi = pi.doi
-            WHERE p.scopus_id = ?
-        `;
+    // Validate quartileYear
+    let safeQuartileYear = quartileYear;
+    if (!/^\d{4}$/.test(safeQuartileYear)) {
+      safeQuartileYear = '2024'; // fallback
+    }
 
-        const queryParams = [scopusId];
-        const conditions = [];
+    let queryParams = [scopusId];
+    let baseQuery = `
+      SELECT 
+        p.*, 
+        pi.sustainable_development_goals AS sdg, 
+        pi.qs_subject_field_name AS domain,
+        fqs.quartile_2022,
+        fqs.quartile_2023,
+        fqs.quartile_2024,
+        fqs.quartile_${safeQuartileYear} AS quartile_value
+      FROM papers p
+      LEFT JOIN paper_insights pi ON p.doi = pi.doi
+      LEFT JOIN faculty_quartile_summary fqs ON p.doi = fqs.doi AND fqs.scopus_id = ?
+    `;
 
-        if (sdg) {
-            conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
-            queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
-        }
+    const conditions = ['p.scopus_id = ?'];
+    queryParams.push(scopusId); // second usage of scopus_id (for WHERE)
 
-        if (domain) {
-            conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
-            queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
-        }
+    if (sdg) {
+      conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
+      queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
+    }
 
-        if (year) {
-            conditions.push("YEAR(p.date) = ?");
-            queryParams.push(year);
-        }
+    if (domain) {
+      conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
+      queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
+    }
 
-        if (conditions.length > 0) {
-            papersQuery += ' AND ' + conditions.join(' AND ');
-        }
+    if (year) {
+      conditions.push("YEAR(p.date) = ?");
+      queryParams.push(year);
+    }
 
-        db.query(papersQuery, queryParams, (err, papersResults) => {
-            if (err) return res.status(500).json({ error: 'Failed to fetch faculty papers' });
-            res.json({ faculty: facultyResults[0], papers: papersResults });
+    baseQuery += ` WHERE ${conditions.join(' AND ')}`;
+    baseQuery += ` AND fqs.quartile_${safeQuartileYear} IS NOT NULL`;
+    baseQuery += ` ORDER BY p.date DESC`;
+
+    db.query(baseQuery, queryParams, (err, papersResults) => {
+      if (err) {
+        console.error("❌ Query Error:", err);
+        return res.status(500).json({ error: 'Failed to fetch faculty papers' });
+      }
+
+      // Inject quartile info
+      papersResults.forEach(paper => {
+        paper.quartile = paper.quartile_value || null;
+        paper.quartile_year = safeQuartileYear;
+
+        // Add all available quartiles as an object
+        paper.quartiles = {};
+        Object.keys(paper).forEach(key => {
+          const match = key.match(/^quartile_(\d{4})$/);
+          if (match && paper[key]) {
+            const year = match[1];
+            paper.quartiles[year] = paper[key]; // e.g., Q2
+          }
         });
+      });
+
+      res.json({ faculty: facultyResults[0], papers: papersResults });
     });
+  });
 };
+
+
+
 
 exports.getFacultyQuartileSummary = (req, res) => {
     const { scopusId } = req.params;
-    const { year } = req.query;
 
-    let query = `
-        SELECT year, q1_count, q2_count, q3_count, q4_count
-        FROM faculty_quartile_summary
-        WHERE scopus_id = ?
-    `;
-    const params = [scopusId];
+    const query = `SELECT * FROM faculty_quartile_summary WHERE scopus_id = ?`;
 
-    if (year) {
-        query += ' AND year = ?';
-        params.push(year);
-    }
-
-    db.query(query, params, (err, results) => {
+    db.query(query, [scopusId], (err, rows) => {
         if (err) {
             console.error("Quartile summary error:", err);
             return res.status(500).json({ error: 'Failed to fetch quartile summary' });
         }
 
-        res.json(results);
+        const summaryByYear = {}; // { "2024": { q1_count: x, q2_count: y, ... } }
+
+        for (const row of rows) {
+            for (const key of Object.keys(row)) {
+                const match = key.match(/^quartile_(\d{4})$/); // match quartile_2024 etc.
+                if (match) {
+                    const year = match[1];
+                    const quartile = row[key];
+
+                    if (!summaryByYear[year]) {
+                        summaryByYear[year] = { q1_count: 0, q2_count: 0, q3_count: 0, q4_count: 0 };
+                    }
+
+                    switch (quartile) {
+                        case 'Q1': summaryByYear[year].q1_count++; break;
+                        case 'Q2': summaryByYear[year].q2_count++; break;
+                        case 'Q3': summaryByYear[year].q3_count++; break;
+                        case 'Q4': summaryByYear[year].q4_count++; break;
+                    }
+                }
+            }
+        }
+
+        res.json(summaryByYear);
     });
 };

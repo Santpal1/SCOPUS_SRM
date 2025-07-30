@@ -3,17 +3,15 @@ import re
 import requests
 import pandas as pd
 import mysql.connector
-from mysql.connector import errorcode
 from collections import defaultdict
 import logging
-from datetime import datetime
 
 # ——— SETUP LOGGING ———
 logging.basicConfig(
     level=logging.INFO,
     format='[%(asctime)s] %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("faculty_quartile_summary.log", encoding='utf-8'),
+        logging.FileHandler("faculty_quartile_perpaper.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -54,7 +52,7 @@ def fetch_first_issn(doi):
         logging.warning(f"[CrossRef] Failed to fetch ISSN for DOI {doi}: {e}")
     return None
 
-# ——— 1. Build year-wise ISSN→Quartile map ———
+# ——— 1. Load SJR Files into ISSN→Quartile Maps ———
 yearly_issn_quart = defaultdict(dict)
 
 for year, filename in SJR_FILES.items():
@@ -80,70 +78,65 @@ except mysql.connector.Error as err:
 
 cursor = cnx.cursor()
 
-# ——— 3. Create summary table if not exists ———
+# ——— 3. Drop & Recreate Table ———
+cursor.execute("DROP TABLE IF EXISTS faculty_quartile_summary")
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS faculty_quartile_summary (
-  id INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE faculty_quartile_summary (
   scopus_id VARCHAR(50),
-  year INT,
-  q1_count INT DEFAULT 0,
-  q2_count INT DEFAULT 0,
-  q3_count INT DEFAULT 0,
-  q4_count INT DEFAULT 0
+  doi VARCHAR(255),
+  quartile_2024 VARCHAR(2),
+  quartile_2023 VARCHAR(2),
+  quartile_2022 VARCHAR(2),
+  PRIMARY KEY (doi)
 );
 """)
 cnx.commit()
 
-# ——— 4. Fetch relevant papers ———
-cursor.execute("SELECT scopus_id, doi, date FROM papers WHERE doi IS NOT NULL;")
+# ——— 4. Fetch DOIs ———
+cursor.execute("SELECT scopus_id, doi FROM papers WHERE doi IS NOT NULL;")
 papers = cursor.fetchall()
 logging.info(f"Fetched {len(papers)} papers with DOIs.")
 
-# ——— 5. Process papers and aggregate counts ———
-summary = defaultdict(lambda: defaultdict(int))  # summary[(scopus_id, year)][quartile] = count
+# ——— 5. Process and Insert One by One ———
+insert_sql = """
+INSERT INTO faculty_quartile_summary (scopus_id, doi, quartile_2024, quartile_2023, quartile_2022)
+VALUES (%s, %s, %s, %s, %s)
+"""
 
-for idx, (scopus_id, doi, date) in enumerate(papers, 1):
-    if not doi or not date:
+for idx, (scopus_id, doi) in enumerate(papers, 1):
+    if not doi:
         continue
-    year = date.year
-    if year not in SJR_FILES:
-        continue  # skip years we don't have data for
 
     issn = fetch_first_issn(doi)
     if not issn:
         logging.warning(f"[{idx}] No ISSN found for DOI {doi}")
         continue
 
-    quart = yearly_issn_quart[year].get(issn)
-    if not quart:
-        logging.warning(f"[{idx}] No quartile for ISSN {issn} in year {year}")
-        continue
+    quartiles = {}
+    for year in [2024, 2023, 2022]:
+        quart = yearly_issn_quart[year].get(issn)
+        quartiles[year] = quart if quart else None
 
-    summary[(scopus_id, year)][quart] += 1
-    logging.info(f"[{idx}] {scopus_id} ({year}) → {quart}")
+    try:
+        cursor.execute(insert_sql, (
+            scopus_id,
+            doi,
+            quartiles[2024],
+            quartiles[2023],
+            quartiles[2022]
+        ))
+        cnx.commit()
+        logging.info(f"[{idx}] Inserted {doi} → 2024:{quartiles[2024]} 2023:{quartiles[2023]} 2022:{quartiles[2022]}")
+    except mysql.connector.errors.IntegrityError as e:
+        if e.errno == 1062:
+            logging.warning(f"[{idx}] Skipped duplicate DOI: {doi}")
+        else:
+            logging.error(f"[{idx}] Failed to insert {doi}: {e}")
 
     if idx % 50 == 0:
-        time.sleep(1)  # polite CrossRef throttle
+        time.sleep(1)  # CrossRef throttle
 
-# ——— 6. Insert into summary table ———
-cursor.execute("TRUNCATE TABLE faculty_quartile_summary")
-
-insert_sql = """
-INSERT INTO faculty_quartile_summary (scopus_id, year, q1_count, q2_count, q3_count, q4_count)
-VALUES (%s, %s, %s, %s, %s, %s)
-"""
-
-for (scopus_id, year), counts in summary.items():
-    q1 = counts.get("Q1", 0)
-    q2 = counts.get("Q2", 0)
-    q3 = counts.get("Q3", 0)
-    q4 = counts.get("Q4", 0)
-    cursor.execute(insert_sql, (scopus_id, year, q1, q2, q3, q4))
-
-cnx.commit()
-logging.info("✅ Summary table populated successfully.")
-
-# ——— 7. Cleanup ———
+# ——— 6. Cleanup ———
 cursor.close()
 cnx.close()
 logging.info("Closed MySQL connection.")

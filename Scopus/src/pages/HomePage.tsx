@@ -99,8 +99,8 @@ const FacultyLandingPage = () => {
                         description: data.topCountries.map(c => `${c.country} (${c.count})`).join(', '),
                     },
                     {
-                        title: "Q1 Publications (Last 3 Years)",
-                        description: `${data.recentQ1Papers} Q1 papers published in the last 3 years.`,
+                        title: "Q1 Publications (As of 2024)",
+                        description: `${data.recentQ1Papers} Q1 rankings achieved by our faculty in 2024.`,
                     },
                     {
                         title: "Recent Publications (Last 1 Year)",

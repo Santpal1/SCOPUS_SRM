@@ -7,3 +7,4 @@ scopus_data
 *.xlsx
 *.csv
 .env
+*.log
