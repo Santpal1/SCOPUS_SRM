@@ -298,34 +298,36 @@ body::before {
   }
 }
 
-/* Super cool quartile badges */
+/* Improved quartile badges with bottom-right positioning */
 .quartile-badge-container {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 10px;
+  margin-top: 15px;
   justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .quartile-badge {
   display: inline-flex;
   align-items: center;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: white;
-  gap: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  transition: var(--transition);
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
   background-color: gray;
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Shimmer effect on badges */
+/* Subtle shimmer effect on badges - performance optimized */
 .quartile-badge::before {
   content: '';
   position: absolute;
@@ -333,8 +335,9 @@ body::before {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.6s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.4s ease;
+  will-change: left;
 }
 
 .quartile-badge:hover::before {
@@ -342,63 +345,60 @@ body::before {
 }
 
 .quartile-badge:hover {
-  transform: translateY(-4px) scale(1.1) rotate(2deg);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
 }
 
-/* Enhanced color variants with amazing gradients */
+/* Enhanced color variants with subtle gradients */
 .q1 { 
-  background: linear-gradient(135deg, var(--success-color) 0%, #45a049 50%, #4CAF50 100%);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, var(--success-color) 0%, #45a049 100%);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 .q2 { 
-  background: linear-gradient(135deg, var(--info-color) 0%, #1976D2 50%, #2196F3 100%);
-  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+  background: linear-gradient(135deg, var(--info-color) 0%, #1976D2 100%);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 .q3 { 
-  background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 50%, #FF9800 100%);
-  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+  background: linear-gradient(135deg, var(--warning-color) 0%, #F57C00 100%);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
 }
 .q4 { 
-  background: linear-gradient(135deg, var(--danger-color) 0%, #D32F2F 50%, #F44336 100%);
-  box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+  background: linear-gradient(135deg, var(--danger-color) 0%, #D32F2F 100%);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
 }
 
 .quartile-text {
-  margin-right: 4px;
+  margin-right: 2px;
   color: white;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .badge-icon {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.95);
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
 }
 
-/* Pulsing animation for Q1 badges */
+/* Subtle pulse animation for Q1 badges only - performance optimized */
 .quartile-badge.q1 { 
-  animation: epicPulse 3s ease-in-out infinite; 
+  animation: subtlePulse 3s ease-in-out infinite; 
 }
 
-@keyframes epicPulse {
+@keyframes subtlePulse {
   0%, 100% { 
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); 
-    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); 
   }
   50% { 
-    box-shadow: 0 10px 40px rgba(76, 175, 80, 0.6),
-                0 0 30px rgba(76, 175, 80, 0.3); 
-    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.4); 
   }
 }
 
-/* Enhanced publication cards */
+/* Enhanced publication cards with better badge positioning */
 .publication-card {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   padding: 24px;
   margin: 18px 0;
   border: 1px solid rgba(221, 221, 221, 0.4);
@@ -436,6 +436,7 @@ body::before {
 
 .publication-left {
   flex: 1;
+  margin-bottom: 10px;
 }
 
 /* Super cool back button */
@@ -1090,8 +1091,8 @@ p {
   }
 
   .quartile-badge {
-    padding: 8px 14px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 }
 
@@ -1107,8 +1108,6 @@ p {
 
   .publication-card {
     padding: 20px;
-    flex-direction: column;
-    gap: 12px;
   }
 
   .faculty-name {
@@ -1129,8 +1128,8 @@ p {
   }
 
   .quartile-badge {
-    padding: 6px 12px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    font-size: 0.75rem;
   }
 
   .floating-btn {
