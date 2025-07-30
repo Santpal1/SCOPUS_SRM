@@ -109,6 +109,61 @@ body {
   animation: fadeSlideIn 0.7s ease-out forwards;
 }
 
+.criteria-button {
+  background: #004a8f;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.criteria-button:hover {
+  background: #00376b;
+}
+
+.criteria-inputs {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.criteria-inputs input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.apply-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.apply-button:hover {
+  background: #218838;
+}
+
+.criteria-inputs {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.criteria-inputs input,
+.criteria-inputs button {
+  padding: 8px;
+}
+
 
 .title {
   text-align: center;

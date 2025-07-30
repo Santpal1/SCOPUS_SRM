@@ -27,8 +27,11 @@ const FacultyListPage: React.FC = () => {
   const [docsInTimeframeMap, setDocsInTimeframeMap] = useState<{ [key: string]: number }>({});
   const [sdgFilter, setSdgFilter] = useState<string>("none");
   const [domainFilter, setDomainFilter] = useState<string>("none");
-  const [lowPaperFilter, setLowPaperFilter] = useState<string>("none");
 
+  const [criteriaVisible, setCriteriaVisible] = useState<boolean>(false);
+  const [criteriaStart, setCriteriaStart] = useState<string>("");
+  const [criteriaEnd, setCriteriaEnd] = useState<string>("");
+  const [criteriaPapers, setCriteriaPapers] = useState<number>(0);
 
   const currentYear = new Date().getFullYear();
   const previousYear = currentYear - 1;
@@ -42,8 +45,8 @@ const FacultyListPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (lowPaperFilter === "none") {
-      fetchFaculty(); // Only fetch normal data if not showing low papers
+    if (!criteriaVisible) {
+      fetchFaculty(); // Only fetch normal data if criteria filter is not active
     }
   }, [sdgFilter, domainFilter, timeframe]);
 
@@ -82,12 +85,37 @@ const FacultyListPage: React.FC = () => {
     }
   };
 
+  const fetchCriteriaFilteredFaculty = async () => {
+    if (!criteriaStart || !criteriaEnd || criteriaPapers <= 0) {
+      alert("Please enter valid Start Date, End Date, and Paper Count.");
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:5001/api/faculty/criteria-filter`,
+        { params: { start: criteriaStart, end: criteriaEnd, papers: criteriaPapers } }
+      );
 
+      const updatedFaculty = response.data
+        .map((member: Faculty) => ({
+          ...member,
+          docs_in_timeframe: member.timeframe_docs,
+        }))
+        .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
+
+      setFaculty(updatedFaculty);
+      setCurrentFaculty(updatedFaculty);
+      setFilteredFaculty(updatedFaculty);
+    } catch (error) {
+      console.error("Error fetching criteria-filtered faculty:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchFacultyByTimeframe = async (selectedTimeframe: string) => {
-    setLowPaperFilter("none");
     setTimeframe(selectedTimeframe);
-
     if (selectedTimeframe === "none") {
       setDocsInTimeframeMap({});
       const sorted = [...faculty].sort((a, b) => b.docs_count - a.docs_count);
@@ -120,78 +148,38 @@ const FacultyListPage: React.FC = () => {
     }
   };
 
-  const fetchLowPaperFacultyByYears = async (years: number) => {
-    try {
-      setLoading(true);
-
-      const response = await axios.get(`http://localhost:5001/api/faculty/low-papers?years=${years}`);
-
-      const updatedFaculty = response.data
-        .map((member: Faculty) => ({
-          ...member,
-          docs_in_timeframe: member.timeframe_docs,
-        }))
-        .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
-
-      setFaculty(updatedFaculty);
-      setCurrentFaculty(updatedFaculty);
-      setFilteredFaculty(updatedFaculty);
-    } catch (error) {
-      console.error("Error fetching faculty with low papers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-
     if (query === "") {
       setFilteredFaculty(currentFaculty);
       return;
     }
-
     const filtered = currentFaculty.filter(
       member =>
         member.name.toLowerCase().includes(query) ||
         member.scopus_id.toLowerCase().includes(query)
     );
-
     setFilteredFaculty(filtered);
   };
 
   const applyAllFilters = (baseList?: Faculty[]) => {
     let updatedList = baseList || currentFaculty;
-
     if (sdgFilter !== "none") {
       updatedList = updatedList.filter(f => f.sdg?.toLowerCase() === sdgFilter.toLowerCase());
     }
-
     if (domainFilter !== "none") {
       updatedList = updatedList.filter(f => f.domain?.toLowerCase() === domainFilter.toLowerCase());
     }
-
     setFilteredFaculty(updatedList);
   };
 
-  const handleLowPaperSelect = (value: string) => {
-    if (value === "none") {
-      setLowPaperFilter("none");
-      fetchFaculty(); // reset to full list
+  const handleCriteriaClick = () => {
+    if (sdgFilter !== "none" || domainFilter !== "none" || timeframe !== "none") {
+      alert("Please clear Year, SDG, and Domain filters before using Criteria Filter.");
       return;
     }
-
-    const hasOtherFilters = sdgFilter !== "none" || domainFilter !== "none" || timeframe !== "none";
-
-    if (hasOtherFilters) {
-      alert("Please clear other filters (Year, SDG, Domain) before using this option.");
-      return;
-    }
-
-    setLowPaperFilter(value);
-    fetchLowPaperFacultyByYears(parseInt(value));
+    setCriteriaVisible(!criteriaVisible);
   };
 
   if (loading) return <div className="loading">Loading faculty data...</div>;
@@ -219,7 +207,7 @@ const FacultyListPage: React.FC = () => {
             value={timeframe}
             onChange={(e) => fetchFacultyByTimeframe(e.target.value)}
             className="dropdown"
-            disabled={lowPaperFilter !== "none"}
+            disabled={criteriaVisible}
           >
             <option value="none" disabled hidden>Year Filter</option>
             <option value="none">None</option>
@@ -229,12 +217,9 @@ const FacultyListPage: React.FC = () => {
 
           <select
             value={sdgFilter}
-            onChange={(e) => {
-              setSdgFilter(e.target.value);
-              setLowPaperFilter("none");
-            }}
+            onChange={(e) => setSdgFilter(e.target.value)}
             className="dropdown"
-            disabled={lowPaperFilter !== "none"}
+            disabled={criteriaVisible}
           >
             <option value="none" disabled hidden>SDG Filter</option>
             <option value="none">None</option>
@@ -243,15 +228,11 @@ const FacultyListPage: React.FC = () => {
             ))}
           </select>
 
-
           <select
             value={domainFilter}
-            onChange={(e) => {
-              setDomainFilter(e.target.value);
-              setLowPaperFilter("none");
-            }}
+            onChange={(e) => setDomainFilter(e.target.value)}
             className="dropdown"
-            disabled={lowPaperFilter !== "none"}
+            disabled={criteriaVisible}
           >
             <option value="none" disabled hidden>Domain Filter</option>
             <option value="none">None</option>
@@ -269,21 +250,41 @@ const FacultyListPage: React.FC = () => {
             ))}
           </select>
 
-          <select
-            className="dropdown"
-            value={lowPaperFilter}
-            onChange={(e) => handleLowPaperSelect(e.target.value)}
-          >
-            <option value="none" disabled hidden>Criteria Filter</option>
-            <option value="none">None</option>
-            <option value="1">Show Faculty with &lt; 4 Papers in 1 Year</option>
-            <option value="2">Show Faculty with &lt; 4 Papers in 2 Years</option>
-            <option value="3">Show Faculty with &lt; 4 Papers in 3 Years</option>
-            <option value="4">Show Faculty with &lt; 4 Papers in 4 Years</option>
-            <option value="5">Show Faculty with &lt; 4 Papers in 5 Years</option>
-          </select>
-
+          <button className="criteria-button" onClick={handleCriteriaClick}>
+            {criteriaVisible ? "Hide Criteria Filter" : "Criteria Filter"}
+          </button>
         </div>
+
+        {/* Criteria Inputs */}
+        {criteriaVisible && (
+          <div className="criteria-inputs" style={{ margin: "20px 0" }}>
+            <input
+              type="date"
+              value={criteriaStart}
+              onChange={(e) => setCriteriaStart(e.target.value)}
+              placeholder="Start Date"
+            />
+            <span>-</span>
+            <input
+              type="date"
+              value={criteriaEnd}
+              onChange={(e) => setCriteriaEnd(e.target.value)}
+              placeholder="End Date"
+            />
+            <input
+              type="number"
+              value={criteriaPapers === 0 ? "" : criteriaPapers}
+              onChange={(e) => setCriteriaPapers(e.target.value === "" ? 0 : parseInt(e.target.value))}
+              placeholder="Min Paper Count"
+              min={1}
+            />
+            <button onClick={fetchCriteriaFilteredFaculty} className="apply-button">
+              Apply
+            </button>
+          </div>
+        )}
+
+
 
         {/* Search Bar */}
         <div className="search-bar">

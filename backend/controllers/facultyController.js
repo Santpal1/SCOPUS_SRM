@@ -94,24 +94,24 @@ exports.getFacultyPaperStats = (req, res) => {
     });
 };
 
-exports.getLowPublishingFaculty = (req, res) => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
+// Existing imports
+exports.getCriteriaFilteredFaculty = (req, res) => {
+    const { start, end, papers } = req.query;
 
-    const years = parseInt(req.query.years) || 1; // Default is 1 year if not provided
-    const startDate = `${currentYear - years}-07-01`;
-    const endDate = `${currentYear}-06-30`;
+    if (!start || !end || !papers) {
+        return res.status(400).json({ error: "Start date, end date, and paper count are required." });
+    }
 
     const query = `
         SELECT u.scopus_id, u.name, COUNT(p.scopus_id) AS timeframe_docs
         FROM users u
         LEFT JOIN papers p ON u.scopus_id = p.scopus_id 
-            AND p.date >= '${startDate}' AND p.date <= '${endDate}'
+            AND p.date >= ? AND p.date <= ?
         GROUP BY u.scopus_id, u.name
-        HAVING timeframe_docs < 4;
+        HAVING timeframe_docs < ?;
     `;
 
-    db.query(query, (err, results) => {
+    db.query(query, [start, end, parseInt(papers)], (err, results) => {
         if (err) {
             console.error("DB Error:", err);
             return res.status(500).json({ error: 'Failed to fetch data' });
@@ -119,6 +119,8 @@ exports.getLowPublishingFaculty = (req, res) => {
         res.json(results);
     });
 };
+
+
 
 
 exports.getFacultyDetails = (req, res) => {
