@@ -124,21 +124,21 @@ exports.getCriteriaFilteredFaculty = (req, res) => {
 
 
 exports.getFacultyDetails = (req, res) => {
-  const { scopusId } = req.params;
-  const { sdg, domain, year, quartileYear } = req.query;
+    const { scopusId } = req.params;
+    const { sdg, domain, year, quartileYear } = req.query;
 
-  db.query('SELECT * FROM users WHERE scopus_id = ?', [scopusId], (err, facultyResults) => {
-    if (err) return res.status(500).json({ error: 'Failed to fetch faculty details' });
-    if (!facultyResults.length) return res.status(404).json({ error: 'Faculty not found' });
+    db.query('SELECT * FROM users WHERE scopus_id = ?', [scopusId], (err, facultyResults) => {
+        if (err) return res.status(500).json({ error: 'Failed to fetch faculty details' });
+        if (!facultyResults.length) return res.status(404).json({ error: 'Faculty not found' });
 
-    // Validate quartileYear
-    let safeQuartileYear = quartileYear;
-    if (!/^\d{4}$/.test(safeQuartileYear)) {
-      safeQuartileYear = '2024'; // fallback
-    }
+        // Validate quartileYear
+        let safeQuartileYear = quartileYear;
+        if (!/^\d{4}$/.test(safeQuartileYear)) {
+            safeQuartileYear = '2024'; // fallback
+        }
 
-    let queryParams = [scopusId];
-    let baseQuery = `
+        let queryParams = [scopusId];
+        let baseQuery = `
       SELECT 
         p.*, 
         pi.sustainable_development_goals AS sdg, 
@@ -152,53 +152,53 @@ exports.getFacultyDetails = (req, res) => {
       LEFT JOIN faculty_quartile_summary fqs ON p.doi = fqs.doi AND fqs.scopus_id = ?
     `;
 
-    const conditions = ['p.scopus_id = ?'];
-    queryParams.push(scopusId); // second usage of scopus_id (for WHERE)
+        const conditions = ['p.scopus_id = ?'];
+        queryParams.push(scopusId); // second usage of scopus_id (for WHERE)
 
-    if (sdg) {
-      conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
-      queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
-    }
+        if (sdg) {
+            conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
+            queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
+        }
 
-    if (domain) {
-      conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
-      queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
-    }
+        if (domain) {
+            conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
+            queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
+        }
 
-    if (year) {
-      conditions.push("YEAR(p.date) = ?");
-      queryParams.push(year);
-    }
+        if (year) {
+            conditions.push("YEAR(p.date) = ?");
+            queryParams.push(year);
+        }
 
-    baseQuery += ` WHERE ${conditions.join(' AND ')}`;
-    baseQuery += ` AND fqs.quartile_${safeQuartileYear} IS NOT NULL`;
-    baseQuery += ` ORDER BY p.date DESC`;
+        baseQuery += ` WHERE ${conditions.join(' AND ')}`;
+        baseQuery += ` AND fqs.quartile_${safeQuartileYear} IS NOT NULL`;
+        baseQuery += ` ORDER BY p.date DESC`;
 
-    db.query(baseQuery, queryParams, (err, papersResults) => {
-      if (err) {
-        console.error("❌ Query Error:", err);
-        return res.status(500).json({ error: 'Failed to fetch faculty papers' });
-      }
+        db.query(baseQuery, queryParams, (err, papersResults) => {
+            if (err) {
+                console.error("❌ Query Error:", err);
+                return res.status(500).json({ error: 'Failed to fetch faculty papers' });
+            }
 
-      // Inject quartile info
-      papersResults.forEach(paper => {
-        paper.quartile = paper.quartile_value || null;
-        paper.quartile_year = safeQuartileYear;
+            // Inject quartile info
+            papersResults.forEach(paper => {
+                paper.quartile = paper.quartile_value || null;
+                paper.quartile_year = safeQuartileYear;
 
-        // Add all available quartiles as an object
-        paper.quartiles = {};
-        Object.keys(paper).forEach(key => {
-          const match = key.match(/^quartile_(\d{4})$/);
-          if (match && paper[key]) {
-            const year = match[1];
-            paper.quartiles[year] = paper[key]; // e.g., Q2
-          }
+                // Add all available quartiles as an object
+                paper.quartiles = {};
+                Object.keys(paper).forEach(key => {
+                    const match = key.match(/^quartile_(\d{4})$/);
+                    if (match && paper[key]) {
+                        const year = match[1];
+                        paper.quartiles[year] = paper[key]; // e.g., Q2
+                    }
+                });
+            });
+
+            res.json({ faculty: facultyResults[0], papers: papersResults });
         });
-      });
-
-      res.json({ faculty: facultyResults[0], papers: papersResults });
     });
-  });
 };
 
 
