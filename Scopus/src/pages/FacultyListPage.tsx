@@ -175,9 +175,12 @@ const FacultyListPage: React.FC = () => {
   };
 
   const handleCriteriaClick = () => {
-    if (sdgFilter !== "none" || domainFilter !== "none" || timeframe !== "none") {
-      alert("Please clear Year, SDG, and Domain filters before using Criteria Filter.");
-      return;
+    if (criteriaVisible) {
+      // If hiding, reset criteria inputs and reload faculty list
+      setCriteriaStart("");
+      setCriteriaEnd("");
+      setCriteriaPapers(0);
+      fetchFaculty();
     }
     setCriteriaVisible(!criteriaVisible);
   };
@@ -258,33 +261,36 @@ const FacultyListPage: React.FC = () => {
         {/* Criteria Inputs */}
         {criteriaVisible && (
           <div className="criteria-inputs" style={{ margin: "20px 0" }}>
-            <input
-              type="date"
-              value={criteriaStart}
-              onChange={(e) => setCriteriaStart(e.target.value)}
-              placeholder="Start Date"
-            />
-            <span>-</span>
-            <input
-              type="date"
-              value={criteriaEnd}
-              onChange={(e) => setCriteriaEnd(e.target.value)}
-              placeholder="End Date"
-            />
-            <input
-              type="number"
-              value={criteriaPapers === 0 ? "" : criteriaPapers}
-              onChange={(e) => setCriteriaPapers(e.target.value === "" ? 0 : parseInt(e.target.value))}
-              placeholder="Min Paper Count"
-              min={1}
-            />
+            <div style={{ display: "flex", flexDirection: "column", marginRight: "10px" }}>
+              <label>Start Date</label>
+              <input
+                type="date"
+                value={criteriaStart}
+                onChange={(e) => setCriteriaStart(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", marginRight: "10px" }}>
+              <label>End Date</label>
+              <input
+                type="date"
+                value={criteriaEnd}
+                onChange={(e) => setCriteriaEnd(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", marginRight: "10px" }}>
+              <label>Minimum Papers</label>
+              <input
+                type="number"
+                value={criteriaPapers === 0 ? "" : criteriaPapers}
+                onChange={(e) => setCriteriaPapers(e.target.value === "" ? 0 : parseInt(e.target.value))}
+                min={1}
+              />
+            </div>
             <button onClick={fetchCriteriaFilteredFaculty} className="apply-button">
               Apply
             </button>
           </div>
         )}
-
-
 
         {/* Search Bar */}
         <div className="search-bar">
