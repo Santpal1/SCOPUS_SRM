@@ -8,30 +8,38 @@ interface PublicationData {
   month: string;
   count: number;
 }
-
 interface TopAuthor {
   scopus_id: string;
   name: string;
   total_docs: number;
   timeframe_docs: number;
 }
+interface QuartileData {
+  Q1: number;
+  Q2: number;
+  Q3: number;
+  Q4: number;
+}
 
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-  "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function ResearchDashboard() {
   const [timeframe, setTimeframe] = useState<string>("1y");
+  const [year, setYear] = useState<string>("all");
   const [publicationData, setPublicationData] = useState<PublicationData[]>([]);
   const [topAuthors, setTopAuthors] = useState<TopAuthor[]>([]);
+  const [quartiles, setQuartiles] = useState<QuartileData>({ Q1: 0, Q2: 0, Q3: 0, Q4: 0 });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [animatedPublications, setAnimatedPublications] = useState(0);
   const [animatedAuthors, setAnimatedAuthors] = useState(0);
+  const [animatedQuartiles, setAnimatedQuartiles] = useState<QuartileData>({ Q1: 0, Q2: 0, Q3: 0, Q4: 0 });
   const navigate = useNavigate();
 
+  // Fetch Top Authors
   const fetchTopAuthors = async (selectedTimeframe: string) => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/top-author?timeframe=${selectedTimeframe}`);
-      const data = response.data;
+      const res = await axios.get(`http://localhost:5001/api/top-author?timeframe=${selectedTimeframe}`);
+      const data = res.data;
       setTopAuthors(Array.isArray(data) && data.length > 0 ? data : []);
     } catch (error) {
       console.error("Error fetching top authors:", error);
@@ -39,12 +47,11 @@ export default function ResearchDashboard() {
     }
   };
 
+  // Fetch Publications
   const fetchData = async (selectedTimeframe: string) => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/publications?timeframe=${selectedTimeframe}`);
-      let sortedData = response.data.sort((a: PublicationData, b: PublicationData) =>
-        a.month.localeCompare(b.month)
-      );
+      const res = await axios.get(`http://localhost:5001/api/publications?timeframe=${selectedTimeframe}`);
+      let sortedData = res.data.sort((a: PublicationData, b: PublicationData) => a.month.localeCompare(b.month));
       if (selectedTimeframe === "2y") sortedData = aggregateDataByYear(sortedData);
       setPublicationData(sortedData);
     } catch (error) {
@@ -52,10 +59,30 @@ export default function ResearchDashboard() {
     }
   };
 
+  // Fetch Quartiles
+  const fetchQuartiles = async (selectedYear: string) => {
+    try {
+      const url =
+        selectedYear === "all"
+          ? "http://localhost:5001/api/quartile-stats"
+          : `http://localhost:5001/api/quartile-stats?year=${selectedYear}`;
+      const res = await axios.get(url);
+      setQuartiles(res.data);
+    } catch (error) {
+      console.error("Error fetching quartile data:", error);
+    }
+  };
+
+
+
   useEffect(() => {
     fetchTopAuthors(timeframe);
     fetchData(timeframe);
   }, [timeframe]);
+
+  useEffect(() => {
+    fetchQuartiles(year);
+  }, [year]);
 
   const aggregateDataByYear = (data: PublicationData[]): PublicationData[] => {
     const yearlyData: { [key: string]: number } = {};
@@ -83,13 +110,11 @@ export default function ResearchDashboard() {
   const barSpacing = getBarSpacing();
 
   const totalPublications = publicationData.reduce((sum, d) => sum + d.count, 0);
-  const authorNames = topAuthors.map(author => author.name).join(", ");
-  const publicationCount = topAuthors.length > 0 ? topAuthors[0].timeframe_docs : null;
 
-  // Counter animation function
+  // Counter animation
   const animateCounter = (target: number, setter: (val: number) => void, duration: number = 800) => {
     let start = 0;
-    const increment = target / (duration / 16); // 60fps
+    const increment = target / (duration / 16);
     const step = () => {
       start += increment;
       if (start < target) {
@@ -101,16 +126,25 @@ export default function ResearchDashboard() {
     };
     requestAnimationFrame(step);
   };
+  const animateQuartiles = (target: QuartileData) => {
+    Object.keys(target).forEach((key) => {
+      animateCounter(target[key as keyof QuartileData], (val) => {
+        setAnimatedQuartiles((prev) => ({ ...prev, [key]: val }));
+      });
+    });
+  };
 
-  // Trigger counters when data changes
   useEffect(() => {
     animateCounter(totalPublications, setAnimatedPublications);
     animateCounter(topAuthors.length, setAnimatedAuthors);
   }, [totalPublications, topAuthors]);
 
+  useEffect(() => {
+    animateQuartiles(quartiles);
+  }, [quartiles]);
+
   return (
     <div className={style.pageWrapper}>
-      {/* Full-width Navbar */}
       <div className={style.navbar}>
         <a className={style.logo}>
           <img src={srmLogo} alt="SRM Logo" className={style.navLogo} />
@@ -119,19 +153,26 @@ export default function ResearchDashboard() {
       </div>
 
       <div className={style.container}>
-        {/* Heading */}
         <h2 className={style.title}>Turning Research Into Impactful Insights</h2>
 
-        {/* KPI Counters */}
+        {/* Year Dropdown */}
+        <div className={style.dropdown}>
+          <select className={style.select} value={year} onChange={(e) => setYear(e.target.value)}>
+            <option value="all">All Years</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+
+        {/* Quartile Cards */}
         <div className={style.kpiContainer}>
-          <div className={style.kpiCard}>
-            <h3>Total Publications</h3>
-            <p className={style.counter}>{animatedPublications}</p>
-          </div>
-          <div className={style.kpiCard}>
-            <h3>Top Authors</h3>
-            <p className={style.counter}>{animatedAuthors}</p>
-          </div>
+          {["Q1", "Q2", "Q3", "Q4"].map((q) => (
+            <div className={style.kpiCard} key={q}>
+              <h3>{q}</h3>
+              <p className={style.counter}>{animatedQuartiles[q as keyof QuartileData]}</p>
+            </div>
+          ))}
         </div>
 
         {/* Timeframe Dropdown */}
@@ -143,22 +184,25 @@ export default function ResearchDashboard() {
           </select>
         </div>
 
-        {/* Top Authors */}
+        {/* Top Authors & Publication Counters */}
+        <div className={style.kpiContainer}>
+          <div className={style.kpiCard}>
+            <h3>Total Publications</h3>
+            <p className={style.counter}>{animatedPublications}</p>
+          </div>
+          <div className={style.kpiCard}>
+            <h3>Top Authors</h3>
+            <p className={style.counter}>{animatedAuthors}</p>
+          </div>
+        </div>
+
+        {/* Top Authors List */}
         <div className={style.topAuthor}>
-          <h3>
-            Top {topAuthors.length > 1 ? "Authors" : "Author"} ({{
-              "6m": "Last 6 Months",
-              "1y": "Last 1 Year",
-              "2y": "Last 2 Years"
-            }[timeframe]})
-          </h3>
+          <h3>Top Authors</h3>
           <div className={style.authorList}>
             {topAuthors.length > 0 ? (
               topAuthors.map((author, index) => (
-                <div
-                  key={`${author.scopus_id}-${timeframe}-${index}`}
-                  className={style.authorChip}
-                >
+                <div key={`${author.scopus_id}-${index}`} className={style.authorChip}>
                   {author.name}
                   <span className={style.authorBadge}>{author.timeframe_docs}</span>
                 </div>
@@ -168,7 +212,6 @@ export default function ResearchDashboard() {
             )}
           </div>
         </div>
-
 
         {/* Chart Container */}
         <div className={style.chartContainer}>
