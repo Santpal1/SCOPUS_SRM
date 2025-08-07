@@ -34,6 +34,8 @@ export default function ResearchDashboard() {
   const [animatedAuthors, setAnimatedAuthors] = useState(0);
   const [animatedQuartiles, setAnimatedQuartiles] = useState<QuartileData>({ Q1: 0, Q2: 0, Q3: 0, Q4: 0 });
   const navigate = useNavigate();
+  const [hoveredQuartile, setHoveredQuartile] = useState<string | null>(null);
+
 
   // Fetch Top Authors
   const fetchTopAuthors = async (selectedTimeframe: string) => {
@@ -159,21 +161,144 @@ export default function ResearchDashboard() {
         <div className={style.dropdown}>
           <select className={style.select} value={year} onChange={(e) => setYear(e.target.value)}>
             <option value="all">All Years</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
             <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
           </select>
         </div>
 
-        {/* Quartile Cards */}
-        <div className={style.kpiContainer}>
-          {["Q1", "Q2", "Q3", "Q4"].map((q) => (
-            <div className={style.kpiCard} key={q}>
-              <h3>{q}</h3>
-              <p className={style.counter}>{animatedQuartiles[q as keyof QuartileData]}</p>
-            </div>
-          ))}
+        {/* Quartile Graph */}
+        <div className={style.chartContainer}>
+          <h3 className={style.chartTitle}>Quartile-wise Publications</h3>
+          <div className={style.chartBox}>
+            <svg width="100%" height="250" viewBox="0 0 400 250">
+              {/* Y-axis */}
+              <line x1="50" y1="20" x2="50" y2="200" stroke="black" strokeWidth="2" />
+              {/* X-axis */}
+              <line x1="50" y1="200" x2="380" y2="200" stroke="black" strokeWidth="2" />
+
+              {/* Y-axis Labels */}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const yVal = Math.max(...Object.values(animatedQuartiles)) / 4 * i;
+                const yPos = 200 - (yVal / Math.max(...Object.values(animatedQuartiles))) * 160;
+                return (
+                  <g key={i}>
+                    <line x1="45" y1={yPos} x2="50" y2={yPos} stroke="black" />
+                    <text x="40" y={yPos + 5} fontSize="12" textAnchor="end">{Math.round(yVal)}</text>
+                  </g>
+                );
+              })}
+
+              {["Q1", "Q2", "Q3", "Q4"].map((q, index) => {
+                const value = animatedQuartiles[q as keyof QuartileData];
+                const maxVal = Math.max(...Object.values(animatedQuartiles), 1);
+                const barHeight = (value / maxVal) * 160;
+                const barWidth = 40;
+                const barX = 70 + index * 80;
+                const barY = 200 - barHeight;
+                const isHovered = hoveredQuartile === q;
+
+                // Tooltip content and dynamic sizing
+                const tooltipText = `${q} : ${value}`;
+                const tooltipFontSize = 12;
+                const tooltipPadding = 10;
+                const approxCharWidth = 7;
+                const tooltipTextWidth = tooltipText.length * approxCharWidth;
+                const tooltipWidth = tooltipTextWidth + tooltipPadding * 2;
+                const tooltipHeight = 30;
+                const tooltipX = barX + barWidth / 2 - tooltipWidth / 2;
+                const tooltipY = barY - tooltipHeight - 8;
+
+                return (
+                  <g
+                    key={q}
+                    onMouseEnter={() => setHoveredQuartile(q)}
+                    onMouseLeave={() => setHoveredQuartile(null)}
+                  >
+                    {/* Bar */}
+                    <rect
+                      x={barX}
+                      y={barY}
+                      width={barWidth}
+                      height={barHeight}
+                      fill={isHovered ? "#1976d2" : "url(#quartileGradient)"}
+                      style={{ transition: "fill 0.2s" }}
+                    />
+
+                    {/* Bar label (Q1, Q2, etc.) */}
+                    <text
+                      x={barX + barWidth / 2}
+                      y={220}
+                      textAnchor="middle"
+                      fontSize="14"
+                      fill="#000"
+                    >
+                      {q}
+                    </text>
+
+                    {/* Bar value on top of bar */}
+                    <text
+                      x={barX + barWidth / 2}
+                      y={barY - 10}
+                      textAnchor="middle"
+                      fontSize="14"
+                      fill="#000"
+                    >
+                      {value}
+                    </text>
+
+                    {/* Tooltip */}
+                    {isHovered && (
+                      <g>
+                        {/* Shadow filter (should be defined once globally in <svg>) */}
+                        <defs>
+                          <filter id="tooltipShadow" x="0" y="0" width="200%" height="200%">
+                            <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.2" />
+                          </filter>
+                        </defs>
+
+                        {/* Tooltip box */}
+                        <rect
+                          x={tooltipX}
+                          y={tooltipY}
+                          width={tooltipWidth}
+                          height={tooltipHeight}
+                          fill="#fff"
+                          rx="6"
+                          ry="6"
+                          filter="url(#tooltipShadow)"
+                        />
+
+                        {/* Tooltip text */}
+                        <text
+                          x={barX + barWidth / 2}
+                          y={tooltipY + 20}
+                          fontSize={tooltipFontSize}
+                          textAnchor="middle"
+                        >
+                          <tspan fill="#1976d2" fontWeight="bold">{q} :</tspan>
+                          <tspan fill="#000" > {value}</tspan>
+                        </text>
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+
+
+
+
+              {/* Gradient */}
+              <defs>
+                <linearGradient id="quartileGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ff9800" />
+                  <stop offset="100%" stopColor="#f57c00" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
+
 
         {/* Timeframe Dropdown */}
         <div className={style.dropdown}>
