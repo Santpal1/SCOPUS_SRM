@@ -92,8 +92,8 @@ const GlobalCollabMap: React.FC = () => {
     return (
         <div
             style={{
-                width: '95%',                 // Same as SDGPieChart
-                maxWidth: '1200px',          // Match max width
+                width: '100%',                
+                maxWidth: '1300px',         
                 margin: '1rem auto',
                 padding: '2rem',
                 borderRadius: '1.25rem',
