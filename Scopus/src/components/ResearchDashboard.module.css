@@ -320,6 +320,7 @@ body {
     background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
     padding: 2rem;
     border-radius: 20px;
+    height: 22rem;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
 }
@@ -331,7 +332,7 @@ body {
 /* Tooltip */
 .tooltip {
     position: absolute;
-    top: 15px;
+    top: 10px;
     /* Distance from the top of chartBox */
     right: 15px;
     /* Distance from the right of chartBox */

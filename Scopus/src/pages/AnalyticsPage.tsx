@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GlobalCollabMap from '../components/GlobalCollabMap';
-import SDGPieChart from '../components/SDGPieChart';
-import SDGTagCloud from '../components/SDGTagCloud';
 import CombinedSDGDashboard from '../components/CombinedSDGDashboard';
 import srmLogo from "../assets/srmist-logo.png";
 import '../components/AnalyticsPage.css';
@@ -45,12 +43,6 @@ const AnalyticsPage: React.FC = () => {
                     <CombinedSDGDashboard />
                 </section>
 
-                {/* <section style={{ marginBottom: 40 }}>
-                    <SDGPieChart />
-                </section>
-                <section className="mt-6">
-                    <SDGTagCloud />
-                </section> */}
             </div>
         </div>
     );

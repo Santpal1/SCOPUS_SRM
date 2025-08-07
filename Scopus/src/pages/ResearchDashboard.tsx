@@ -156,6 +156,7 @@ export default function ResearchDashboard() {
 
       <div className={style.container}>
         <h2 className={style.title}>Turning Research Into Impactful Insights</h2>
+        <h3 className={style.chartTitle}>Quartile-wise Publications</h3>
 
         {/* Year Dropdown */}
         <div className={style.dropdown}>
@@ -169,13 +170,36 @@ export default function ResearchDashboard() {
 
         {/* Quartile Graph */}
         <div className={style.chartContainer}>
-          <h3 className={style.chartTitle}>Quartile-wise Publications</h3>
+
           <div className={style.chartBox}>
-            <svg width="100%" height="250" viewBox="0 0 400 250">
+            <svg width="100%" height="275" viewBox="0 0 400 250">
               {/* Y-axis */}
               <line x1="50" y1="20" x2="50" y2="200" stroke="black" strokeWidth="2" />
               {/* X-axis */}
               <line x1="50" y1="200" x2="380" y2="200" stroke="black" strokeWidth="2" />
+
+              {/* X-axis Label */}
+              <text
+                x="215"
+                y="240"
+                fontSize="16"
+                textAnchor="middle"
+                fontWeight="bold"
+              >
+                Quartile
+              </text>
+
+              {/* Y-axis Label */}
+              <text
+                x="10"
+                y="110"
+                fontSize="16"
+                textAnchor="middle"
+                transform="rotate(-90, 10, 120)"
+                fontWeight="bold"
+              >
+                Count
+              </text>
 
               {/* Y-axis Labels */}
               {Array.from({ length: 5 }).map((_, i) => {
@@ -221,7 +245,7 @@ export default function ResearchDashboard() {
                       y={barY}
                       width={barWidth}
                       height={barHeight}
-                      fill={isHovered ? "#1976d2" : "url(#quartileGradient)"}
+                      fill={isHovered ? "#054768" : "url(#quartileGradient)"}
                       style={{ transition: "fill 0.2s" }}
                     />
 
@@ -276,8 +300,8 @@ export default function ResearchDashboard() {
                           fontSize={tooltipFontSize}
                           textAnchor="middle"
                         >
-                          <tspan fill="#1976d2" fontWeight="bold">{q} :</tspan>
-                          <tspan fill="#000" > {value}</tspan>
+                          <tspan fill="#054768" fontWeight="bold" fontSize="14">{q} :</tspan>
+                          <tspan fill="#000" fontSize="14"> {value}</tspan>
                         </text>
                       </g>
                     )}
@@ -291,14 +315,16 @@ export default function ResearchDashboard() {
               {/* Gradient */}
               <defs>
                 <linearGradient id="quartileGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ff9800" />
-                  <stop offset="100%" stopColor="#f57c00" />
+                  <stop offset="0%" stopColor="#42a5f5" />
+                  <stop offset="100%" stopColor="#1e88e5" />
                 </linearGradient>
               </defs>
             </svg>
           </div>
         </div>
 
+        {/* Heading for Timeframe-based Publications */}
+        <h3 className={style.chartTitle}>Timeframe-based Publications</h3>
 
         {/* Timeframe Dropdown */}
         <div className={style.dropdown}>
@@ -340,7 +366,6 @@ export default function ResearchDashboard() {
 
         {/* Chart Container */}
         <div className={style.chartContainer}>
-          <h3 className={style.chartTitle}>Research Publications Overview</h3>
           <div className={style.chartBox}>
             {/* Fixed tooltip in the top-right of chart box */}
             {hoveredIndex !== null && (
@@ -353,13 +378,13 @@ export default function ResearchDashboard() {
             <svg width="100%" height={chartHeight + 80} viewBox={`0 0 1200 ${chartHeight + 120}`}>
               {/* Y-axis */}
               <line x1="80" y1="20" x2="80" y2={chartHeight} stroke="black" strokeWidth="3" />
-              <text x="5" y={chartHeight / 2} transform="rotate(-90, 15, 150)" fontSize="18" textAnchor="middle" fontWeight="bold">
+              <text x="5" y={chartHeight / 2} transform="rotate(-90, 15, 150)" fontSize="20" textAnchor="middle" fontWeight="bold">
                 No. of Publications
               </text>
 
               {/* X-axis */}
               <line x1="80" y1={chartHeight} x2="1150" y2={chartHeight} stroke="black" strokeWidth="3" />
-              <text x="600" y={chartHeight + 60} fontSize="18" textAnchor="middle" fontWeight="bold">
+              <text x="600" y={chartHeight + 60} fontSize="20" textAnchor="middle" fontWeight="bold">
                 Observation Period
               </text>
 
