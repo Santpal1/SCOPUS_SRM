@@ -5,6 +5,51 @@ import json
 import random
 import time
 from datetime import datetime
+import os
+
+LOG_FILE = "./sync_progress.log"
+
+import json
+from datetime import datetime
+
+LOG_FILE = "progress_log.jsonl"  # same as before
+
+def log_progress(status: str, progress: float = None, details: dict = None):
+    """
+    Log a progress update:
+    - Append to JSONL file for historical logs
+    - Print JSON line to stdout for SSE live streaming
+    status: short text message
+    progress: float 0-1 for percentage
+    details: optional dict for extra info
+    """
+    entry = {
+        "time": datetime.now().isoformat(),
+        "status": status,
+        "progress": progress,
+        "details": details or {}
+    }
+
+    # Save to file
+    try:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        # If file writing fails, don't crash the process
+        print(json.dumps({
+            "time": datetime.now().isoformat(),
+            "status": f"Log file write error: {e}",
+            "progress": progress
+        }, ensure_ascii=False), flush=True)
+
+    # Print JSON for SSE route (important: flush so it appears immediately)
+    print(json.dumps(entry, ensure_ascii=False), flush=True)
+
+
+def clear_progress_log():
+    """Clear any existing log before a new run."""
+    if os.path.exists(LOG_FILE):
+        os.remove(LOG_FILE)
 
 def load_config():
     try:
@@ -77,10 +122,10 @@ def insert_paper(cursor, conn, scopus_id, doi, title, pub_type, pub_name, date, 
           *authors[:6], *affiliations[:3]))
     conn.commit()
 
-
-
-
 def fetch_new_papers():
+    clear_progress_log()
+    log_progress("Starting Scopus paper update...", 0)
+
     # Load configuration and initialize connections
     config = load_config()
     conn = connect_to_database()
@@ -131,43 +176,39 @@ def fetch_new_papers():
         "56911467900", "57214415472", "57222616675", "57204562624", "55436730800"
     ]
     
-    # Track statistics
+    
+    total_ids = len(scopus_ids)
     total_new_papers = 0
     total_updated_authors = 0
     authors_with_new_papers = set()
     
-    # Process each author
-    for scopus_id in scopus_ids:
+    for index, scopus_id in enumerate(scopus_ids, start=1):
+        progress = index / total_ids
+        log_progress(f"Processing author {index}/{total_ids} ({scopus_id})", progress)
+
         my_auth = ElsAuthor(uri=f'https://api.elsevier.com/content/author/author_id/{scopus_id}')
         
         if my_auth.read(client):
             author_name = my_auth.full_name
-            print(f"Processing Author: {author_name} ({scopus_id})")
-            
-            # Fetch total document count from author profile
+            log_progress(f"Fetched profile for {author_name}", progress)
+
             docs_count = int(my_auth.data.get('coredata', {}).get('document-count', 0))
             
-            # Insert or update author information
             if scopus_id not in existing_authors:
                 insert_user(cursor, conn, scopus_id, author_name, docs_count)
                 total_updated_authors += 1
-                print(f"Added new author: {author_name}")
+                log_progress(f"Added new author: {author_name}", progress)
             else:
-                # Update author information
                 insert_user(cursor, conn, scopus_id, author_name, docs_count)
-            
-            # Get author's papers
+
             new_papers_for_author = 0
             if my_auth.read_docs(client):
                 for doc in my_auth.doc_list:
                     doi = doc.get("prism:doi")
-                    
-                    # Check if this paper is new (not in existing_papers for this author)
                     is_new_paper = (
                         scopus_id not in existing_papers or 
                         (doi and doi not in existing_papers.get(scopus_id, set()))
                     )
-                    
                     if is_new_paper:
                         title = doc.get("dc:title", "Unknown Title")
                         pub_type = doc.get("prism:aggregationType", "journal").lower()
@@ -177,46 +218,29 @@ def fetch_new_papers():
                         authors = [author.get("authname", "Unknown Author") for author in doc.get("author", [])[:6]]
                         affiliations = [affil.get("affilname", "Unknown Affiliation") for affil in doc.get("affiliation", [])[:3]]
                         
-                        # Insert the new paper
                         insert_paper(cursor, conn, scopus_id, doi, title, pub_type, pub_name, date, authors, affiliations)
                         
-                        print(f"  Added new paper: {title}")
                         new_papers_for_author += 1
                         total_new_papers += 1
+                        log_progress(f"Added new paper: {title}", progress)
                 
-                # If we found new papers for this author, add them to our tracking set
                 if new_papers_for_author > 0:
                     authors_with_new_papers.add(author_name)
             else:
-                print(f"Failed to read documents for {scopus_id}.")
+                log_progress(f"Failed to read documents for {scopus_id}", progress)
         else:
-            print(f"Failed to read author data for {scopus_id}.")
+            log_progress(f"Failed to read author data for {scopus_id}", progress)
     
-    # Display summary with Easter egg if new papers were found
-    if total_new_papers > 0:
-        
-        # Print summary
-        print(f"\nUpdate Summary ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})")
-        print(f"Total new papers added: {total_new_papers}")
-        print(f"Authors with new publications: {len(authors_with_new_papers)}")
-        print(f"Authors updated: {total_updated_authors}")
-        
-        # List authors who had new papers
-        if authors_with_new_papers:
-            print("\nNew papers from:")
-            for idx, author in enumerate(sorted(authors_with_new_papers), 1):
-                print(f"  {idx}. {author}")
-    else:
-        print("\nNo new papers found. Database is up to date!")
+    summary_msg = f"Update complete: {total_new_papers} new papers, {len(authors_with_new_papers)} authors updated."
+    log_progress(summary_msg, 1, {
+        "total_new_papers": total_new_papers,
+        "authors_with_new_papers": list(authors_with_new_papers),
+        "authors_updated": total_updated_authors
+    })
     
-    # Clean up
     cursor.close()
     conn.close()
-    print("\nDatabase connection closed.")
+    log_progress("Database connection closed.", 1)
 
 if __name__ == "__main__":
-    # Check for secret konami code (this would work if you implement keyboard input)
-    # check_konami_code()
-    
-    print("Starting Scopus paper update...")
     fetch_new_papers()

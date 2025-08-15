@@ -1,0 +1,60 @@
+{"time": "2025-08-16T00:24:00.904743", "status": "Starting Scopus paper update...", "progress": 0, "details": {}}
+{"time": "2025-08-16T00:24:00.994775", "status": "Processing author 1/209 (35146619400)", "progress": 0.004784688995215311, "details": {}}
+{"time": "2025-08-16T00:24:01.815185", "status": "Fetched profile for M. Pushpalatha", "progress": 0.004784688995215311, "details": {}}
+{"time": "2025-08-16T00:24:04.242041", "status": "Processing author 2/209 (57226266325)", "progress": 0.009569377990430622, "details": {}}
+{"time": "2025-08-16T00:24:05.709541", "status": "Fetched profile for M. Murali", "progress": 0.009569377990430622, "details": {}}
+{"time": "2025-08-16T00:24:07.818781", "status": "Processing author 3/209 (57216474980)", "progress": 0.014354066985645933, "details": {}}
+{"time": "2025-08-16T00:24:09.305866", "status": "Fetched profile for S. Ramamoorthy", "progress": 0.014354066985645933, "details": {}}
+{"time": "2025-08-16T00:24:11.351707", "status": "Processing author 4/209 (36148240300)", "progress": 0.019138755980861243, "details": {}}
+{"time": "2025-08-16T00:24:12.815359", "status": "Fetched profile for Indhumathi Raman", "progress": 0.019138755980861243, "details": {}}
+{"time": "2025-08-16T00:24:14.924796", "status": "Processing author 5/209 (26639006000)", "progress": 0.023923444976076555, "details": {}}
+{"time": "2025-08-16T00:24:17.487501", "status": "Fetched profile for B. Amutha", "progress": 0.023923444976076555, "details": {}}
+{"time": "2025-08-16T00:24:19.544696", "status": "Processing author 6/209 (26639841900)", "progress": 0.028708133971291867, "details": {}}
+{"time": "2025-08-16T00:24:21.060424", "status": "Fetched profile for E. Poovammal", "progress": 0.028708133971291867, "details": {}}
+{"time": "2025-08-16T00:24:23.208342", "status": "Processing author 7/209 (24776839900)", "progress": 0.03349282296650718, "details": {}}
+{"time": "2025-08-16T00:24:24.682302", "status": "Fetched profile for R. K. Pongiannan", "progress": 0.03349282296650718, "details": {}}
+{"time": "2025-08-16T00:24:26.785584", "status": "Processing author 8/209 (56962827900)", "progress": 0.03827751196172249, "details": {}}
+{"time": "2025-08-16T00:24:28.246708", "status": "Fetched profile for S. S. Sridhar", "progress": 0.03827751196172249, "details": {}}
+{"time": "2025-08-16T00:24:30.289229", "status": "Processing author 9/209 (55445341200)", "progress": 0.0430622009569378, "details": {}}
+{"time": "2025-08-16T00:24:31.830556", "status": "Fetched profile for R. I. Minu", "progress": 0.0430622009569378, "details": {}}
+{"time": "2025-08-16T00:24:33.766909", "status": "Processing author 10/209 (56635856200)", "progress": 0.04784688995215311, "details": {}}
+{"time": "2025-08-16T00:24:35.331549", "status": "Fetched profile for G. Niranjana", "progress": 0.04784688995215311, "details": {}}
+{"time": "2025-08-16T00:24:37.660444", "status": "Processing author 11/209 (26326397200)", "progress": 0.05263157894736842, "details": {}}
+{"time": "2025-08-16T00:24:39.118516", "status": "Fetched profile for D. Malathi", "progress": 0.05263157894736842, "details": {}}
+{"time": "2025-08-16T00:24:41.023952", "status": "Processing author 12/209 (56901450600)", "progress": 0.05741626794258373, "details": {}}
+{"time": "2025-08-16T00:24:42.463995", "status": "Fetched profile for T. Manoranjitham", "progress": 0.05741626794258373, "details": {}}
+{"time": "2025-08-16T00:24:44.521818", "status": "Processing author 13/209 (57209822555)", "progress": 0.06220095693779904, "details": {}}
+{"time": "2025-08-16T00:24:48.011396", "status": "Fetched profile for S. Babu", "progress": 0.06220095693779904, "details": {}}
+{"time": "2025-08-16T00:24:49.944341", "status": "Processing author 14/209 (35070109700)", "progress": 0.06698564593301436, "details": {}}
+{"time": "2025-08-16T00:24:51.434188", "status": "Fetched profile for P. Murali", "progress": 0.06698564593301436, "details": {}}
+{"time": "2025-08-16T00:24:53.309783", "status": "Processing author 15/209 (57192177838)", "progress": 0.07177033492822966, "details": {}}
+{"time": "2025-08-16T00:24:55.822314", "status": "Fetched profile for R. Manjula", "progress": 0.07177033492822966, "details": {}}
+{"time": "2025-08-16T00:24:57.877281", "status": "Processing author 16/209 (57225400932)", "progress": 0.07655502392344497, "details": {}}
+{"time": "2025-08-16T00:25:01.564033", "status": "Fetched profile for S. Saranya", "progress": 0.07655502392344497, "details": {}}
+{"time": "2025-08-16T00:25:03.386799", "status": "Processing author 17/209 (57191663448)", "progress": 0.08133971291866028, "details": {}}
+{"time": "2025-08-16T00:25:05.070523", "status": "Fetched profile for V. Deeban Chakravarthy", "progress": 0.08133971291866028, "details": {}}
+{"time": "2025-08-16T00:25:08.091714", "status": "Processing author 18/209 (57223054981)", "progress": 0.0861244019138756, "details": {}}
+{"time": "2025-08-16T00:25:09.771573", "status": "Fetched profile for T. K. Senthil Kumar", "progress": 0.0861244019138756, "details": {}}
+{"time": "2025-08-16T00:25:11.723841", "status": "Processing author 19/209 (12767780000)", "progress": 0.09090909090909091, "details": {}}
+{"time": "2025-08-16T00:25:13.163177", "status": "Fetched profile for V. V. Ramalingam", "progress": 0.09090909090909091, "details": {}}
+{"time": "2025-08-16T00:25:15.233116", "status": "Processing author 20/209 (24605697100)", "progress": 0.09569377990430622, "details": {}}
+{"time": "2025-08-16T00:25:16.770062", "status": "Fetched profile for R. S. Ponmagal", "progress": 0.09569377990430622, "details": {}}
+{"time": "2025-08-16T00:25:19.271062", "status": "Processing author 21/209 (25626737800)", "progress": 0.10047846889952153, "details": {}}
+{"time": "2025-08-16T00:25:21.747313", "status": "Fetched profile for Rajkamal Rajendran", "progress": 0.10047846889952153, "details": {}}
+{"time": "2025-08-16T00:25:23.992478", "status": "Processing author 22/209 (55787221000)", "progress": 0.10526315789473684, "details": {}}
+{"time": "2025-08-16T00:25:25.831763", "status": "Fetched profile for Jeyaraj Kalaivani", "progress": 0.10526315789473684, "details": {}}
+{"time": "2025-08-16T00:25:27.345480", "status": "Processing author 23/209 (57193133229)", "progress": 0.11004784688995216, "details": {}}
+{"time": "2025-08-16T00:25:28.865252", "status": "Fetched profile for C. Jothi Kumar", "progress": 0.11004784688995216, "details": {}}
+{"time": "2025-08-16T00:25:31.109442", "status": "Processing author 24/209 (57224691110)", "progress": 0.11483253588516747, "details": {}}
+{"time": "2025-08-16T00:25:32.568434", "status": "Fetched profile for S. Kavitha", "progress": 0.11483253588516747, "details": {}}
+{"time": "2025-08-16T00:25:34.266685", "status": "Processing author 25/209 (55356546000)", "progress": 0.11961722488038277, "details": {}}
+{"time": "2025-08-16T00:25:35.708733", "status": "Fetched profile for Chinnaudayar Navaneethakrishnan Subalalitha", "progress": 0.11961722488038277, "details": {}}
+{"time": "2025-08-16T00:25:37.737007", "status": "Added new paper: A Deep Learning-Based Residual Network Model for Traffic Sign Detection and Classification", "progress": 0.11961722488038277, "details": {}}
+{"time": "2025-08-16T00:25:37.739035", "status": "Processing author 26/209 (57188588453)", "progress": 0.12440191387559808, "details": {}}
+{"time": "2025-08-16T00:25:39.219250", "status": "Fetched profile for P. Selvaraj", "progress": 0.12440191387559808, "details": {}}
+{"time": "2025-08-16T00:25:41.195090", "status": "Processing author 27/209 (57191840929)", "progress": 0.1291866028708134, "details": {}}
+{"time": "2025-08-16T00:25:42.657287", "status": "Fetched profile for G. K. Sandhia", "progress": 0.1291866028708134, "details": {}}
+{"time": "2025-08-16T00:25:44.630669", "status": "Processing author 28/209 (57216770442)", "progress": 0.1339712918660287, "details": {}}
+{"time": "2025-08-16T00:25:46.156528", "status": "Fetched profile for B. Sivakumar", "progress": 0.1339712918660287, "details": {}}
+{"time": "2025-08-16T00:25:48.258180", "status": "Processing author 29/209 (57215845190)", "progress": 0.13875598086124402, "details": {}}
+{"time": "2025-08-16T00:25:49.742305", "status": "Fetched profile for K. M. Uma Maheswari", "progress": 0.13875598086124402, "details": {}}
