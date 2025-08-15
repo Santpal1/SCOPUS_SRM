@@ -8,6 +8,8 @@ import HeroSection from "./pages/HeroSection";
 import HomePage from "./pages/HomePage";
 import PaperDetailPage from "./pages/PaperDetailPage";
 import ResearchDashboard from "./pages/ResearchDashboard";
+import AuthorPerformance from "./pages/AuthorPerformance";
+import AuthorPerformanceDetail from "./pages/AuthorPerformanceDetails";
 
 const App: React.FC = () => {
   return (
@@ -21,6 +23,8 @@ const App: React.FC = () => {
         <Route path="/faculty/:scopusId" element={<FacultyDetailPage />}></Route>
         <Route path="/paper/:doi" element={<PaperDetailPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/author-performance" element={<AuthorPerformance />} />
+        <Route path="/author-performance/:scopus_id" element={<AuthorPerformanceDetail />}/>
       </Routes>
   );
 };

@@ -241,3 +241,141 @@ exports.getFacultyQuartileSummary = (req, res) => {
         res.json(summaryByYear);
     });
 };
+
+
+exports.getAuthorList = (req, res) => {
+    const { search } = req.query;
+
+    let query = `SELECT scopus_id, name FROM users`;
+    let params = [];
+
+    if (search && search.trim()) {
+        query += ` WHERE LOWER(name) LIKE ? OR scopus_id LIKE ?`;
+        const searchTerm = `%${search.toLowerCase()}%`;
+        params.push(searchTerm, searchTerm);
+    }
+
+    query += ` ORDER BY name ASC`;
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.error("DB Error:", err);
+            return res.status(500).json({ error: "Failed to fetch authors" });
+        }
+        res.json(results);
+    });
+};
+
+
+exports.getAuthorPerformance = (req, res) => {
+    const { scopus_id } = req.params;  // Changed from req.query to req.params
+    console.log("Received request for scopus_id:", scopus_id);
+
+    if (!scopus_id) {
+        return res.status(400).json({ error: "scopus_id is required" });
+    }
+
+    // Step 1: Get author name
+    db.query(
+        `SELECT name FROM users WHERE scopus_id = ?`,
+        [scopus_id],
+        (err, authorResults) => {
+            if (err) {
+                console.error("DB Error (author fetch):", err);
+                return res.status(500).json({ error: "Failed to fetch author" });
+            }
+            if (!authorResults.length) {
+                return res.status(404).json({ error: "Author not found" });
+            }
+
+            const authorName = authorResults[0].name;
+            console.log("Fetching chart data for scopus_id:", scopus_id);
+
+            // Get current year and calculate last 5 years
+            const currentYear = new Date().getFullYear();
+            const last5Years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+            console.log("Filtering for last 5 years:", last5Years);
+
+            // Step 2: Get chart data from scopus_chart_data (only last 5 years)
+            const chartQuery = `
+        SELECT year, documents, citations
+        FROM scopus_chart_data
+        WHERE scopus_id = ?
+          AND year IN (${last5Years.join(',')})
+        ORDER BY year DESC
+      `;
+
+            // Step 3: Get academic year data from papers table
+            const academicYearQuery = `
+        SELECT 
+          CASE 
+            WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
+            WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
+            WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
+          END as academic_year,
+          COUNT(*) as document_count
+        FROM papers
+        WHERE scopus_id = ? 
+          AND date >= '2022-07-01' 
+          AND date <= '2025-06-30'
+        GROUP BY 
+          CASE 
+            WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
+            WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
+            WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
+          END
+        HAVING academic_year IS NOT NULL
+        ORDER BY academic_year ASC
+      `;
+
+            // Execute both queries
+            db.query(chartQuery, [scopus_id], (err, chartResults) => {
+                if (err) {
+                    console.error("DB Error (chart data fetch):", err);
+                    return res.status(500).json({ error: "Failed to fetch chart data" });
+                }
+
+                db.query(academicYearQuery, [scopus_id], (err, academicResults) => {
+                    if (err) {
+                        console.error("DB Error (academic year data fetch):", err);
+                        return res.status(500).json({ error: "Failed to fetch academic year data" });
+                    }
+
+                    console.log("Chart data results:", chartResults);
+                    console.log("Academic year results:", academicResults);
+
+                    // Process academic year data to ensure all 3 years are present
+                    const academicYears = ['2022-23', '2023-24', '2024-25'];
+                    const processedAcademicData = academicYears.map(year => {
+                        const found = academicResults.find(item => item.academic_year === year);
+                        return {
+                            academic_year: year,
+                            document_count: found ? found.document_count : 0
+                        };
+                    });
+
+                    // Calculate consistency
+                    const consistentYears = processedAcademicData.filter(item => item.document_count >= 3).length;
+                    const inconsistentYears = 3 - consistentYears;
+
+                    let consistencyStatus;
+                    if (inconsistentYears === 0) {
+                        consistencyStatus = 'green'; // Consistent all years
+                    } else if (inconsistentYears === 1) {
+                        consistencyStatus = 'orange'; // Not consistent 1 year
+                    } else {
+                        consistencyStatus = 'red'; // Not consistent more than 1 year
+                    }
+
+                    res.json({
+                        name: authorName,
+                        scopus_id: scopus_id,
+                        chart_data: chartResults,
+                        academic_year_data: processedAcademicData,
+                        consistency_status: consistencyStatus
+                    });
+                });
+            });
+        }
+    );
+};
