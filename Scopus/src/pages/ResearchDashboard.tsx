@@ -473,6 +473,10 @@ export default function ResearchDashboard() {
           <button className={style.analyticsBtn} onClick={() => navigate("/analytics")}>
             Go to Analytics Dashboard
           </button>
+          <button
+            className={style.performanceBtn} onClick={() => navigate("/author-performance")}>
+            Author Yearly Performance
+          </button>
         </div>
       </div>
     </div>
