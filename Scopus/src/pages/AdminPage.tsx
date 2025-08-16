@@ -19,6 +19,8 @@ const AdminPage: React.FC = () => {
   const [currentOperation, setCurrentOperation] = useState<string>("");
   const [processedCount, setProcessedCount] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [quartileFile, setQuartileFile] = useState<File | null>(null);
+  const [quartileUploading, setQuartileUploading] = useState(false);
 
   const logsEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -114,6 +116,58 @@ const AdminPage: React.FC = () => {
     };
   };
 
+  const handleQuartileFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setQuartileFile(e.target.files[0]);
+    }
+  };
+
+  const handleRunQuartileUpload = () => {
+    if (!quartileFile) return;
+    setLogs([]);
+    setProgress(0);
+    setProcessedCount(0);
+    setTotalCount(0);
+    setLoading(true);
+    setQuartileUploading(true);
+    setModalOpen(true);
+    setCurrentOperation("Quartile Upload");
+
+    const formData = new FormData();
+    formData.append("file", quartileFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:5001/admin/run-quartile-upload", true);
+    xhr.setRequestHeader("Accept", "text/event-stream");
+
+    xhr.onreadystatechange = () => {
+      // Ignore non-streaming states
+      if (xhr.readyState !== 3 && xhr.readyState !== 4) return;
+      // Parse SSE lines
+      const lines = xhr.responseText.split("\n").filter(Boolean);
+      for (const line of lines) {
+        if (line.startsWith("data:")) {
+          try {
+            const data: ProgressEntry = JSON.parse(line.replace("data: ", ""));
+            setLogs((prev) => [...prev, data]);
+            if (typeof data.progress === "number") setProgress(data.progress / 100);
+            if (data.status === "COMPLETE" || data.status === "FAILED") {
+              setLoading(false);
+              setQuartileUploading(false);
+            }
+          } catch {}
+        }
+      }
+    };
+
+    xhr.onerror = () => {
+      setLoading(false);
+      setQuartileUploading(false);
+    };
+
+    xhr.send(formData);
+  };
+
   const closeModal = () => {
     if (!loading) {
       setModalOpen(false);
@@ -151,6 +205,26 @@ const AdminPage: React.FC = () => {
             className={`${styles.actionButton} ${loading && currentOperation === "Scopus Scraping" ? styles.loading : ''}`}
           >
             {loading && currentOperation === "Scopus Scraping" ? "Running..." : "Start Scraper"}
+          </button>
+        </div>
+
+        <div className={styles.actionCard}>
+          <div className={styles.cardIcon}>📤</div>
+          <h3>Quartile Upload</h3>
+          <p>Upload a CSV file to update faculty quartile data</p>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleQuartileFileChange}
+            disabled={loading || quartileUploading}
+            style={{ marginBottom: "8px" }}
+          />
+          <button
+            onClick={handleRunQuartileUpload}
+            disabled={loading || quartileUploading || !quartileFile}
+            className={`${styles.actionButton} ${quartileUploading ? styles.loading : ''}`}
+          >
+            {quartileUploading ? "Uploading..." : "Upload Quartile CSV"}
           </button>
         </div>
       </div>
