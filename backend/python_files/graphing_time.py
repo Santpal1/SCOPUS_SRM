@@ -29,7 +29,7 @@ def log_progress(status, message="", processed=0, total=0, progress=0, **kwargs)
 
 
 def setup_database_connection(host='localhost', user='root', password='', database='scopus', port=3306):
-    """Setup MySQL database connection and ensure citation_count column exists."""
+    """Setup MySQL database connection and ensure citation_count and h_index columns exist."""
     try:
         conn = mysql.connector.connect(
             host=host,
@@ -48,6 +48,17 @@ def setup_database_connection(host='localhost', user='root', password='', databa
             """)
             conn.commit()
             log_progress("DATABASE_SETUP", "Added citation_count column to database")
+        except mysql.connector.errors.ProgrammingError:
+            pass  # Column already exists
+        
+        # Add h_index column if it doesn't exist
+        try:
+            cursor.execute("""
+                ALTER TABLE users
+                ADD COLUMN h_index INT DEFAULT 0
+            """)
+            conn.commit()
+            log_progress("DATABASE_SETUP", "Added h_index column to database")
         except mysql.connector.errors.ProgrammingError:
             pass  # Column already exists
         
@@ -72,6 +83,21 @@ def update_citation_count_in_db(cursor, conn, author_id, total_citations):
     
     except mysql.connector.Error as e:
         log_progress("DATABASE_ERROR", f"Database update error for {author_id}: {e}")
+        return False
+
+
+def update_h_index_in_db(cursor, conn, author_id, h_index):
+    """Update h_index in database for a specific author."""
+    try:
+        cursor.execute(
+            "UPDATE users SET h_index = %s WHERE scopus_id = %s",
+            (h_index, author_id)
+        )
+        conn.commit()
+        log_progress("DATABASE_UPDATED", f"Updated database: Author {author_id} - h_index {h_index}", h_index=h_index, author_id=author_id)
+        return True
+    except mysql.connector.Error as e:
+        log_progress("DATABASE_ERROR", f"Database update error for h_index {author_id}: {e}")
         return False
 
 
@@ -155,6 +181,17 @@ def extract_metrics_data(driver):
     metrics_data = {}
     
     try:
+        # Try to extract using data-testid spans (Scopus UI)
+        spans = driver.find_elements(By.CSS_SELECTOR, "span[data-testid='unclickable-count']")
+        if spans and len(spans) >= 3:
+            # Usually: [citations, documents, h-index]
+            metrics_data["citations"] = spans[0].text.strip()
+            metrics_data["documents"] = spans[1].text.strip()
+            metrics_data["h_index"] = spans[2].text.strip()
+            log_progress("METRIC_FOUND", f"Found metrics via spans: citations={metrics_data['citations']}, documents={metrics_data['documents']}, h_index={metrics_data['h_index']}")
+            return metrics_data
+
+        # Fallback to regex if spans not found
         metric_patterns = {
             "h_index": [r"h-index: (\d+)", r"H-index: (\d+)"],
             "documents": [r"Documents: (\d+)", r"Total documents: (\d+)"],
@@ -316,6 +353,9 @@ def scrape_scopus_author_metrics(author_id, db_cursor=None, db_conn=None):
         # Extract data
         chart_data = extract_chart_data_from_svg(driver)
         metrics_data = extract_metrics_data(driver)
+        # Always log the extracted h-index value, even if missing
+        h_index_val_log = metrics_data.get('h_index', 'N/A') if metrics_data else 'N/A'
+        log_progress("H_INDEX_VALUE", f"H-index for {author_id}: {h_index_val_log}", author_id=author_id, h_index=h_index_val_log)
         
         # Calculate total citations for database update
         total_citations = 0
@@ -355,8 +395,18 @@ def scrape_scopus_author_metrics(author_id, db_cursor=None, db_conn=None):
             print(f"Summary metrics saved to: {filename}")
         
         # Update database if connection provided
-        if db_cursor and db_conn and total_citations > 0:
-            update_citation_count_in_db(db_cursor, db_conn, author_id, total_citations)
+        if db_cursor and db_conn:
+            if total_citations > 0:
+                update_citation_count_in_db(db_cursor, db_conn, author_id, total_citations)
+            # Update h_index if available
+            h_index_val = None
+            if metrics_data and metrics_data.get('h_index'):
+                try:
+                    h_index_val = int(metrics_data['h_index'])
+                except Exception:
+                    h_index_val = None
+            if h_index_val is not None:
+                update_h_index_in_db(db_cursor, db_conn, author_id, h_index_val)
         
         return {
             "author_name": author_name,
