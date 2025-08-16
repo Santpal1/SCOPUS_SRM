@@ -269,7 +269,7 @@ const AdminPage: React.FC = () => {
             accept=".csv"
             onChange={handleQuartileFileChange}
             disabled={loading || quartileUploading}
-            style={{ marginBottom: "8px" }}
+            className={styles.fileInput}
           />
           <button
             onClick={handleRunQuartileUpload}
@@ -279,6 +279,7 @@ const AdminPage: React.FC = () => {
             {quartileUploading ? "Uploading..." : "Upload Quartile CSV"}
           </button>
         </div>
+        
         <div className={styles.actionCard}>
           <div className={styles.cardIcon}>📈</div>
           <h3>Scival Upload</h3>
@@ -288,7 +289,7 @@ const AdminPage: React.FC = () => {
             accept=".csv"
             onChange={handleScivalFileChange}
             disabled={loading || scivalUploading}
-            style={{ marginBottom: "8px" }}
+            className={styles.fileInput}
           />
           <button
             onClick={handleRunScivalUpload}
@@ -303,34 +304,63 @@ const AdminPage: React.FC = () => {
       {modalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h2>{currentOperation} Progress</h2>
+            <div className={styles.modalHeader}>
+              <h2>{currentOperation} Progress</h2>
+              <div className={styles.statusIndicator}>
+                <div className={styles.statusDot}></div>
+                <span className={styles.statusText}>Live</span>
+              </div>
+            </div>
 
-            <div className={styles.progressBarContainer}>
-              <div
-                className={styles.progressBarFill}
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
+            <div className={styles.progressSection}>
+              <div className={styles.progressBarContainer}>
+                <div
+                  className={styles.progressBarFill}
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              </div>
+              <div className={styles.progressPercentage}>
+                {Math.round(progress * 100)}%
+              </div>
             </div>
 
             {/* Show processed/total counts for Scopus scraper */}
             {currentOperation === "Scopus Scraping" && totalCount > 0 && (
-              <div className={styles.progressText}>
-                Progress: {processedCount} / {totalCount} ({Math.round(progress * 100)}%)
+              <div className={styles.progressStats}>
+                <div className={styles.statItem}>
+                  <span className={styles.statValue}>{processedCount.toLocaleString()}</span>
+                  <span className={styles.statLabel}>Processed</span>
+                </div>
+                <div className={styles.statDivider}>/</div>
+                <div className={styles.statItem}>
+                  <span className={styles.statValue}>{totalCount.toLocaleString()}</span>
+                  <span className={styles.statLabel}>Total</span>
+                </div>
               </div>
             )}
 
-            <pre className={styles.logs}>
-              {logs.map((log, i) => (
-                <div key={i}>
-                  [{log.time}] {log.status}
-                  {log.message && ` - ${log.message}`}
-                  {log.details && Object.keys(log.details).length > 0 &&
-                    ` | ${JSON.stringify(log.details)}`
-                  }
-                </div>
-              ))}
-              <div ref={logsEndRef} />
-            </pre>
+            <div className={styles.logsContainer}>
+              <div className={styles.logsHeader}>
+                <span>Console Output</span>
+              </div>
+              <pre className={styles.logs}>
+                {logs.map((log, i) => (
+                  <div key={i} className={styles.logEntry}>
+                    <span className={styles.logTime}>[{log.time || new Date().toLocaleTimeString()}]</span>
+                    <span className={`${styles.logStatus} ${styles[log.status.toLowerCase()]}`}>
+                      {log.status}
+                    </span>
+                    {log.message && <span className={styles.logMessage}>- {log.message}</span>}
+                    {log.details && Object.keys(log.details).length > 0 &&
+                      <div className={styles.logDetails}>
+                        {JSON.stringify(log.details)}
+                      </div>
+                    }
+                  </div>
+                ))}
+                <div ref={logsEndRef} />
+              </pre>
+            </div>
 
             <div className={styles.modalFooter}>
               <button
@@ -338,7 +368,7 @@ const AdminPage: React.FC = () => {
                 disabled={loading}
                 className={styles.closeButton}
               >
-                Close
+                {loading ? 'Operation in Progress...' : 'Close'}
               </button>
             </div>
           </div>
