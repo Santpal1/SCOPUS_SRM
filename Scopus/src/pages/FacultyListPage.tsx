@@ -185,6 +185,24 @@ const FacultyListPage: React.FC = () => {
     setCriteriaVisible(!criteriaVisible);
   };
 
+  // Helper function to build query parameters for View Details link
+  const buildViewDetailsQuery = () => {
+    const params = new URLSearchParams();
+    
+    if (criteriaVisible && criteriaStart && criteriaEnd) {
+      // If criteria filter is active, pass the date range
+      params.set("start", criteriaStart);
+      params.set("end", criteriaEnd);
+    } else {
+      // Otherwise, pass the regular filters
+      if (sdgFilter !== "none") params.set("sdg", sdgFilter);
+      if (domainFilter !== "none") params.set("domain", domainFilter);
+      if (timeframe !== "none") params.set("year", timeframe);
+    }
+    
+    return params.toString();
+  };
+
   if (loading) return <div className="loading">Loading faculty data...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
@@ -349,10 +367,7 @@ const FacultyListPage: React.FC = () => {
                   <td>{member.docs_in_timeframe !== undefined ? member.docs_in_timeframe : "N/A"}</td>
                   <td>
                     <Link
-                      to={{
-                        pathname: `/faculty/${member.scopus_id}`,
-                        search: `?sdg=${sdgFilter}&domain=${domainFilter}&year=${timeframe}`,
-                      }}
+                      to={`/faculty/${member.scopus_id}?${buildViewDetailsQuery()}`}
                       className="view-button"
                     >
                       View Details

@@ -50,7 +50,6 @@ const FacultyDetailPage: React.FC = () => {
     q4_count: number;
   }> | null>(null);
 
-
   const [sdgFilter, setSdgFilter] = useState<string>(
     new URLSearchParams(location.search).get("sdg") || "none"
   );
@@ -59,6 +58,12 @@ const FacultyDetailPage: React.FC = () => {
   );
   const [yearFilter, setYearFilter] = useState<string>(
     new URLSearchParams(location.search).get("year") || "none"
+  );
+  const [criteriaStartFilter, setCriteriaStartFilter] = useState<string>(
+    new URLSearchParams(location.search).get("start") || ""
+  );
+  const [criteriaEndFilter, setCriteriaEndFilter] = useState<string>(
+    new URLSearchParams(location.search).get("end") || ""
   );
 
   const updateQuery = (key: string) => {
@@ -74,6 +79,16 @@ const FacultyDetailPage: React.FC = () => {
         break;
       case 'year':
         setYearFilter("none");
+        break;
+      case 'start':
+        setCriteriaStartFilter("");
+        queryParams.delete('end'); // Remove both start and end when clearing criteria
+        setCriteriaEndFilter("");
+        break;
+      case 'end':
+        setCriteriaEndFilter("");
+        queryParams.delete('start'); // Remove both start and end when clearing criteria
+        setCriteriaStartFilter("");
         break;
       default:
         break;
@@ -100,27 +115,31 @@ const FacultyDetailPage: React.FC = () => {
             sdg: sdgFilter !== "none" ? sdgFilter : undefined,
             domain: domainFilter !== "none" ? domainFilter : undefined,
             year: yearFilter !== "none" ? yearFilter : undefined,
+            start: criteriaStartFilter || undefined,
+            end: criteriaEndFilter || undefined,
             quartileYear: quartileYear || undefined,
           },
         });
         setFacultyData(response.data);
-        try {
-          const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`);
-          const summaryData = quartRes.data || {};
-          setQuartileSummaryAllYears(summaryData);
 
-          // Dynamically set default quartile year if not already set
-          const allYears = Object.keys(summaryData);
-          if (!quartileYear && allYears.length > 0) {
-            const latestYear = allYears.sort((a, b) => Number(b) - Number(a))[0];
-            setQuartileYear(latestYear);
+        // Only fetch quartile summary if no criteria filter is applied
+        if (!criteriaStartFilter && !criteriaEndFilter) {
+          try {
+            const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`);
+            const summaryData = quartRes.data || {};
+            setQuartileSummaryAllYears(summaryData);
+
+            // Dynamically set default quartile year if not already set
+            const allYears = Object.keys(summaryData);
+            if (!quartileYear && allYears.length > 0) {
+              const latestYear = allYears.sort((a, b) => Number(b) - Number(a))[0];
+              setQuartileYear(latestYear);
+            }
+          } catch (e) {
+            console.warn("Failed to load quartile summary:", e);
+            setQuartileSummaryAllYears(null);
           }
-
-        } catch (e) {
-          console.warn("Failed to load quartile summary:", e);
-          setQuartileSummaryAllYears(null);
         }
-
 
       } catch (err) {
         setError('Failed to fetch faculty details');
@@ -130,7 +149,8 @@ const FacultyDetailPage: React.FC = () => {
     };
 
     fetchFacultyDetails();
-  }, [scopusId, sdgFilter, domainFilter, yearFilter, quartileYear]);
+  }, [scopusId, sdgFilter, domainFilter, yearFilter, criteriaStartFilter, criteriaEndFilter, quartileYear]);
+
   const yearSummary =
     quartileSummaryAllYears && quartileYear && quartileSummaryAllYears[quartileYear]
       ? quartileSummaryAllYears[quartileYear]
@@ -197,6 +217,7 @@ const FacultyDetailPage: React.FC = () => {
     if (sdgFilter !== 'none') filterLines.push(`SDG: ${sdgFilter}`);
     if (domainFilter !== 'none') filterLines.push(`Domain: ${domainFilter}`);
     if (yearFilter !== 'none') filterLines.push(`Year: ${yearFilter}`);
+    if (criteriaStartFilter && criteriaEndFilter) filterLines.push(`Date Range: ${criteriaStartFilter} to ${criteriaEndFilter}`);
 
     if (filterLines.length > 0) {
       yPos += 10;
@@ -253,7 +274,7 @@ const FacultyDetailPage: React.FC = () => {
       yPos += 5;
     });
 
-    if (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none') {
+    if (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !criteriaStartFilter && !criteriaEndFilter) {
       const iframe = document.querySelector('.highcharts-iframe') as HTMLIFrameElement;
       const iframeDoc = iframe?.contentDocument;
 
@@ -286,7 +307,6 @@ const FacultyDetailPage: React.FC = () => {
     return dateB - dateA; // Sort from latest to oldest
   });
 
-
   const filteredPapers = selectedQuartile
     ? allPapers.filter(
       (p) =>
@@ -295,6 +315,8 @@ const FacultyDetailPage: React.FC = () => {
     )
     : allPapers;
 
+  // Check if criteria filter is active
+  const isCriteriaFilterActive = criteriaStartFilter && criteriaEndFilter;
 
   return (
     <div className="faculty-detail-container">
@@ -322,7 +344,7 @@ const FacultyDetailPage: React.FC = () => {
 
           <div className="filter-badges">
             <strong>Filters Applied: </strong>
-            {sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' ? (
+            {sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !isCriteriaFilterActive ? (
               <span className="filter-chip">NA</span>
             ) : (
               <>
@@ -339,6 +361,11 @@ const FacultyDetailPage: React.FC = () => {
                 {yearFilter !== 'none' && (
                   <span className="filter-chip">
                     Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
+                  </span>
+                )}
+                {isCriteriaFilterActive && (
+                  <span className="filter-chip">
+                    Date Range: {criteriaStartFilter} to {criteriaEndFilter} <button onClick={() => updateQuery('start')}>❌</button>
                   </span>
                 )}
               </>
@@ -363,7 +390,7 @@ const FacultyDetailPage: React.FC = () => {
             📄 Generate Report
           </button>
 
-          {quartileSummaryAllYears && quartileSummaryAllYears[quartileYear] && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
+          {quartileSummaryAllYears && quartileSummaryAllYears[quartileYear] && !isCriteriaFilterActive && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
             <div className="quartile-summary-table">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                 <h4>Quartile Summary for {quartileYear}</h4>
@@ -422,7 +449,6 @@ const FacultyDetailPage: React.FC = () => {
         </div>
       </div>
 
-
       <h3 className="publications-title">Publications</h3>
       {filteredPapers.length > 0 ? (
         filteredPapers.map((paper, index) => (
@@ -439,7 +465,7 @@ const FacultyDetailPage: React.FC = () => {
                 <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
                 <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
               </div>
-              {paper.quartiles && paper.type?.toLowerCase().includes("journal") && (
+              {paper.quartiles && paper.type?.toLowerCase().includes("journal") && !isCriteriaFilterActive && (
                 <div className="quartile-badge-container">
                   {selectedQuartile
                     ? (() => {
@@ -473,19 +499,14 @@ const FacultyDetailPage: React.FC = () => {
                     )}
                 </div>
               )}
-
-
-
-
             </div>
-
           </Link>
         ))
       ) : (
         <div className="no-records">No publications found for this faculty member.</div>
       )}
 
-      {(sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
+      {!isCriteriaFilterActive && (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
         <>
           <h3 className="publications-title">Interactive Scopus Dashboard</h3>
           <div className="highcharts-frame-container">

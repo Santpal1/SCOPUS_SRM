@@ -125,7 +125,7 @@ exports.getCriteriaFilteredFaculty = (req, res) => {
 
 exports.getFacultyDetails = (req, res) => {
     const { scopusId } = req.params;
-    const { sdg, domain, year, quartileYear } = req.query;
+    const { sdg, domain, year, quartileYear, start, end } = req.query;
 
     db.query('SELECT * FROM users WHERE scopus_id = ?', [scopusId], (err, facultyResults) => {
         if (err) return res.status(500).json({ error: 'Failed to fetch faculty details' });
@@ -139,9 +139,9 @@ exports.getFacultyDetails = (req, res) => {
 
         let queryParams = [scopusId];
         let baseQuery = `
-      SELECT 
-        p.*, 
-        pi.sustainable_development_goals AS sdg, 
+      SELECT
+        p.*,
+        pi.sustainable_development_goals AS sdg,
         pi.qs_subject_field_name AS domain,
         fqs.quartile_2022,
         fqs.quartile_2023,
@@ -155,19 +155,28 @@ exports.getFacultyDetails = (req, res) => {
         const conditions = ['p.scopus_id = ?'];
         queryParams.push(scopusId); // second usage of scopus_id (for WHERE)
 
-        if (sdg) {
-            conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
-            queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
+        // Handle criteria filter (date range)
+        if (start && end) {
+            conditions.push("p.date BETWEEN ? AND ?");
+            queryParams.push(start, end);
         }
 
-        if (domain) {
-            conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
-            queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
-        }
+        // Handle existing filters only if criteria filter is not applied
+        if (!start || !end) {
+            if (sdg) {
+                conditions.push("REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') LIKE ?");
+                queryParams.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
+            }
 
-        if (year) {
-            conditions.push("YEAR(p.date) = ?");
-            queryParams.push(year);
+            if (domain) {
+                conditions.push("REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') LIKE ?");
+                queryParams.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
+            }
+
+            if (year) {
+                conditions.push("YEAR(p.date) = ?");
+                queryParams.push(year);
+            }
         }
 
         baseQuery += ` WHERE ${conditions.join(' AND ')}`;
@@ -200,9 +209,6 @@ exports.getFacultyDetails = (req, res) => {
         });
     });
 };
-
-
-
 
 exports.getFacultyQuartileSummary = (req, res) => {
     const { scopusId } = req.params;
@@ -242,7 +248,7 @@ exports.getFacultyQuartileSummary = (req, res) => {
     });
 };
 
-
+// Performance
 exports.getAuthorList = (req, res) => {
     const { search } = req.query;
 
