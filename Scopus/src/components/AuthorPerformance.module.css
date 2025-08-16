@@ -1,7 +1,9 @@
 /* Enhanced Container */
 .container {
     animation: fadeInUp 0.8s ease-out;
-}:root {
+}
+
+:root {
     --primary-color: #007bff;
     --primary-hover: #0056b3;
     --secondary-color: #6c757d;
@@ -32,6 +34,30 @@ body {
     min-height: 100vh;
 }
 
+.contentCard {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 /* Enhanced Navbar - Fixed to top */
 .navbar {
     width: 100%;
@@ -56,6 +82,7 @@ body {
         transform: translateY(-100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -90,7 +117,8 @@ body {
 /* Page Wrapper */
 .pageWrapper {
     min-height: 100vh;
-    padding-top: 80px; /* Account for fixed navbar */
+    padding-top: 80px;
+    /* Account for fixed navbar */
     padding-bottom: 2rem;
 }
 
@@ -106,6 +134,7 @@ body {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -366,7 +395,8 @@ body {
     box-shadow: var(--shadow-sm);
     animation: slideInScale 0.3s ease-out;
     position: relative;
-    padding-right: 32px; /* Make room for close button */
+    padding-right: 32px;
+    /* Make room for close button */
 }
 
 .activeFilterChip .filterChipClose {
@@ -399,6 +429,7 @@ body {
         opacity: 0;
         transform: scale(0.8) translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -407,7 +438,8 @@ body {
 
 .activeFilterChip.searchChip {
     background: linear-gradient(135deg, var(--success-color), #20c997);
-    padding-right: 32px; /* Make room for close button */
+    padding-right: 32px;
+    /* Make room for close button */
 }
 
 .activeFilterChip.searchChip .filterChipClose {
@@ -421,7 +453,8 @@ body {
 .activeFilterChip.hIndexChip {
     background: linear-gradient(135deg, var(--warning-color), #fd7e14);
     color: #333;
-    padding-right: 32px; /* Make room for close button */
+    padding-right: 32px;
+    /* Make room for close button */
 }
 
 .activeFilterChip.hIndexChip .filterChipClose {
@@ -535,6 +568,7 @@ body {
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -639,8 +673,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .emptyStateIcon {

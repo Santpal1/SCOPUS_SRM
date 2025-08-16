@@ -305,7 +305,7 @@ exports.getAuthorList = (req, res) => {
 
 exports.getAuthorPerformance = (req, res) => {
     const { scopus_id } = req.params;
-    console.log("Received request for scopus_id:", scopus_id);
+    // console.log("Received request for scopus_id:", scopus_id);
 
     if (!scopus_id) {
         return res.status(400).json({ error: "scopus_id is required" });
@@ -326,12 +326,12 @@ exports.getAuthorPerformance = (req, res) => {
 
             const authorName = authorResults[0].name;
             const authorHIndex = authorResults[0].h_index;
-            console.log("Fetching chart data for scopus_id:", scopus_id);
+            // console.log("Fetching chart data for scopus_id:", scopus_id);
 
             // Get current year and calculate last 5 years
             const currentYear = new Date().getFullYear();
             const last5Years = Array.from({ length: 5 }, (_, i) => currentYear - i);
-            console.log("Filtering for last 5 years:", last5Years);
+            // console.log("Filtering for last 5 years:", last5Years);
 
             // Step 2: Get chart data from scopus_chart_data (only last 5 years)
             const chartQuery = `
@@ -378,8 +378,8 @@ exports.getAuthorPerformance = (req, res) => {
                         return res.status(500).json({ error: "Failed to fetch academic year data" });
                     }
 
-                    console.log("Chart data results:", chartResults);
-                    console.log("Academic year results:", academicResults);
+                    // console.log("Chart data results:", chartResults);
+                    // console.log("Academic year results:", academicResults);
 
                     // Process academic year data to ensure all 3 years are present
                     const academicYears = ['2022-23', '2023-24', '2024-25'];
