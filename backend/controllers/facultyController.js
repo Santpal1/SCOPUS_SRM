@@ -250,18 +250,50 @@ exports.getFacultyQuartileSummary = (req, res) => {
 
 // Performance
 exports.getAuthorList = (req, res) => {
-    const { search } = req.query;
+    const { search, h_index_filter } = req.query;
 
-    let query = `SELECT scopus_id, name FROM users`;
+    let query = `SELECT scopus_id, name, h_index FROM users`;
     let params = [];
+    let whereConditions = [];
 
+    // Handle search filter
     if (search && search.trim()) {
-        query += ` WHERE LOWER(name) LIKE ? OR scopus_id LIKE ?`;
+        whereConditions.push(`(LOWER(name) LIKE ? OR scopus_id LIKE ?)`);
         const searchTerm = `%${search.toLowerCase()}%`;
         params.push(searchTerm, searchTerm);
     }
 
-    query += ` ORDER BY name ASC`;
+    // Handle H-index filter
+    if (h_index_filter && h_index_filter !== 'none') {
+        let hIndexCondition;
+        switch (h_index_filter) {
+            case '1-3':
+                hIndexCondition = `h_index BETWEEN 1 AND 3`;
+                break;
+            case '4-6':
+                hIndexCondition = `h_index BETWEEN 4 AND 6`;
+                break;
+            case '7-9':
+                hIndexCondition = `h_index BETWEEN 7 AND 9`;
+                break;
+            case '10-12':
+                hIndexCondition = `h_index BETWEEN 10 AND 12`;
+                break;
+            case '12+':
+                hIndexCondition = `h_index > 12`;
+                break;
+        }
+        if (hIndexCondition) {
+            whereConditions.push(hIndexCondition);
+        }
+    }
+
+    // Add WHERE clause if there are conditions
+    if (whereConditions.length > 0) {
+        query += ` WHERE ${whereConditions.join(' AND ')}`;
+    }
+
+    query += ` ORDER BY h_index DESC, name ASC`;
 
     db.query(query, params, (err, results) => {
         if (err) {
@@ -272,18 +304,17 @@ exports.getAuthorList = (req, res) => {
     });
 };
 
-
 exports.getAuthorPerformance = (req, res) => {
-    const { scopus_id } = req.params;  // Changed from req.query to req.params
+    const { scopus_id } = req.params;
     console.log("Received request for scopus_id:", scopus_id);
 
     if (!scopus_id) {
         return res.status(400).json({ error: "scopus_id is required" });
     }
 
-    // Step 1: Get author name
+    // Step 1: Get author name and h_index
     db.query(
-        `SELECT name FROM users WHERE scopus_id = ?`,
+        `SELECT name, h_index FROM users WHERE scopus_id = ?`,
         [scopus_id],
         (err, authorResults) => {
             if (err) {
@@ -295,6 +326,7 @@ exports.getAuthorPerformance = (req, res) => {
             }
 
             const authorName = authorResults[0].name;
+            const authorHIndex = authorResults[0].h_index;
             console.log("Fetching chart data for scopus_id:", scopus_id);
 
             // Get current year and calculate last 5 years
@@ -304,35 +336,35 @@ exports.getAuthorPerformance = (req, res) => {
 
             // Step 2: Get chart data from scopus_chart_data (only last 5 years)
             const chartQuery = `
-        SELECT year, documents, citations
-        FROM scopus_chart_data
-        WHERE scopus_id = ?
-          AND year IN (${last5Years.join(',')})
-        ORDER BY year DESC
-      `;
+                SELECT year, documents, citations
+                FROM scopus_chart_data
+                WHERE scopus_id = ?
+                  AND year IN (${last5Years.join(',')})
+                ORDER BY year DESC
+            `;
 
             // Step 3: Get academic year data from papers table
             const academicYearQuery = `
-        SELECT 
-          CASE 
-            WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
-            WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
-            WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
-          END as academic_year,
-          COUNT(*) as document_count
-        FROM papers
-        WHERE scopus_id = ? 
-          AND date >= '2022-07-01' 
-          AND date <= '2025-06-30'
-        GROUP BY 
-          CASE 
-            WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
-            WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
-            WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
-          END
-        HAVING academic_year IS NOT NULL
-        ORDER BY academic_year ASC
-      `;
+                SELECT 
+                  CASE 
+                    WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
+                    WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
+                    WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
+                  END as academic_year,
+                  COUNT(*) as document_count
+                FROM papers
+                WHERE scopus_id = ? 
+                  AND date >= '2022-07-01' 
+                  AND date <= '2025-06-30'
+                GROUP BY 
+                  CASE 
+                    WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
+                    WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
+                    WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
+                  END
+                HAVING academic_year IS NOT NULL
+                ORDER BY academic_year ASC
+            `;
 
             // Execute both queries
             db.query(chartQuery, [scopus_id], (err, chartResults) => {
@@ -376,6 +408,7 @@ exports.getAuthorPerformance = (req, res) => {
                     res.json({
                         name: authorName,
                         scopus_id: scopus_id,
+                        h_index: authorHIndex, // Added h_index to response
                         chart_data: chartResults,
                         academic_year_data: processedAcademicData,
                         consistency_status: consistencyStatus

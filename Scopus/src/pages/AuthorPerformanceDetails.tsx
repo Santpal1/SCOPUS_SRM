@@ -18,6 +18,7 @@ interface AcademicYearRow {
 interface PerformanceData {
     name: string;
     scopus_id: string;
+    h_index?: number; // Added h_index property
     chart_data: ChartRow[];
     academic_year_data: AcademicYearRow[];
     consistency_status: 'green' | 'orange' | 'red';
@@ -164,12 +165,13 @@ export default function AuthorPerformanceDetail() {
 
                 {/* Content Area */}
                 <div className={style.contentArea}>
-                    {/* Author Information Box */}
+                    {/* Author Information Box - Enhanced with H-index */}
                     <div className={style.authorInfoBox}>
                         <div className={style.authorInfoGrid}>
                             <div className={style.authorDetails}>
                                 <h3>{performanceData.name}</h3>
                                 <p>Scopus ID: {performanceData.scopus_id}</p>
+                                <p>H-Index: <strong>{performanceData.h_index || 'N/A'}</strong></p>
                             </div>
                             <div className={style.statusInfo}>
                                 <strong>Eligibility Status:</strong>
