@@ -70,7 +70,7 @@ body {
     background: white;
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Search Box */
@@ -93,7 +93,8 @@ body {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    min-height: 200px; /* ✅ Keeps space even if empty */
+    min-height: 200px;
+    /* ✅ Keeps space even if empty */
 }
 
 .authorTable th,
@@ -115,7 +116,8 @@ body {
 
 /* "No authors found" placeholder */
 .no-data {
-    min-height: 200px; /* ✅ Matches table height */
+    min-height: 200px;
+    /* ✅ Matches table height */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -134,4 +136,150 @@ body {
 
 .back-button:hover {
     background-color: #004494;
+}
+
+/* Filters container to hold search and H-index filter */
+.filtersContainer {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Updated search box with clear button */
+.searchBox {
+    position: relative;
+    flex: 1;
+    min-width: 300px;
+}
+
+.searchBox input {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    /* Add right padding for clear button */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.searchBox input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Clear button (X) - Enhanced with red styling */
+.clearButton {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #dc3545;
+    /* Red color */
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.clearButton:hover {
+    background-color: #dc3545;
+    /* Red background on hover */
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.clearButton:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* H-index filter - Enhanced styling */
+.filterBox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.filterBox label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.filterSelect {
+    padding: 10px 14px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    color: #495057;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filterSelect:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.filterSelect:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the dropdown options */
+.filterSelect option {
+    padding: 10px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.filterSelect option:hover {
+    background-color: #f8f9fa;
+}
+
+/* Update table to accommodate H-index column */
+.authorTable th:nth-child(3),
+.authorTable td:nth-child(3) {
+    width: 100px;
+    text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .filtersContainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .searchBox {
+        min-width: unset;
+    }
+
+    .filterBox {
+        justify-content: space-between;
+    }
 }
