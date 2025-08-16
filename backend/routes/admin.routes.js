@@ -5,12 +5,7 @@ const { spawn } = require("child_process");
 const multer = require("multer");
 const fs = require("fs");
 
-// Configure multer for file uploads
 const upload = multer({ dest: "uploads/" });
-
-// ==============================
-// Existing routes
-// ==============================
 
 router.get("/run-refresh-stream", (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
@@ -25,9 +20,9 @@ router.get("/run-refresh-stream", (req, res) => {
         const lines = data.toString().trim().split("\n");
         for (const line of lines) {
             try {
-                const parsed = JSON.parse(line); 
+                const parsed = JSON.parse(line);
                 res.write(`data: ${JSON.stringify(parsed)}\n\n`);
-            } catch (err) {
+            } catch {
                 res.write(`data: ${JSON.stringify({ status: line })}\n\n`);
             }
         }
@@ -61,14 +56,13 @@ router.get("/run-scopus-scraper", (req, res) => {
 
     pythonProcess.stdout.on("data", (data) => {
         const lines = data.toString().trim().split("\n");
-
         for (const line of lines) {
             try {
                 const parsed = JSON.parse(line);
                 res.write(`data: ${JSON.stringify(parsed)}\n\n`);
                 if (parsed.processed !== undefined) processedCount = parsed.processed;
                 if (parsed.total !== undefined) totalCount = parsed.total;
-            } catch (err) {
+            } catch {
                 res.write(`data: ${JSON.stringify({ 
                     status: "INFO", 
                     message: line,
@@ -80,10 +74,9 @@ router.get("/run-scopus-scraper", (req, res) => {
     });
 
     pythonProcess.stderr.on("data", (data) => {
-        const errorMessage = data.toString().trim();
         res.write(`data: ${JSON.stringify({ 
             status: "ERROR", 
-            message: errorMessage,
+            message: data.toString().trim(),
             processed: processedCount,
             total: totalCount
         })}\n\n`);
@@ -107,10 +100,6 @@ router.get("/run-scopus-scraper", (req, res) => {
     });
 });
 
-// ==============================
-// NEW ROUTE: Quartile Uploader
-// ==============================
-
 router.post("/run-quartile-upload", upload.single("file"), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -130,7 +119,7 @@ router.post("/run-quartile-upload", upload.single("file"), (req, res) => {
             try {
                 const parsed = JSON.parse(line);
                 res.write(`data: ${JSON.stringify(parsed)}\n\n`);
-            } catch (err) {
+            } catch {
                 res.write(`data: ${JSON.stringify({ status: "INFO", message: line })}\n\n`);
             }
         }
@@ -147,11 +136,7 @@ router.post("/run-quartile-upload", upload.single("file"), (req, res) => {
             code 
         })}\n\n`);
         res.end();
-
-        // Clean up uploaded file
-        fs.unlink(req.file.path, (err) => {
-            if (err) console.error("Error deleting temp file:", err);
-        });
+        fs.unlink(req.file.path, () => {});
     });
 
     req.on("close", () => {
@@ -159,9 +144,44 @@ router.post("/run-quartile-upload", upload.single("file"), (req, res) => {
     });
 });
 
-// Optional: route to preview authors
-router.get("/scopus-authors", (req, res) => {
-    res.json({ message: "Endpoint for getting Scopus author list" });
+// 🔥 New Route: Scival Upload
+router.post("/run-scival-upload", upload.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    const scriptPath = path.join(__dirname, "../python_files/scival_data_to_db.py");
+    const pythonProcess = spawn("python", [scriptPath, req.file.path]);
+
+    pythonProcess.stdout.on("data", (data) => {
+        const lines = data.toString().trim().split("\n");
+        for (const line of lines) {
+            res.write(`data: ${JSON.stringify({ status: "INFO", message: line })}\n\n`);
+        }
+    });
+
+    pythonProcess.stderr.on("data", (data) => {
+        res.write(`data: ${JSON.stringify({ status: "ERROR", message: data.toString().trim() })}\n\n`);
+    });
+
+    pythonProcess.on("close", (code) => {
+        res.write(`data: ${JSON.stringify({ 
+            status: code === 0 ? "COMPLETE" : "FAILED", 
+            message: code === 0 ? "Scival upload finished successfully!" : "Scival upload failed", 
+            code 
+        })}\n\n`);
+        res.end();
+        fs.unlink(req.file.path, () => {});
+    });
+
+    req.on("close", () => {
+        pythonProcess.kill();
+    });
 });
 
 module.exports = router;

@@ -21,6 +21,8 @@ const AdminPage: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [quartileFile, setQuartileFile] = useState<File | null>(null);
   const [quartileUploading, setQuartileUploading] = useState(false);
+  const [scivalFile, setScivalFile] = useState<File | null>(null);
+  const [scivalUploading, setScivalUploading] = useState(false);
 
   const logsEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -168,6 +170,56 @@ const AdminPage: React.FC = () => {
     xhr.send(formData);
   };
 
+  const handleScivalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setScivalFile(e.target.files[0]);
+    }
+  };
+
+  const handleRunScivalUpload = () => {
+    if (!scivalFile) return;
+    setLogs([]);
+    setProgress(0);
+    setProcessedCount(0);
+    setTotalCount(0);
+    setLoading(true);
+    setScivalUploading(true);
+    setModalOpen(true);
+    setCurrentOperation("Scival Upload");
+
+    const formData = new FormData();
+    formData.append("file", scivalFile);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:5001/admin/run-scival-upload", true);
+    xhr.setRequestHeader("Accept", "text/event-stream");
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState !== 3 && xhr.readyState !== 4) return;
+      const lines = xhr.responseText.split("\n").filter(Boolean);
+      for (const line of lines) {
+        if (line.startsWith("data:")) {
+          try {
+            const data: ProgressEntry = JSON.parse(line.replace("data: ", ""));
+            setLogs((prev) => [...prev, data]);
+            if (typeof data.progress === "number") setProgress(data.progress / 100);
+            if (data.status === "COMPLETE" || data.status === "FAILED") {
+              setLoading(false);
+              setScivalUploading(false);
+            }
+          } catch {}
+        }
+      }
+    };
+
+    xhr.onerror = () => {
+      setLoading(false);
+      setScivalUploading(false);
+    };
+
+    xhr.send(formData);
+  };
+
   const closeModal = () => {
     if (!loading) {
       setModalOpen(false);
@@ -225,6 +277,25 @@ const AdminPage: React.FC = () => {
             className={`${styles.actionButton} ${quartileUploading ? styles.loading : ''}`}
           >
             {quartileUploading ? "Uploading..." : "Upload Quartile CSV"}
+          </button>
+        </div>
+        <div className={styles.actionCard}>
+          <div className={styles.cardIcon}>📈</div>
+          <h3>Scival Upload</h3>
+          <p>Upload a Scival CSV file to update faculty Scival data</p>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleScivalFileChange}
+            disabled={loading || scivalUploading}
+            style={{ marginBottom: "8px" }}
+          />
+          <button
+            onClick={handleRunScivalUpload}
+            disabled={loading || scivalUploading || !scivalFile}
+            className={`${styles.actionButton} ${scivalUploading ? styles.loading : ''}`}
+          >
+            {scivalUploading ? "Uploading..." : "Upload Scival CSV"}
           </button>
         </div>
       </div>
