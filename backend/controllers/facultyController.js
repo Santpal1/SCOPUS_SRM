@@ -180,7 +180,6 @@ exports.getFacultyDetails = (req, res) => {
         }
 
         baseQuery += ` WHERE ${conditions.join(' AND ')}`;
-        baseQuery += ` AND fqs.quartile_${safeQuartileYear} IS NOT NULL`;
         baseQuery += ` ORDER BY p.date DESC`;
 
         db.query(baseQuery, queryParams, (err, papersResults) => {
