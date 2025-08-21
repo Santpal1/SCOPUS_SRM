@@ -645,6 +645,7 @@
     background: linear-gradient(135deg, #f3e5f5, #e1bee7);
     color: #4a148c;
     box-shadow: 0 4px 12px rgba(74, 20, 140, 0.15);
+    margin-bottom: 1rem;
 }
 
 .countryTag:hover {
