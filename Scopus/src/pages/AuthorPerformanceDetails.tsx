@@ -153,8 +153,8 @@ const AcademicYearTable = ({ academicYearData }: { academicYearData: AcademicYea
                                     <span className={style.dataValue}>{row.document_count}</span>
                                 </td>
                                 <td>
-                                    <span className={row.document_count >= 3 ? style.yes : style.no}>
-                                        {row.document_count >= 3 ? 'Consistent' : 'Inconsistent'}
+                                    <span className={row.document_count >= 2 ? style.yes : style.no}>
+                                        {row.document_count >= 2 ? 'Consistent' : 'Inconsistent'}
                                     </span>
                                 </td>
                             </tr>

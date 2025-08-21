@@ -392,7 +392,7 @@ exports.getAuthorPerformance = (req, res) => {
                     });
 
                     // Calculate consistency
-                    const consistentYears = processedAcademicData.filter(item => item.document_count >= 3).length;
+                    const consistentYears = processedAcademicData.filter(item => item.document_count >= 2).length;
                     const inconsistentYears = 3 - consistentYears;
 
                     let consistencyStatus;
