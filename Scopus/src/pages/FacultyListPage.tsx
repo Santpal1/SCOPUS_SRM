@@ -86,15 +86,24 @@ const FacultyListPage: React.FC = () => {
   };
 
   const fetchCriteriaFilteredFaculty = async () => {
-    if (!criteriaStart || !criteriaEnd || criteriaPapers <= 0) {
-      alert("Please enter valid Start Date, End Date, and Paper Count.");
+    // Check if all inputs are empty
+    if (!criteriaStart && !criteriaEnd && (!criteriaPapers || criteriaPapers <= 0)) {
+      alert("Please enter either Start/End Date or Minimum Papers to filter.");
       return;
     }
+
     try {
       setLoading(true);
+
+      // Build params dynamically
+      const params: any = {};
+      if (criteriaStart) params.start = criteriaStart;
+      if (criteriaEnd) params.end = criteriaEnd;
+      if (criteriaPapers > 0) params.papers = criteriaPapers;
+
       const response = await axios.get(
         `http://localhost:5001/api/faculty/criteria-filter`,
-        { params: { start: criteriaStart, end: criteriaEnd, papers: criteriaPapers } }
+        { params }
       );
 
       const updatedFaculty = response.data
@@ -113,6 +122,7 @@ const FacultyListPage: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   const fetchFacultyByTimeframe = async (selectedTimeframe: string) => {
     setTimeframe(selectedTimeframe);
@@ -188,7 +198,7 @@ const FacultyListPage: React.FC = () => {
   // Helper function to build query parameters for View Details link
   const buildViewDetailsQuery = () => {
     const params = new URLSearchParams();
-    
+
     if (criteriaVisible && criteriaStart && criteriaEnd) {
       // If criteria filter is active, pass the date range
       params.set("start", criteriaStart);
@@ -199,7 +209,7 @@ const FacultyListPage: React.FC = () => {
       if (domainFilter !== "none") params.set("domain", domainFilter);
       if (timeframe !== "none") params.set("year", timeframe);
     }
-    
+
     return params.toString();
   };
 
@@ -352,7 +362,7 @@ const FacultyListPage: React.FC = () => {
                 <th>Faculty ID</th>
                 <th>Scopus ID</th>
                 <th>Name</th>
-                <th>Documents</th>
+                <th>Total Documents</th>
                 <th>Filtered Documents</th>
                 <th>Actions</th>
               </tr>

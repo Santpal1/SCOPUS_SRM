@@ -94,24 +94,41 @@ exports.getFacultyPaperStats = (req, res) => {
     });
 };
 
-// Existing imports
 exports.getCriteriaFilteredFaculty = (req, res) => {
     const { start, end, papers } = req.query;
 
-    if (!start || !end || !papers) {
-        return res.status(400).json({ error: "Start date, end date, and paper count are required." });
-    }
-
-    const query = `
+    let query = `
         SELECT u.scopus_id, u.name, COUNT(p.scopus_id) AS timeframe_docs
         FROM users u
-        LEFT JOIN papers p ON u.scopus_id = p.scopus_id 
-            AND p.date >= ? AND p.date <= ?
+        LEFT JOIN papers p ON u.scopus_id = p.scopus_id
+    `;
+    
+    const conditions = [];
+    const params = [];
+
+    // Apply date filters only if provided
+    if (start && end) {
+        conditions.push(`p.date >= ? AND p.date <= ?`);
+        params.push(start, end);
+    }
+
+    if (conditions.length > 0) {
+        query += ` WHERE ` + conditions.join(' AND ');
+    }
+
+    query += `
         GROUP BY u.scopus_id, u.name
-        HAVING timeframe_docs < ?;
     `;
 
-    db.query(query, [start, end, parseInt(papers)], (err, results) => {
+    // Apply paper count filter only if provided
+    if (papers) {
+        query += ` HAVING timeframe_docs <= ?`;
+        params.push(parseInt(papers));
+    }
+
+    query += `;`;
+
+    db.query(query, params, (err, results) => {
         if (err) {
             console.error("DB Error:", err);
             return res.status(500).json({ error: 'Failed to fetch data' });
