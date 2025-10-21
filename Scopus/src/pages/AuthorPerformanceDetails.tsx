@@ -37,9 +37,9 @@ const getAcademicYearDisplay = (academicYear: string): string => {
 
 const getConsistencyMessage = (status: string): string => {
     const messages: Record<string, string> = {
-        green: 'Faculty has been consistent for all 3 academic years (3+ papers each year)',
-        orange: 'Faculty has been inconsistent for 1 academic year (less than 3 papers)',
-        red: 'Faculty has been inconsistent for more than 1 academic year (less than 3 papers)'
+        green: 'Faculty has been consistent for all 3 academic years (2+ papers each year)',
+        orange: 'Faculty has been inconsistent for 1 academic year (less than 2 papers)',
+        red: 'Faculty has been inconsistent for more than 1 academic year (less than 2 papers)'
     };
     return messages[status] || '';
 };
