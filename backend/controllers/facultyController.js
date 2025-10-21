@@ -305,7 +305,6 @@ exports.getAuthorList = (req, res) => {
 
 exports.getAuthorPerformance = (req, res) => {
     const { scopus_id } = req.params;
-    // console.log("Received request for scopus_id:", scopus_id);
 
     if (!scopus_id) {
         return res.status(400).json({ error: "scopus_id is required" });
@@ -326,12 +325,10 @@ exports.getAuthorPerformance = (req, res) => {
 
             const authorName = authorResults[0].name;
             const authorHIndex = authorResults[0].h_index;
-            // console.log("Fetching chart data for scopus_id:", scopus_id);
 
-            // Get current year and calculate last 5 years
+            // Get current year and calculate last 5 years (for chart data)
             const currentYear = new Date().getFullYear();
             const last5Years = Array.from({ length: 5 }, (_, i) => currentYear - i);
-            // console.log("Filtering for last 5 years:", last5Years);
 
             // Step 2: Get chart data from scopus_chart_data (only last 5 years)
             const chartQuery = `
@@ -342,25 +339,30 @@ exports.getAuthorPerformance = (req, res) => {
                 ORDER BY year DESC
             `;
 
-            // Step 3: Get academic year data from papers table
+            // Step 3: Dynamic academic year query (last 3 academic years)
+            const academicYears = Array.from({ length: 3 }, (_, i) => {
+                const start = currentYear - i - 1;
+                const end = currentYear - i;
+                return `${start}-${String(end).slice(-2)}`;
+            }).reverse();
+
+            const caseConditions = academicYears.map(ay => {
+                const [startYear, endYearShort] = ay.split("-");
+                const endYear = `20${endYearShort}`;
+                return `WHEN date >= '${startYear}-07-01' AND date <= '${endYear}-06-30' THEN '${ay}'`;
+            }).join("\n");
+
             const academicYearQuery = `
                 SELECT 
-                  CASE 
-                    WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
-                    WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
-                    WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
-                  END as academic_year,
-                  COUNT(*) as document_count
+                    CASE 
+                        ${caseConditions}
+                    END as academic_year,
+                    COUNT(*) as document_count
                 FROM papers
                 WHERE scopus_id = ? 
-                  AND date >= '2022-07-01' 
-                  AND date <= '2025-06-30'
-                GROUP BY 
-                  CASE 
-                    WHEN date >= '2022-07-01' AND date <= '2023-06-30' THEN '2022-23'
-                    WHEN date >= '2023-07-01' AND date <= '2024-06-30' THEN '2023-24'
-                    WHEN date >= '2024-07-01' AND date <= '2025-06-30' THEN '2024-25'
-                  END
+                  AND date >= '${academicYears[0].split("-")[0]}-07-01'
+                  AND date <= '${currentYear}-06-30'
+                GROUP BY academic_year
                 HAVING academic_year IS NOT NULL
                 ORDER BY academic_year ASC
             `;
@@ -378,11 +380,7 @@ exports.getAuthorPerformance = (req, res) => {
                         return res.status(500).json({ error: "Failed to fetch academic year data" });
                     }
 
-                    // console.log("Chart data results:", chartResults);
-                    // console.log("Academic year results:", academicResults);
-
                     // Process academic year data to ensure all 3 years are present
-                    const academicYears = ['2022-23', '2023-24', '2024-25'];
                     const processedAcademicData = academicYears.map(year => {
                         const found = academicResults.find(item => item.academic_year === year);
                         return {
@@ -407,7 +405,7 @@ exports.getAuthorPerformance = (req, res) => {
                     res.json({
                         name: authorName,
                         scopus_id: scopus_id,
-                        h_index: authorHIndex, // Added h_index to response
+                        h_index: authorHIndex,
                         chart_data: chartResults,
                         academic_year_data: processedAcademicData,
                         consistency_status: consistencyStatus
