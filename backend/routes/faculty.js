@@ -25,7 +25,7 @@ router.get('/author-performance/:scopus_id', (req, res) => {
 router.get('/', getAllFaculty);
 router.get('/papers', getFacultyPaperStats);
 router.get('/criteria-filter', getCriteriaFilteredFaculty);
-router.get('/:scopusId/quartile-summary', getFacultyQuartileSummary);
-router.get('/:scopusId', getFacultyDetails);
+router.get('/:facultyId/quartile-summary', getFacultyQuartileSummary);
+router.get('/:facultyId', getFacultyDetails);
 
 module.exports = router;

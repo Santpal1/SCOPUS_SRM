@@ -536,6 +536,22 @@ body::before {
   position: relative;
 }
 
+/* Compact scopus ID display: first id + "+N more" with tooltip */
+.scopus-ids {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: help; /* indicates hover for tooltip */
+}
+
+.scopus-ids .more-count {
+  color: var(--secondary-color);
+  font-weight: 600;
+  margin-left: 6px;
+}
+
 .faculty-table th {
   font-weight: 700;
   text-transform: uppercase;

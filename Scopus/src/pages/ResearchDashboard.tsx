@@ -9,9 +9,10 @@ interface PublicationData {
   count: number;
 }
 interface TopAuthor {
-  scopus_id: string;
+  faculty_id?: string;
+  scopus_id?: string;
   name: string;
-  total_docs: number;
+  total_docs?: number;
   timeframe_docs: number;
 }
 interface QuartileData {
@@ -42,7 +43,31 @@ export default function ResearchDashboard() {
     try {
       const res = await axios.get(`http://localhost:5001/api/top-author?timeframe=${selectedTimeframe}`);
       const data = res.data;
-      setTopAuthors(Array.isArray(data) && data.length > 0 ? data : []);
+
+      // Backend may return an object for single top author or an array. Normalize to an array of TopAuthor
+      let authors: TopAuthor[] = [];
+
+      if (!data) {
+        authors = [];
+      } else if (Array.isArray(data)) {
+        authors = data.map((a: any) => ({
+          faculty_id: a.faculty_id,
+          scopus_id: a.scopus_id,
+          name: a.faculty_name || a.name || 'Unknown',
+          total_docs: a.total_docs || a.docs_count || 0,
+          timeframe_docs: a.timeframe_docs || a.timeframe_docs || 0,
+        }));
+      } else if (typeof data === 'object') {
+        authors = [{
+          faculty_id: data.faculty_id,
+          scopus_id: data.scopus_id,
+          name: data.faculty_name || data.name || 'Unknown',
+          total_docs: data.total_docs || data.docs_count || 0,
+          timeframe_docs: data.timeframe_docs || data.timeframe_docs || 0,
+        }];
+      }
+
+      setTopAuthors(authors);
     } catch (error) {
       console.error("Error fetching top authors:", error);
       setTopAuthors([]);
@@ -203,8 +228,10 @@ export default function ResearchDashboard() {
 
               {/* Y-axis Labels */}
               {Array.from({ length: 5 }).map((_, i) => {
-                const yVal = Math.max(...Object.values(animatedQuartiles)) / 4 * i;
-                const yPos = 200 - (yVal / Math.max(...Object.values(animatedQuartiles))) * 160;
+                // Guard against zero to avoid NaN SVG coordinate errors
+                const quartileMax = Math.max(...Object.values(animatedQuartiles), 1);
+                const yVal = (quartileMax / 4) * i;
+                const yPos = 200 - (yVal / quartileMax) * 160;
                 return (
                   <g key={i}>
                     <line x1="45" y1={yPos} x2="50" y2={yPos} stroke="black" />
@@ -353,9 +380,9 @@ export default function ResearchDashboard() {
           <div className={style.authorList}>
             {topAuthors.length > 0 ? (
               topAuthors.map((author, index) => (
-                <div key={`${author.scopus_id}-${index}`} className={style.authorChip}>
-                  {author.name}
-                  <span className={style.authorBadge}>{author.timeframe_docs}</span>
+                <div key={`${author.faculty_id || author.scopus_id || index}`} className={style.authorChip}>
+                  {author.name || 'Unknown'}
+                  <span className={style.authorBadge}>{author.timeframe_docs ?? 0}</span>
                 </div>
               ))
             ) : (

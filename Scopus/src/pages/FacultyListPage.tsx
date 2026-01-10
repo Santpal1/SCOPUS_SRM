@@ -5,12 +5,12 @@ import srmLogo from "../assets/srmist-logo.png";
 import "../components/FacultyListPage.css";
 
 interface Faculty {
-  scopus_id: string;
+  scopus_ids?: string[];
   name: string;
   docs_count: number;
   timeframe_docs: number;
   access: string;
-  faculty_id?: string;
+  faculty_id: string;
   docs_in_timeframe?: number;
   sdg?: string;
   domain?: string;
@@ -27,6 +27,10 @@ const FacultyListPage: React.FC = () => {
   const [docsInTimeframeMap, setDocsInTimeframeMap] = useState<{ [key: string]: number }>({});
   const [sdgFilter, setSdgFilter] = useState<string>("none");
   const [domainFilter, setDomainFilter] = useState<string>("none");
+
+  // Loading state for per-row scopus id fetches
+  const [scopusLoading, setScopusLoading] = useState<{ [facultyId: string]: boolean }>({});
+
 
   const [criteriaVisible, setCriteriaVisible] = useState<boolean>(false);
   const [criteriaStart, setCriteriaStart] = useState<string>("");
@@ -138,7 +142,7 @@ const FacultyListPage: React.FC = () => {
       const response = await axios.get(`http://localhost:5001/api/faculty/papers?timeframe=${selectedTimeframe}`);
       const docsMap: { [key: string]: number } = {};
       response.data.forEach((f: Faculty) => {
-        docsMap[f.scopus_id] = f.timeframe_docs;
+        docsMap[f.faculty_id] = f.timeframe_docs;
       });
 
       setDocsInTimeframeMap(docsMap);
@@ -146,7 +150,7 @@ const FacultyListPage: React.FC = () => {
       const updatedFaculty = faculty
         .map(member => ({
           ...member,
-          docs_in_timeframe: docsMap[member.scopus_id] ?? 0,
+          docs_in_timeframe: docsMap[member.faculty_id] ?? 0,
         }))
         .filter(member => member.docs_in_timeframe > 0)
         .sort((a, b) => (b.docs_in_timeframe ?? 0) - (a.docs_in_timeframe ?? 0));
@@ -159,17 +163,20 @@ const FacultyListPage: React.FC = () => {
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value.toLowerCase();
-    setSearchQuery(query);
+    const raw = event.target.value;
+    const query = raw.toLowerCase();
+    setSearchQuery(raw);
     if (query === "") {
       setFilteredFaculty(currentFaculty);
       return;
     }
-    const filtered = currentFaculty.filter(
-      member =>
-        member.name.toLowerCase().includes(query) ||
-        member.scopus_id.toLowerCase().includes(query)
-    );
+    const filtered = currentFaculty.filter(member => {
+      const nameMatch = member.name && member.name.toLowerCase().includes(query);
+      const scopusMatch = member.scopus_ids && member.scopus_ids.some(id => id.toLowerCase().includes(query));
+      const facultyIdStr = member.faculty_id ? String(member.faculty_id).toLowerCase() : "";
+      const facultyIdMatch = facultyIdStr.includes(query);
+      return Boolean(nameMatch || scopusMatch || facultyIdMatch);
+    });
     setFilteredFaculty(filtered);
   };
 
@@ -325,7 +332,7 @@ const FacultyListPage: React.FC = () => {
           <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "400px" }}>
             <input
               type="text"
-              placeholder="Search by Name or Scopus ID..."
+              placeholder="Search by Name, Faculty ID or Scopus ID..."
               value={searchQuery}
               onChange={handleSearch}
               className="search-input"
@@ -360,7 +367,7 @@ const FacultyListPage: React.FC = () => {
             <thead>
               <tr>
                 <th>Faculty ID</th>
-                <th>Scopus ID</th>
+                <th>Scopus IDs</th>
                 <th>Name</th>
                 <th>Total Documents</th>
                 <th>Filtered Documents</th>
@@ -369,15 +376,54 @@ const FacultyListPage: React.FC = () => {
             </thead>
             <tbody>
               {filteredFaculty.map(member => (
-                <tr key={member.scopus_id}>
+                <tr key={member.faculty_id}>
                   <td>{member.faculty_id || "Not Available"}</td>
-                  <td>{member.scopus_id}</td>
+                  <td>
+                    {member.scopus_ids && member.scopus_ids.length ? (
+                      <span className="scopus-ids" title={member.scopus_ids.join(", ")}>
+                        {member.scopus_ids[0]}
+                        {member.scopus_ids.length > 1 && (
+                          <span className="more-count"> {`(+${member.scopus_ids.length - 1})`}</span>
+                        )}
+                      </span>
+                    ) : (
+                      <>
+                        {scopusLoading[member.faculty_id] ? (
+                          <span>Loading...</span>
+                        ) : (
+                          <button
+                            className="fetch-ids-button"
+                            onClick={async () => {
+                              try {
+                                setScopusLoading(prev => ({ ...prev, [member.faculty_id]: true }));
+                                const res = await axios.get(`http://localhost:5001/api/faculty/${member.faculty_id}`);
+                                const returned = res.data && res.data.faculty;
+                                const ids: string[] = returned && returned.scopus_ids ? returned.scopus_ids : [];
+
+                                // Update faculty lists with the fetched ids
+                                setFaculty(prev => prev.map(f => f.faculty_id === member.faculty_id ? { ...f, scopus_ids: ids } : f));
+                                setCurrentFaculty(prev => prev.map(f => f.faculty_id === member.faculty_id ? { ...f, scopus_ids: ids } : f));
+                                setFilteredFaculty(prev => prev.map(f => f.faculty_id === member.faculty_id ? { ...f, scopus_ids: ids } : f));
+                              } catch (err) {
+                                console.error('Failed to fetch scopus ids for faculty', member.faculty_id, err);
+                                alert('Failed to fetch Scopus IDs');
+                              } finally {
+                                setScopusLoading(prev => ({ ...prev, [member.faculty_id]: false }));
+                              }
+                            }}
+                          >
+                            Fetch IDs
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </td>
                   <td>{member.name}</td>
                   <td>{member.docs_count}</td>
                   <td>{member.docs_in_timeframe !== undefined ? member.docs_in_timeframe : "N/A"}</td>
                   <td>
                     <Link
-                      to={`/faculty/${member.scopus_id}?${buildViewDetailsQuery()}`}
+                      to={`/faculty/${member.faculty_id}?${buildViewDetailsQuery()}`}
                       className="view-button"
                     >
                       View Details

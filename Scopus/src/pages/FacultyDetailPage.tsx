@@ -7,10 +7,11 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import '../components/FacultyDetailPage.css';
 
 interface Faculty {
-  scopus_id: string;
+  scopus_ids?: string[];
+  scopus_id?: string;
   name: string;
   docs_count: number;
-  faculty_id?: string;
+  faculty_id: string;
   citation_count: number;
   h_index: number;
 }
@@ -33,7 +34,8 @@ interface FacultyDetailResponse {
 }
 
 const FacultyDetailPage: React.FC = () => {
-  const { scopusId } = useParams<{ scopusId: string }>();
+  const { facultyId, scopusId } = useParams<{ facultyId?: string; scopusId?: string }>();
+  const id = facultyId || scopusId;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -102,15 +104,15 @@ const FacultyDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchFacultyDetails = async () => {
-      if (!scopusId) {
-        setError('No Scopus ID provided');
+      if (!id) {
+        setError('No faculty id provided');
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5001/api/faculty/${scopusId}`, {
+        const response = await axios.get(`http://localhost:5001/api/faculty/${id}`, {
           params: {
             sdg: sdgFilter !== "none" ? sdgFilter : undefined,
             domain: domainFilter !== "none" ? domainFilter : undefined,
@@ -125,7 +127,7 @@ const FacultyDetailPage: React.FC = () => {
         // Only fetch quartile summary if no criteria filter is applied
         if (!criteriaStartFilter && !criteriaEndFilter) {
           try {
-            const quartRes = await axios.get(`http://localhost:5001/api/faculty/${scopusId}/quartile-summary`);
+            const quartRes = await axios.get(`http://localhost:5001/api/faculty/${id}/quartile-summary`);
             const summaryData = quartRes.data || {};
             setQuartileSummaryAllYears(summaryData);
 
@@ -149,7 +151,7 @@ const FacultyDetailPage: React.FC = () => {
     };
 
     fetchFacultyDetails();
-  }, [scopusId, sdgFilter, domainFilter, yearFilter, criteriaStartFilter, criteriaEndFilter, quartileYear]);
+  }, [id, sdgFilter, domainFilter, yearFilter, criteriaStartFilter, criteriaEndFilter, quartileYear]);
 
   const yearSummary =
     quartileSummaryAllYears && quartileYear && quartileSummaryAllYears[quartileYear]
@@ -187,10 +189,11 @@ const FacultyDetailPage: React.FC = () => {
 
     yPos += 8;
     doc.setFont('helvetica', 'bold');
-    doc.text('Scopus ID:', margin, yPos);
+    const scopusText = faculty.scopus_ids && faculty.scopus_ids.length ? faculty.scopus_ids.join(', ') : faculty.scopus_id || 'N/A';
+    doc.text('Scopus ID(s):', margin, yPos);
     doc.setFont('helvetica', 'normal');
-    const idLabelWidth = doc.getTextWidth('Scopus ID:');
-    doc.text(faculty.scopus_id, margin + idLabelWidth + 2, yPos);
+    const idLabelWidth = doc.getTextWidth('Scopus ID(s):');
+    doc.text(scopusText, margin + idLabelWidth + 2, yPos);
 
     yPos += 8;
     doc.setFont('helvetica', 'bold');
@@ -334,7 +337,7 @@ const FacultyDetailPage: React.FC = () => {
           )}
 
           <h2 className="faculty-name">{faculty.name}</h2>
-          <p><strong>Scopus ID:</strong> {faculty.scopus_id}</p>
+          <p><strong>Scopus ID(s):</strong> {faculty.scopus_ids && faculty.scopus_ids.length ? faculty.scopus_ids.join(', ') : faculty.scopus_id || 'N/A'}</p>
           {faculty.faculty_id && (
             <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
           )}
@@ -376,7 +379,7 @@ const FacultyDetailPage: React.FC = () => {
 
         <div className="faculty-bottom">
           <a
-            href={`https://www.scopus.com/authid/detail.uri?authorId=${faculty.scopus_id}`}
+            href={`https://www.scopus.com/authid/detail.uri?authorId=${(faculty.scopus_ids && faculty.scopus_ids[0]) || faculty.scopus_id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="scopus-link-button"
@@ -511,7 +514,7 @@ const FacultyDetailPage: React.FC = () => {
           <h3 className="publications-title">Interactive Scopus Dashboard</h3>
           <div className="highcharts-frame-container">
             <iframe
-              src={`/highcharts_dashboards/${faculty.scopus_id}_highcharts_dashboard.html`}
+              src={`/highcharts_dashboards/${(faculty.scopus_ids && faculty.scopus_ids[0]) || faculty.scopus_id}_highcharts_dashboard.html`}
               title="Highcharts Dashboard"
               className="highcharts-iframe"
               onLoad={handleIframeLoad}
