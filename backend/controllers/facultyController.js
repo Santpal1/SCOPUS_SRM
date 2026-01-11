@@ -518,8 +518,7 @@ exports.getAuthorPerformance = (req, res) => {
                     sc.citations AS citations
                 FROM scopus_chart_data sc
                 WHERE sc.scopus_id = ?
-                  AND sc.year IN (${last5Years.join(",")})
-                ORDER BY sc.year DESC
+                ORDER BY sc.year ASC
             `
             : `
                 SELECT
@@ -529,9 +528,8 @@ exports.getAuthorPerformance = (req, res) => {
                 FROM scopus_chart_data sc
                 JOIN users u ON sc.scopus_id = u.scopus_id
                 WHERE u.faculty_id = ?
-                  AND sc.year IN (${last5Years.join(",")})
                 GROUP BY sc.year
-                ORDER BY sc.year DESC
+                ORDER BY sc.year ASC
             `;
 
         // 3️⃣ Academic year logic
@@ -590,6 +588,36 @@ exports.getAuthorPerformance = (req, res) => {
                 return res.status(500).json({ error: "Failed to fetch chart data" });
             }
 
+            // fill missing years with zeros.
+            // If client asked for full history (?full=true) return min..max inclusive; otherwise default to last 5 years.
+            const full = req.query && req.query.full === 'true';
+
+            let normalized;
+            if (full && chartResults && chartResults.length) {
+                const years = chartResults.map(r => Number(r.year));
+                const minYear = Math.min(...years);
+                const maxYear = Math.max(...years);
+                normalized = [];
+                for (let y = minYear; y <= maxYear; y++) {
+                    const found = chartResults.find(r => Number(r.year) === y);
+                    normalized.push({
+                        year: y,
+                        documents: found ? Number(found.documents) : 0,
+                        citations: found ? Number(found.citations) : 0
+                    });
+                }
+            } else {
+                // default behavior: last 5 years
+                normalized = last5Years.map(y => {
+                    const found = chartResults.find(r => Number(r.year) === y);
+                    return {
+                        year: y,
+                        documents: found ? Number(found.documents) : 0,
+                        citations: found ? Number(found.citations) : 0
+                    };
+                });
+            }
+
             // Execute academic year query
             db.query(academicYearQuery, [id], (err, academicResults) => {
                 if (err) {
@@ -625,11 +653,61 @@ exports.getAuthorPerformance = (req, res) => {
                     scopus_id: isScopus ? id : null,
                     name: facultyName,
                     h_index: facultyHIndex,
-                    chart_data: chartResults,
+                    chart_data: normalized,
                     academic_year_data: processedAcademicData,
                     consistency_status: consistencyStatus
                 });
             });
         });
+    });
+};
+
+
+// New helper endpoints to fetch raw scopus_chart_data rows (for debugging or CSV export)
+exports.getScopusChart = (req, res) => {
+    const { scopus_id } = req.params;
+
+    if (!scopus_id) {
+        return res.status(400).json({ error: 'scopus_id is required' });
+    }
+
+    const q = `
+        SELECT year, documents, citations
+        FROM scopus_chart_data
+        WHERE scopus_id = ?
+        ORDER BY year ASC
+    `;
+
+    db.query(q, [scopus_id], (err, rows) => {
+        if (err) {
+            console.error('DB Error (scopus chart):', err);
+            return res.status(500).json({ error: 'Failed to fetch scopus chart data' });
+        }
+        res.json(rows);
+    });
+};
+
+exports.getScopusChartForFaculty = (req, res) => {
+    const { facultyId } = req.params;
+
+    if (!facultyId) {
+        return res.status(400).json({ error: 'facultyId is required' });
+    }
+
+    const q = `
+        SELECT sc.year, SUM(sc.documents) AS documents, SUM(sc.citations) AS citations
+        FROM scopus_chart_data sc
+        JOIN users u ON sc.scopus_id = u.scopus_id
+        WHERE u.faculty_id = ?
+        GROUP BY sc.year
+        ORDER BY sc.year ASC
+    `;
+
+    db.query(q, [facultyId], (err, rows) => {
+        if (err) {
+            console.error('DB Error (scopus chart faculty):', err);
+            return res.status(500).json({ error: 'Failed to fetch scopus chart data for faculty' });
+        }
+        res.json(rows);
     });
 };

@@ -8,7 +8,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '', // change if needed
-    database: 'scopus',
+    database: 'scopuss',
     port: process.env.port || 3307 // default port
 });
 

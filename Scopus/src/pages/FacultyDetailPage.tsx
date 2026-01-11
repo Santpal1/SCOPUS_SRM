@@ -2,7 +2,7 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import '../components/FacultyDetailPage.css';
 
@@ -162,6 +162,163 @@ const FacultyDetailPage: React.FC = () => {
     setIframeLoaded(true);
   };
 
+  // Dynamic Highcharts rendering using backend `author-performance` data
+  const chartRef = useRef<HTMLDivElement | null>(null);
+  const [chartLoading, setChartLoading] = useState<boolean>(false);
+  const [chartError, setChartError] = useState<string | null>(null);
+  // Toggle to request full history (min..max years) from backend
+  const [fullHistory, setFullHistory] = useState<boolean>(false);
+
+  // Persist the user's preference per faculty in localStorage
+  useEffect(() => {
+    if (!id) return;
+    const key = `faculty_${id}_full_history`;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved !== null) setFullHistory(saved === 'true');
+    } catch (e) {
+      // ignore (e.g., SSR or blocked storage)
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    const key = `faculty_${id}_full_history`;
+    try {
+      localStorage.setItem(key, fullHistory ? 'true' : 'false');
+    } catch (e) {
+      // ignore
+    }
+  }, [id, fullHistory]);
+
+  const loadScript = (src: string) => new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) return resolve();
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error(`Failed to load script ${src}`));
+    document.body.appendChild(s);
+  });
+
+  useEffect(() => {
+    const renderChart = async () => {
+      if (!id) return;
+      // Only render when no filters applied and not filtering by quartile
+      if (sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none' || selectedQuartile || criteriaStartFilter || criteriaEndFilter) {
+        // Clear chart container when filters applied
+        if (chartRef.current) chartRef.current.innerHTML = '';
+        return;
+      }
+
+      setChartLoading(true);
+      setChartError(null);
+
+      try {
+        // Load Highcharts (via CDN) if not already present
+        if (!(window as any).Highcharts) {
+          await loadScript('https://code.highcharts.com/highcharts.js');
+          await loadScript('https://code.highcharts.com/modules/exporting.js');
+          await loadScript('https://code.highcharts.com/modules/export-data.js');
+          await loadScript('https://code.highcharts.com/modules/accessibility.js');
+        }
+
+        // Try faculty-level route first, fallback to scopus route
+        let res;
+        const facultyUrl = `http://localhost:5001/api/faculty/${id}/author-performance`;
+        const scopusUrl = `http://localhost:5001/api/faculty/author-performance/${id}`;
+        const requestOptions = fullHistory ? { params: { full: 'true' } } : {};
+        try {
+          try {
+            res = await axios.get(facultyUrl, requestOptions);
+          } catch (err) {
+            res = await axios.get(scopusUrl, requestOptions);
+          }
+        } catch (err) {
+          throw err;
+        }
+
+        const chartData = res.data?.chart_data || [];
+        const categories = chartData.map((r: any) => r.year);
+        const documents = chartData.map((r: any) => r.documents);
+        const citations = chartData.map((r: any) => r.citations);
+
+        // Compute xAxis label behavior for long ranges
+        const maxLabels = 12; // desired maximum visible labels on x-axis
+        const labelStep = categories.length > maxLabels ? Math.ceil(categories.length / maxLabels) : 1;
+        const xAxisOptions: any = {
+          categories,
+          crosshair: true,
+          labels: {
+            rotation: categories.length > maxLabels ? -45 : 0,
+            step: labelStep,
+          },
+          tickInterval: labelStep
+        };
+
+        // Render chart
+        const Highcharts = (window as any).Highcharts;
+        if (!Highcharts) {
+          setChartError('Highcharts not available');
+          return;
+        }
+
+        // Wait for chart container to be mounted (retry for up to 1s)
+        const waitForContainer = async (timeoutMs = 1000, intervalMs = 50) => {
+          const maxTries = Math.ceil(timeoutMs / intervalMs);
+          for (let i = 0; i < maxTries; i++) {
+            if (chartRef.current) return;
+            await new Promise(r => setTimeout(r, intervalMs));
+          }
+          throw new Error('Chart container did not appear in time');
+        };
+
+        try {
+          await waitForContainer();
+        } catch (e: any) {
+          console.warn('Chart container not available:', e);
+          setChartError('Chart container element not available');
+          return;
+        }
+
+        // Clear previous chart content (if any)
+        if (chartRef.current) {
+          chartRef.current.innerHTML = '';
+        }
+
+        Highcharts.chart(chartRef.current as any, {
+          chart: { zoomType: 'xy' },
+          title: { text: `Document and Citation Trends${fullHistory ? ' (Full history)' : ''}` },
+          xAxis: xAxisOptions,
+          yAxis: [{ // documents
+            title: { text: 'Documents' },
+            labels: { style: { color: '#3679e0' } }
+          }, { // citations
+            title: { text: 'Citations' },
+            labels: { style: { color: '#000347' } },
+            opposite: true
+          }],
+          tooltip: { shared: true, useHTML: true, headerFormat: '<b>Year: {point.key}</b><br>' },
+          series: [
+            { name: 'Documents', type: 'column', yAxis: 0, data: documents, color: '#3679e0', tooltip: { valueSuffix: ' documents' } },
+            { name: 'Citations', type: 'line', yAxis: 1, data: citations, color: '#000347', marker: { symbol: 'circle' }, tooltip: { valueSuffix: ' citations' } }
+          ],
+          credits: { enabled: false },
+          exporting: { enabled: true }
+        });
+
+        // Optionally set the iframeLoaded flag so other features can detect chart is ready
+        setIframeLoaded(true);
+      } catch (err: any) {
+        console.error('Failed to render chart:', err);
+        setChartError(err.message || 'Failed to load chart');
+      } finally {
+        setChartLoading(false);
+      }
+    };
+
+    renderChart();
+  }, [id, sdgFilter, domainFilter, yearFilter, selectedQuartile, criteriaStartFilter, criteriaEndFilter, fullHistory]);
   const generatePDF = async () => {
     if (!facultyData) {
       alert('No data to generate PDF');
@@ -278,19 +435,34 @@ const FacultyDetailPage: React.FC = () => {
     });
 
     if (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !criteriaStartFilter && !criteriaEndFilter) {
-      const iframe = document.querySelector('.highcharts-iframe') as HTMLIFrameElement;
-      const iframeDoc = iframe?.contentDocument;
+      // If dynamic chart exists, capture it via html2canvas
+      const chartElem = (document.getElementById('faculty-highcharts-container') || chartRef.current) as HTMLElement | null;
 
-      if (iframeDoc) {
-        const canvas = await html2canvas(iframeDoc.body);
-        const imgData = canvas.toDataURL('image/png');
+      if (chartElem) {
+        try {
+          const canvas = await html2canvas(chartElem);
+          const imgData = canvas.toDataURL('image/png');
 
-        if (yPos + 100 > pageHeight - margin) {
-          doc.addPage();
-          yPos = margin + 10;
+          if (yPos + 100 > pageHeight - margin) {
+            doc.addPage();
+            yPos = margin + 10;
+          }
+
+          doc.addImage(imgData, 'PNG', margin, yPos, pageWidth - margin * 2, 100);
+        } catch (err: any) {
+          console.warn('Failed to capture chart for PDF:', err);
+          // fall back to skipping the chart rather than crashing
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.text('Chart not available for export', margin, yPos);
+          yPos += 8;
         }
-
-        doc.addImage(imgData, 'PNG', margin, yPos, pageWidth - margin * 2, 100);
+      } else {
+        // No chart element — skip cleanly
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Chart not available for export', margin, yPos);
+        yPos += 8;
       }
     }
 
@@ -512,13 +684,31 @@ const FacultyDetailPage: React.FC = () => {
       {!isCriteriaFilterActive && (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
         <>
           <h3 className="publications-title">Interactive Scopus Dashboard</h3>
-          <div className="highcharts-frame-container">
-            <iframe
-              src={`/highcharts_dashboards/${(faculty.scopus_ids && faculty.scopus_ids[0]) || faculty.scopus_id}_highcharts_dashboard.html`}
-              title="Highcharts Dashboard"
-              className="highcharts-iframe"
-              onLoad={handleIframeLoad}
-            ></iframe>
+        <div className="full-history-control" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <label className="full-history-toggle" role="switch" aria-checked={fullHistory}>
+            <div className="switch">
+              <input
+                className="switch-input"
+                type="checkbox"
+                checked={fullHistory}
+                onChange={(e) => setFullHistory(e.target.checked)}
+              />
+              <span className="slider" aria-hidden="true"></span>
+            </div>
+            <span className="switch-label">Show full history</span>
+          </label>
+          {fullHistory && <small style={{ color: '#666' }}>Displaying full data range (may be large)</small>}
+        </div>
+        <div className="highcharts-frame-container">
+          <div id="faculty-highcharts-container" ref={chartRef} style={{ width: '100%', height: '420px' }}></div>
+
+            {chartLoading && (
+              <div style={{ marginTop: 8, color: '#666' }}>Loading chart...</div>
+            )}
+
+            {chartError && (
+              <div style={{ marginTop: 8, color: 'red' }}>{chartError}</div>
+            )}
           </div>
         </>
       )}

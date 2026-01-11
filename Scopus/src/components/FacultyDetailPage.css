@@ -918,17 +918,70 @@ p {
   transition: var(--transition);
 }
 
-/* Amazing gradient border animation */
-.highcharts-frame-container::before {
+/* Full history styled toggle */
+.full-history-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.full-history-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch {
+  position: relative;
+  width: 56px;
+  height: 32px;
+  display: inline-block;
+}
+
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #e6e8eb;
+  border-radius: 999px;
+  transition: background .18s ease-in-out;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.switch .slider::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--accent-color), var(--primary-color), var(--success-color));
-  background-size: 300% 100%;
-  animation: gradientShift 4s ease-in-out infinite;
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  top: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: transform .18s ease-in-out;
+}
+
+.switch-input:checked + .slider {
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.switch-input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+.switch-label {
+  font-size: 14px;
+  color: var(--text-muted, #333);
 }
 
 .highcharts-frame-container:hover {
