@@ -622,6 +622,7 @@ exports.getAuthorPerformance = (req, res) => {
 
                 res.json({
                     id,
+                    scopus_id: isScopus ? id : null,
                     name: facultyName,
                     h_index: facultyHIndex,
                     chart_data: chartResults,
