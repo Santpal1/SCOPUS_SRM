@@ -383,3 +383,343 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* Enhanced Add Author Modal Styles */
+.addAuthorModal {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 540px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.addAuthorHeader {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 32px 32px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.addAuthorHeader::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.addAuthorIconWrapper {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  margin-bottom: 16px;
+}
+
+.addAuthorIcon {
+  font-size: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.addAuthorTitle {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.addAuthorSubtitle {
+  font-size: 14px;
+  opacity: 0.95;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
+}
+
+.addAuthorForm {
+  padding: 32px;
+}
+
+.addAuthorFormGroup {
+  margin-bottom: 24px;
+}
+
+.addAuthorLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+.labelIcon {
+  font-size: 18px;
+}
+
+.required {
+  color: #e53e3e;
+  font-weight: 700;
+}
+
+.addAuthorInput {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #2d3748;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.addAuthorInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.addAuthorInput:disabled {
+  background: #f7fafc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.addAuthorInput::placeholder {
+  color: #a0aec0;
+}
+
+.inputHint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inputHint::before {
+  content: 'ℹ️';
+  font-size: 14px;
+}
+
+.addAuthorError {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border: 1px solid #fc8181;
+  border-radius: 12px;
+  color: #c53030;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.errorIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.addAuthorSuccess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+  border: 1px solid #68d391;
+  border-radius: 12px;
+  color: #2f855a;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.successIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  background: #2f855a;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.addAuthorFooter {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.addAuthorCancelButton {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.addAuthorCancelButton:hover:not(:disabled) {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.addAuthorCancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addAuthorSubmitButton {
+  flex: 2;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  font-family: inherit;
+}
+
+.addAuthorSubmitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.addAuthorSubmitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.addAuthorSubmitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.addAuthorSubmitButton.submitting {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .addAuthorModal {
+    max-width: 95%;
+    margin: 20px;
+    max-height: 95vh;
+  }
+
+  .addAuthorHeader {
+    padding: 32px 24px 24px;
+  }
+
+  .addAuthorIcon {
+    width: 80px;
+    height: 80px;
+    font-size: 44px;
+  }
+
+  .addAuthorTitle {
+    font-size: 24px;
+  }
+
+  .addAuthorForm {
+    padding: 24px;
+  }
+
+  .addAuthorFooter {
+    flex-direction: column;
+  }
+
+  .addAuthorCancelButton,
+  .addAuthorSubmitButton {
+    flex: 1;
+  }
+}

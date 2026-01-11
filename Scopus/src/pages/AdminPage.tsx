@@ -23,6 +23,19 @@ const AdminPage: React.FC = () => {
   const [quartileUploading, setQuartileUploading] = useState(false);
   const [scivalFile, setScivalFile] = useState<File | null>(null);
   const [scivalUploading, setScivalUploading] = useState(false);
+  
+  // Add Author state
+  const [addAuthorModalOpen, setAddAuthorModalOpen] = useState(false);
+  const [authorName, setAuthorName] = useState("");
+  const [scopusId, setScopusId] = useState("");
+  const [facultyId, setFacultyId] = useState("");
+  const [email, setEmail] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [mobileNo, setMobileNo] = useState("");
+  const [doj, setDoj] = useState("");
+  const [addingAuthor, setAddingAuthor] = useState(false);
+  const [authorFormError, setAuthorFormError] = useState("");
+  const [authorFormSuccess, setAuthorFormSuccess] = useState("");
 
   const logsEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -87,7 +100,7 @@ const AdminPage: React.FC = () => {
 
         // Update progress tracking
         if (typeof data.progress === "number") {
-          setProgress(data.progress / 100); // Convert percentage to decimal
+          setProgress(data.progress / 100);
         }
         
         if (typeof data.processed === "number") {
@@ -96,7 +109,6 @@ const AdminPage: React.FC = () => {
         
         if (typeof data.total === "number") {
           setTotalCount(data.total);
-          // Calculate progress from processed/total if not explicitly provided
           if (data.progress === undefined && data.total > 0) {
             setProgress(data.processed / data.total);
           }
@@ -143,9 +155,7 @@ const AdminPage: React.FC = () => {
     xhr.setRequestHeader("Accept", "text/event-stream");
 
     xhr.onreadystatechange = () => {
-      // Ignore non-streaming states
       if (xhr.readyState !== 3 && xhr.readyState !== 4) return;
-      // Parse SSE lines
       const lines = xhr.responseText.split("\n").filter(Boolean);
       for (const line of lines) {
         if (line.startsWith("data:")) {
@@ -218,6 +228,113 @@ const AdminPage: React.FC = () => {
     };
 
     xhr.send(formData);
+  };
+
+  const openAddAuthorModal = () => {
+    setAddAuthorModalOpen(true);
+    setAuthorName("");
+    setScopusId("");
+    setFacultyId("");
+    setEmail("");
+    setDesignation("");
+    setMobileNo("");
+    setDoj("");
+    setAuthorFormError("");
+    setAuthorFormSuccess("");
+  };
+
+  const closeAddAuthorModal = () => {
+    if (!addingAuthor) {
+      setAddAuthorModalOpen(false);
+      setAuthorName("");
+      setScopusId("");
+      setFacultyId("");
+      setEmail("");
+      setDesignation("");
+      setMobileNo("");
+      setDoj("");
+      setAuthorFormError("");
+      setAuthorFormSuccess("");
+    }
+  };
+
+  const handleAddAuthor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthorFormError("");
+    setAuthorFormSuccess("");
+
+    if (!authorName.trim() || !scopusId.trim() || !facultyId.trim() || !email.trim() || !designation.trim() || !mobileNo.trim() || !doj.trim()) {
+      setAuthorFormError("Please fill in all fields");
+      return;
+    }
+
+    if (!/^\d+$/.test(scopusId.trim()) || scopusId.trim().length !== 11) {
+      setAuthorFormError("Scopus ID should contain only numbers and be exactly 11 characters long");
+      return;
+    }
+
+    if (facultyId.trim().length !== 6) {
+      setAuthorFormError("Faculty ID should be exactly 6 characters long");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setAuthorFormError("Please enter a valid email address");
+      return;
+    }
+
+    if (!email.trim().endsWith("@srmist.edu.in")) {
+      setAuthorFormError("Email must end with @srmist.edu.in");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(mobileNo.trim())) {
+      setAuthorFormError("Mobile number must be exactly 10 digits");
+      return;
+    }
+
+    setAddingAuthor(true);
+
+    try {
+      const response = await fetch("http://localhost:5001/admin/add-author", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: authorName.trim(),
+          scopus_id: scopusId.trim(),
+          faculty_id: facultyId.trim(),
+          email: email.trim(),
+          designation: designation.trim(),
+          mobile_no: mobileNo.trim(),
+          doj: doj.trim(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setAuthorFormSuccess(`✓ Author "${authorName}" added successfully!`);
+        setAuthorName("");
+        setScopusId("");
+        setFacultyId("");
+        setEmail("");
+        setDesignation("");
+        setMobileNo("");
+        setDoj("");
+        setTimeout(() => {
+          closeAddAuthorModal();
+        }, 2000);
+      } else {
+        setAuthorFormError(result.error || "Failed to add author");
+      }
+    } catch (error) {
+      setAuthorFormError("Network error. Please try again.");
+      console.error("Add author error:", error);
+    } finally {
+      setAddingAuthor(false);
+    }
   };
 
   const closeModal = () => {
@@ -299,6 +416,19 @@ const AdminPage: React.FC = () => {
             {scivalUploading ? "Uploading..." : "Upload Scival CSV"}
           </button>
         </div>
+
+        <div className={styles.actionCard}>
+          <div className={styles.cardIcon}>➕</div>
+          <h3>Add New Author</h3>
+          <p>Add a new faculty member with their Scopus ID</p>
+          <button
+            onClick={openAddAuthorModal}
+            disabled={loading}
+            className={styles.actionButton}
+          >
+            Add Author
+          </button>
+        </div>
       </div>
 
       {modalOpen && (
@@ -324,7 +454,6 @@ const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Show processed/total counts for Scopus scraper */}
             {currentOperation === "Scopus Scraping" && totalCount > 0 && (
               <div className={styles.progressStats}>
                 <div className={styles.statItem}>
@@ -371,6 +500,192 @@ const AdminPage: React.FC = () => {
                 {loading ? 'Operation in Progress...' : 'Close'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {addAuthorModalOpen && (
+        <div className={styles.modalOverlay} onClick={(e) => {
+          if (e.target === e.currentTarget) closeAddAuthorModal();
+        }}>
+          <div className={styles.addAuthorModal}>
+            <div className={styles.addAuthorHeader}>
+              <div className={styles.addAuthorIconWrapper}>
+                <div className={styles.addAuthorIcon}>👤</div>
+              </div>
+              <h2 className={styles.addAuthorTitle}>Add New Author</h2>
+              <p className={styles.addAuthorSubtitle}>Enter the author's details to add them to the database</p>
+            </div>
+
+            <form onSubmit={handleAddAuthor} className={styles.addAuthorForm}>
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="authorName" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>📝</span>
+                  <span>Full Name</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="authorName"
+                  type="text"
+                  value={authorName}
+                  onChange={(e) => setAuthorName(e.target.value)}
+                  placeholder="Dr. Jane Smith"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                  autoFocus
+                />
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="scopusId" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>🔢</span>
+                  <span>Scopus ID</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="scopusId"
+                  type="text"
+                  value={scopusId}
+                  onChange={(e) => setScopusId(e.target.value)}
+                  placeholder="57123456789"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                />
+                <p className={styles.inputHint}>Enter 11-digit numeric Scopus ID only</p>
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="facultyId" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>🆔</span>
+                  <span>Faculty ID</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="facultyId"
+                  type="text"
+                  value={facultyId}
+                  onChange={(e) => setFacultyId(e.target.value)}
+                  placeholder="FAC001"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                />
+                <p className={styles.inputHint}>Enter 6-character faculty identifier</p>
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="email" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>📧</span>
+                  <span>Email</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="jane.smith@srmist.edu.in"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                />
+                <p className={styles.inputHint}>Enter valid @srmist.edu.in email address</p>
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="designation" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>👔</span>
+                  <span>Designation</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="designation"
+                  type="text"
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  placeholder="Associate Professor"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                />
+                <p className={styles.inputHint}>e.g., Professor, Assistant Professor, etc.</p>
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="mobileNo" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>📱</span>
+                  <span>Mobile Number</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="mobileNo"
+                  type="tel"
+                  value={mobileNo}
+                  onChange={(e) => setMobileNo(e.target.value)}
+                  placeholder="9876543210"
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                  maxLength={10}
+                />
+                <p className={styles.inputHint}>Enter 10-digit mobile number without country code</p>
+              </div>
+
+              <div className={styles.addAuthorFormGroup}>
+                <label htmlFor="doj" className={styles.addAuthorLabel}>
+                  <span className={styles.labelIcon}>📅</span>
+                  <span>Date of Joining</span>
+                  <span className={styles.required}>*</span>
+                </label>
+                <input
+                  id="doj"
+                  type="date"
+                  value={doj}
+                  onChange={(e) => setDoj(e.target.value)}
+                  disabled={addingAuthor}
+                  className={styles.addAuthorInput}
+                />
+                <p className={styles.inputHint}>Select the date when the faculty member joined</p>
+              </div>
+
+              {authorFormError && (
+                <div className={styles.addAuthorError}>
+                  <span className={styles.errorIcon}>⚠️</span>
+                  <span>{authorFormError}</span>
+                </div>
+              )}
+
+              {authorFormSuccess && (
+                <div className={styles.addAuthorSuccess}>
+                  <span className={styles.successIcon}>✓</span>
+                  <span>{authorFormSuccess}</span>
+                </div>
+              )}
+
+              <div className={styles.addAuthorFooter}>
+                <button
+                  type="button"
+                  onClick={closeAddAuthorModal}
+                  disabled={addingAuthor}
+                  className={styles.addAuthorCancelButton}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingAuthor || !authorName.trim() || !scopusId.trim() || !facultyId.trim() || !email.trim() || !designation.trim() || !mobileNo.trim()}
+                  className={`${styles.addAuthorSubmitButton} ${addingAuthor ? styles.submitting : ''}`}
+                >
+                  {addingAuthor ? (
+                    <>
+                      <span className={styles.spinner}></span>
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>➕</span>
+                      <span>Add Author</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
