@@ -221,6 +221,7 @@ exports.getFacultyDetails = (req, res) => {
 
                     // Merge aggregated metrics into faculty object so front-end shows faculty-level totals
                     const faculty = {
+                        name: facultyResults[0].faculty_name,
                         ...facultyResults[0],
                         scopus_ids: scopusArr,
                         citation_count: idRows?.[0]?.citation_count || facultyResults[0].citations || 0,

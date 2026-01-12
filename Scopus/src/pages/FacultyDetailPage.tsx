@@ -319,155 +319,302 @@ const FacultyDetailPage: React.FC = () => {
 
     renderChart();
   }, [id, sdgFilter, domainFilter, yearFilter, selectedQuartile, criteriaStartFilter, criteriaEndFilter, fullHistory]);
+
   const generatePDF = async () => {
+    console.log('Generate PDF button clicked');
+
     if (!facultyData) {
       alert('No data to generate PDF');
       return;
     }
 
-    const { faculty, papers } = facultyData;
-    const doc = new jsPDF('portrait', 'mm', 'a4');
-    const margin = 10;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    try {
+      const { faculty, papers } = facultyData;
+      const doc = new jsPDF('portrait', 'mm', 'a4');
+      const margin = 10;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
-    let yPos = margin + 15;
+      let yPos = margin + 15;
 
-    doc.setFontSize(18);
-    doc.setFont('times', 'bold');
-    doc.text('FACULTY REPORT', pageWidth / 2, margin + 5, { align: 'center' });
+      // Header
+      doc.setFontSize(18);
+      doc.setFont('times', 'bold');
+      doc.text('FACULTY REPORT', pageWidth / 2, margin + 5, { align: 'center' });
 
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Name:', margin, yPos);
-    doc.setFont('helvetica', 'normal');
-    const nameLabelWidth = doc.getTextWidth('Name:');
-    doc.text(faculty.name, margin + nameLabelWidth + 2, yPos);
+      // Faculty Information
+      doc.setFontSize(12);
+      yPos = margin + 20;
 
-    yPos += 8;
-    doc.setFont('helvetica', 'bold');
-    const scopusText = faculty.scopus_ids && faculty.scopus_ids.length ? faculty.scopus_ids.join(', ') : faculty.scopus_id || 'N/A';
-    doc.text('Scopus ID(s):', margin, yPos);
-    doc.setFont('helvetica', 'normal');
-    const idLabelWidth = doc.getTextWidth('Scopus ID(s):');
-    doc.text(scopusText, margin + idLabelWidth + 2, yPos);
-
-    yPos += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Documents Published:', margin, yPos);
-    doc.setFont('helvetica', 'normal');
-    const docsLabelWidth = doc.getTextWidth('Documents Published:');
-    doc.text(faculty.docs_count.toString(), margin + docsLabelWidth + 4, yPos);
-
-    yPos += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Citations:', margin, yPos);
-    doc.setFont('helvetica', 'normal');
-    const citeLabelWidth = doc.getTextWidth('Citations:');
-    doc.text(faculty.citation_count.toString(), margin + citeLabelWidth + 2, yPos);
-
-    yPos += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.text('H-Index:', margin, yPos);
-    doc.setFont('helvetica', 'normal');
-    const hindexLabelWidth = doc.getTextWidth('H-Index:');
-    doc.text((faculty.h_index ?? 'N/A').toString(), margin + hindexLabelWidth + 2, yPos);
-
-    const filterLines: string[] = [];
-    if (sdgFilter !== 'none') filterLines.push(`SDG: ${sdgFilter}`);
-    if (domainFilter !== 'none') filterLines.push(`Domain: ${domainFilter}`);
-    if (yearFilter !== 'none') filterLines.push(`Year: ${yearFilter}`);
-    if (criteriaStartFilter && criteriaEndFilter) filterLines.push(`Date Range: ${criteriaStartFilter} to ${criteriaEndFilter}`);
-
-    if (filterLines.length > 0) {
-      yPos += 10;
+      // Name
       doc.setFont('helvetica', 'bold');
-      doc.text('Filters Applied:', margin, yPos);
+      doc.text('Name:', margin, yPos);
       doc.setFont('helvetica', 'normal');
-      doc.text(filterLines.join(' | '), margin + doc.getTextWidth('Filters Applied:') + 4, yPos);
-    }
+      const facultyName = String(faculty.name || 'N/A');
+      doc.text(facultyName, margin + 20, yPos);
+      yPos += 8;
 
-    yPos += 12;
+      // Scopus ID(s) - Handle multiple IDs
+      doc.setFont('helvetica', 'bold');
+      // Check if faculty has scopus_ids array or single scopus_id
+      const hasScopusIds = (faculty as any).scopus_ids && Array.isArray((faculty as any).scopus_ids);
+      const scopusLabel = hasScopusIds ? 'Scopus IDs:' : 'Scopus ID:';
+      doc.text(scopusLabel, margin, yPos);
+      doc.setFont('helvetica', 'normal');
 
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Publications', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 10;
-
-    const cleanText = (text: string | null | undefined) => text?.replace(/[^ -~]+/g, '') || 'N/A';
-
-    papers.forEach((paper, index) => {
-      if (yPos + 40 > pageHeight - margin) {
-        doc.addPage();
-        yPos = margin + 10;
+      if (hasScopusIds) {
+        // Multiple Scopus IDs
+        const scopusIds = (faculty as any).scopus_ids.join(', ');
+        const scopusIdLines = doc.splitTextToSize(scopusIds, pageWidth - margin * 2 - 30);
+        let scopusYPos = yPos;
+        scopusIdLines.forEach((line: string) => {
+          doc.text(line, margin + 30, scopusYPos);
+          scopusYPos += 5;
+        });
+        yPos = scopusYPos + 3;
+      } else {
+        // Single Scopus ID
+        doc.text(String(faculty.scopus_id || 'N/A'), margin + 30, yPos);
+        yPos += 8;
       }
 
-      const pubHeader = `Publication ${index + 1}`;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(pubHeader, margin, yPos);
-      doc.line(margin, yPos + 1, margin + doc.getTextWidth(pubHeader), yPos + 1);
-
-      yPos += 5;
-      doc.setFontSize(10);
-
-      const writeLine = (label: string, value: string) => {
+      // Faculty ID (if exists)
+      if (faculty.faculty_id) {
         doc.setFont('helvetica', 'bold');
-        doc.text(label, margin, yPos);
+        doc.text('Faculty ID:', margin, yPos);
         doc.setFont('helvetica', 'normal');
-        doc.text(value, margin + doc.getTextWidth(label) + 2, yPos);
-        yPos += 5;
+        doc.text(String(faculty.faculty_id), margin + 30, yPos);
+        yPos += 8;
+      }
+
+      // Documents Published
+      doc.setFont('helvetica', 'bold');
+      doc.text('Documents Published:', margin, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(String(faculty.docs_count || 0), margin + 60, yPos);
+      yPos += 8;
+
+      // Citations
+      doc.setFont('helvetica', 'bold');
+      doc.text('Citations:', margin, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(String(faculty.citation_count || 0), margin + 30, yPos);
+      yPos += 8;
+
+      // H-Index
+      doc.setFont('helvetica', 'bold');
+      doc.text('H-Index:', margin, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(String(faculty.h_index ?? 'N/A'), margin + 25, yPos);
+      yPos += 10;
+
+      // Applied Filters
+      const filterLines: string[] = [];
+      if (sdgFilter !== 'none') filterLines.push(`SDG: ${sdgFilter}`);
+      if (domainFilter !== 'none') filterLines.push(`Domain: ${domainFilter}`);
+      if (yearFilter !== 'none') filterLines.push(`Year: ${yearFilter}`);
+      if (criteriaStartFilter && criteriaEndFilter) {
+        filterLines.push(`Date Range: ${criteriaStartFilter} to ${criteriaEndFilter}`);
+      }
+
+      if (filterLines.length > 0) {
+        doc.setFont('helvetica', 'bold');
+        doc.text('Filters Applied:', margin, yPos);
+        yPos += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        const filterText = filterLines.join(' | ');
+        const filterTextLines = doc.splitTextToSize(filterText, pageWidth - margin * 2);
+        filterTextLines.forEach((line: string) => {
+          doc.text(line, margin, yPos);
+          yPos += 5;
+        });
+        doc.setFontSize(12);
+        yPos += 2;
+      }
+
+      yPos += 6;
+
+      // Publications Section Header
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Publications', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+
+      const cleanText = (text: string | null | undefined): string => {
+        if (!text) return 'N/A';
+        return String(text).replace(/[^\x20-\x7E]/g, '').trim() || 'N/A';
       };
 
-      const title = cleanText(paper.title);
-      const titleLines = doc.splitTextToSize(title, pageWidth - margin * 2 - 20);
-      writeLine('Title:', titleLines[0]);
-      for (let i = 1; i < titleLines.length; i++) {
-        doc.text(titleLines[i], margin + 20, yPos);
+      // Add each publication
+      papers.forEach((paper, index) => {
+        // Check if we need a new page
+        if (yPos + 50 > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin + 10;
+        }
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Publication ${index + 1}`, margin, yPos);
+        yPos += 6;
+
+        doc.setFontSize(10);
+
+        // Title
+        doc.setFont('helvetica', 'bold');
+        doc.text('Title:', margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        const titleText = cleanText(paper.title);
+        const titleLines = doc.splitTextToSize(titleText, pageWidth - margin * 2 - 20);
+        let titleYPos = yPos;
+        titleLines.forEach((line: string) => {
+          doc.text(line, margin + 20, titleYPos);
+          titleYPos += 5;
+        });
+        yPos = titleYPos;
+
+        // DOI
+        if (yPos + 10 > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin + 10;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.text('DOI:', margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.text(cleanText(paper.doi), margin + 20, yPos);
         yPos += 5;
-      }
 
-      writeLine('DOI:', cleanText(paper.doi));
-      writeLine('Type:', cleanText(paper.type));
-      writeLine('Publication:', cleanText(paper.publication_name));
-      writeLine('Date:', paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A');
-      yPos += 5;
-    });
+        // Type
+        if (yPos + 10 > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin + 10;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.text('Type:', margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        doc.text(cleanText(paper.type), margin + 20, yPos);
+        yPos += 5;
 
-    if (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !criteriaStartFilter && !criteriaEndFilter) {
-      // If dynamic chart exists, capture it via html2canvas
-      const chartElem = (document.getElementById('faculty-highcharts-container') || chartRef.current) as HTMLElement | null;
+        // Publication Name
+        if (yPos + 10 > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin + 10;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.text('Publication:', margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        const pubNameText = cleanText(paper.publication_name);
+        const pubNameLines = doc.splitTextToSize(pubNameText, pageWidth - margin * 2 - 35);
+        let pubYPos = yPos;
+        pubNameLines.forEach((line: string) => {
+          doc.text(line, margin + 35, pubYPos);
+          pubYPos += 5;
+        });
+        yPos = pubYPos;
 
-      if (chartElem) {
-        try {
-          const canvas = await html2canvas(chartElem);
-          const imgData = canvas.toDataURL('image/png');
+        // Date
+        if (yPos + 10 > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin + 10;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.text('Date:', margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        const dateText = paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A';
+        doc.text(dateText, margin + 20, yPos);
+        yPos += 5;
 
-          if (yPos + 100 > pageHeight - margin) {
+        // Quartile (if available)
+        if (paper.quartiles && Object.keys(paper.quartiles).length > 0) {
+          if (yPos + 10 > pageHeight - margin) {
             doc.addPage();
             yPos = margin + 10;
           }
+          const quartileText = Object.entries(paper.quartiles)
+            .filter(([_, q]) => q && String(q).trim() !== '-')
+            .map(([year, q]) => `${String(q).toUpperCase()} (${year})`)
+            .join(', ');
 
-          doc.addImage(imgData, 'PNG', margin, yPos, pageWidth - margin * 2, 100);
-        } catch (err: any) {
-          console.warn('Failed to capture chart for PDF:', err);
-          // fall back to skipping the chart rather than crashing
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'normal');
-          doc.text('Chart not available for export', margin, yPos);
-          yPos += 8;
+          if (quartileText) {
+            doc.setFont('helvetica', 'bold');
+            doc.text('Quartile:', margin, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(quartileText, margin + 28, yPos);
+            yPos += 5;
+          }
         }
-      } else {
-        // No chart element — skip cleanly
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Chart not available for export', margin, yPos);
-        yPos += 8;
-      }
-    }
 
-    const fileName = `${faculty.name.replace(/\s+/g, "_")}_Report.pdf`;
-    doc.save(fileName);
+        yPos += 8; // Space between publications
+      });
+
+      // Add chart if no filters applied
+      if (sdgFilter === 'none' &&
+        domainFilter === 'none' &&
+        yearFilter === 'none' &&
+        !criteriaStartFilter &&
+        !criteriaEndFilter) {
+
+        const iframe = document.querySelector('.highcharts-iframe') as HTMLIFrameElement;
+
+        if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+          try {
+            console.log('Attempting to capture iframe chart...');
+
+            doc.addPage();
+            yPos = margin + 10;
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Document and Citation Trends', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 12;
+
+            // Wait for iframe to be fully loaded
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const canvas = await html2canvas(iframe.contentDocument.body, {
+              scale: 2,
+              logging: true,
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              width: iframe.contentDocument.body.scrollWidth,
+              height: iframe.contentDocument.body.scrollHeight
+            });
+
+            console.log('Chart canvas created:', canvas.width, 'x', canvas.height);
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = pageWidth - margin * 2;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            const maxHeight = pageHeight - yPos - margin - 10;
+            const finalHeight = Math.min(imgHeight, maxHeight);
+
+            doc.addImage(imgData, 'PNG', margin, yPos, imgWidth, finalHeight);
+            console.log('Chart added to PDF successfully');
+          } catch (err: any) {
+            console.error('Failed to capture chart for PDF:', err);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'italic');
+            doc.text('Chart could not be captured', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 6;
+            doc.text(`Error: ${err.message}`, pageWidth / 2, yPos, { align: 'center' });
+          }
+        } else {
+          console.warn('Iframe or iframe content not found');
+        }
+      }
+
+      // Generate filename and save
+      const fileName = `${facultyName.replace(/[^a-zA-Z0-9]/g, '_')}_Faculty_Report.pdf`;
+      console.log('Saving PDF:', fileName);
+      doc.save(fileName);
+      console.log('PDF generated successfully!');
+
+    } catch (error: any) {
+      console.error('Error generating PDF:', error);
+      alert(`Failed to generate PDF: ${error.message || 'Unknown error'}`);
+    }
   };
 
   if (loading) return <div className="loading">Loading faculty details...</div>;
@@ -684,23 +831,23 @@ const FacultyDetailPage: React.FC = () => {
       {!isCriteriaFilterActive && (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
         <>
           <h3 className="publications-title">Interactive Scopus Dashboard</h3>
-        <div className="full-history-control" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <label className="full-history-toggle" role="switch" aria-checked={fullHistory}>
-            <div className="switch">
-              <input
-                className="switch-input"
-                type="checkbox"
-                checked={fullHistory}
-                onChange={(e) => setFullHistory(e.target.checked)}
-              />
-              <span className="slider" aria-hidden="true"></span>
-            </div>
-            <span className="switch-label">Show full history</span>
-          </label>
-          {fullHistory && <small style={{ color: '#666' }}>Displaying full data range (may be large)</small>}
-        </div>
-        <div className="highcharts-frame-container">
-          <div id="faculty-highcharts-container" ref={chartRef} style={{ width: '100%', height: '420px' }}></div>
+          <div className="full-history-control" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label className="full-history-toggle" role="switch" aria-checked={fullHistory}>
+              <div className="switch">
+                <input
+                  className="switch-input"
+                  type="checkbox"
+                  checked={fullHistory}
+                  onChange={(e) => setFullHistory(e.target.checked)}
+                />
+                <span className="slider" aria-hidden="true"></span>
+              </div>
+              <span className="switch-label">Show full history</span>
+            </label>
+            {fullHistory && <small style={{ color: '#666' }}>Displaying full data range (may be large)</small>}
+          </div>
+          <div className="highcharts-frame-container">
+            <div id="faculty-highcharts-container" ref={chartRef} style={{ width: '100%', height: '420px' }}></div>
 
             {chartLoading && (
               <div style={{ marginTop: 8, color: '#666' }}>Loading chart...</div>
