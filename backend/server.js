@@ -16,6 +16,7 @@ app.use('/api/insights', require('./routes/insights'));
 app.use('/api', require('./routes/sdg'));
 app.use('/api', require('./routes/homeStats'));
 app.use("/admin", require('./routes/admin.routes'));
+app.use('/api', require('./routes/monthlyReport'));
 
 
 

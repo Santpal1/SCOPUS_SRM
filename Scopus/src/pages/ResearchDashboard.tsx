@@ -501,8 +501,16 @@ export default function ResearchDashboard() {
             Go to Analytics Dashboard
           </button>
           <button
-            className={style.performanceBtn} onClick={() => navigate("/author-performance")}>
+            className={style.performanceBtn}
+            onClick={() => navigate("/author-performance")}
+          >
             Author Yearly Performance
+          </button>
+          <button
+            className={style.monthlyReportBtn}
+            onClick={() => navigate("/monthly-report")}
+          >
+            Monthly Faculty Report
           </button>
         </div>
       </div>

@@ -381,7 +381,8 @@ body {
 
 .facultyBtn,
 .analyticsBtn,
-.performanceBtn {
+.performanceBtn,
+.monthlyReportBtn {
     padding: 12px 24px;
     font-size: 18px;
     background: linear-gradient(135deg, #1A4D6C, #163b4d);
@@ -394,7 +395,8 @@ body {
 
 .facultyBtn:hover,
 .analyticsBtn:hover,
-.performanceBtn:hover {
+.performanceBtn:hover,
+.monthlyReportBtn:hover {
     transform: translateY(-4px) scale(1.05);
     background: linear-gradient(135deg, #163b4d, #1A4D6C);
 }
@@ -416,7 +418,8 @@ body {
 
     .facultyBtn,
     .analyticsBtn,
-    .performanceBtn {
+    .performanceBtn,
+    .monthlyReportBtn {
         width: 100%;
     }
 }

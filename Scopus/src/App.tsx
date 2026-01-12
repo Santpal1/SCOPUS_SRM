@@ -11,6 +11,7 @@ import ResearchDashboard from "./pages/ResearchDashboard";
 import AdminPage from "./pages/AdminPage";
 import AuthorPerformance from "./pages/AuthorPerformance";
 import AuthorPerformanceDetail from "./pages/AuthorPerformanceDetails";
+import MonthlyReport from "./pages/MonthlyReport";
 
 const App: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ const App: React.FC = () => {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/author-performance" element={<AuthorPerformance />} />
         <Route path="/author-performance/:scopus_id" element={<AuthorPerformanceDetail />}/>
+        <Route path="/monthly-report" element={<MonthlyReport />} />
       </Routes>
   );
 };
