@@ -55,28 +55,39 @@ const AdminPage: React.FC = () => {
     setModalOpen(true);
     setCurrentOperation("Data Refresh");
 
+    // Add initial log
+    setLogs([{ status: "INFO", message: "Starting Monthly Data Refresh...", time: new Date().toLocaleTimeString() }]);
+
     const eventSource = new EventSource("http://localhost:5001/admin/run-refresh-stream");
+
+    eventSource.onopen = () => {
+      console.log("SSE connection established for Data Refresh");
+      setLogs((prev) => [...prev, { status: "INFO", message: "Connected to server", time: new Date().toLocaleTimeString() }]);
+    };
 
     eventSource.onmessage = (event) => {
       try {
         const data: ProgressEntry = JSON.parse(event.data);
-        setLogs((prev) => [...prev, data]);
+        console.log("Received data:", data);
+        setLogs((prev) => [...prev, { ...data, time: data.time || new Date().toLocaleTimeString() }]);
 
         if (typeof data.progress === "number") {
           setProgress(data.progress);
         }
 
-        if (data.status === "COMPLETE") {
+        if (data.status === "COMPLETE" || data.status === "FAILED") {
           setLoading(false);
           eventSource.close();
         }
       } catch (err) {
         console.error("Invalid SSE data:", event.data);
+        setLogs((prev) => [...prev, { status: "ERROR", message: `Parse error: ${event.data}`, time: new Date().toLocaleTimeString() }]);
       }
     };
 
-    eventSource.onerror = () => {
-      console.error("SSE connection error");
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+      setLogs((prev) => [...prev, { status: "ERROR", message: "Connection lost. Please check if the server is running.", time: new Date().toLocaleTimeString() }]);
       setLoading(false);
       eventSource.close();
     };
@@ -565,7 +576,7 @@ const AdminPage: React.FC = () => {
                   type="text"
                   value={facultyId}
                   onChange={(e) => setFacultyId(e.target.value)}
-                  placeholder="FAC001"
+                  placeholder="124477"
                   disabled={addingAuthor}
                   className={styles.addAuthorInput}
                 />

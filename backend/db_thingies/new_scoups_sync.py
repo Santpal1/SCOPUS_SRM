@@ -26,6 +26,7 @@ def log_progress(status, progress=None, details=None):
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     print(json.dumps(entry, ensure_ascii=False), flush=True)
 
+
 def clear_progress_log():
     if os.path.exists(LOG_FILE):
         os.remove(LOG_FILE)
@@ -36,14 +37,16 @@ def load_config():
     with open("./config.json") as f:
         return json.load(f)
 
+
 def connect_to_database():
     return mysql.connector.connect(
         host="localhost",
         user="root",
         password="",
         database="scopuss",
-        port=3306
+        port=3307
     )
+
 
 def initialize_elsclient(config):
     return ElsClient(config["apikey"])
@@ -61,9 +64,6 @@ def clean_scopus_id(val):
 # ---------- DB QUERIES ----------
 
 def get_existing_papers(cursor):
-    """
-    {(faculty_id, doi)}
-    """
     cursor.execute("SELECT scopus_id, doi FROM papers")
     existing = set()
     for sid, doi in cursor.fetchall():
@@ -71,10 +71,8 @@ def get_existing_papers(cursor):
             existing.add((sid, doi))
     return existing
 
+
 def get_faculty_scopus_map(cursor):
-    """
-    { faculty_id: [scopus_id1, scopus_id2, ...] }
-    """
     cursor.execute("""
         SELECT faculty_id, scopus_id
         FROM users
@@ -108,7 +106,109 @@ def insert_paper(cursor, scopus_id, doi, title, pub_type, pub_name, date, author
         *authors[:6], *affiliations[:3]
     ))
 
-# ---------- MAIN ----------
+# ---------- MONTHLY AUTHOR REPORT ----------
+
+def get_previous_month():
+    today = datetime.today()
+    year = today.year
+    month = today.month - 1
+    if month == 0:
+        month = 12
+        year -= 1
+    return year, month
+
+
+def get_last_snapshot(cursor, scopus_id):
+    cursor.execute("""
+        SELECT total_docs, total_citations
+        FROM monthly_author_report
+        WHERE scopus_id = %s
+        ORDER BY report_year DESC, report_month DESC
+        LIMIT 1
+    """, (scopus_id,))
+    row = cursor.fetchone()
+    if row:
+        return int(row[0]), int(row[1])
+    return 0, 0
+
+
+def insert_monthly_report(
+    cursor, conn,
+    scopus_id, faculty_id,
+    year, month,
+    docs_added, citations_added,
+    total_docs, total_citations
+):
+    cursor.execute("""
+        INSERT INTO monthly_author_report
+        (scopus_id, faculty_id, report_year, report_month,
+         docs_added, citations_added,
+         total_docs, total_citations)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            docs_added = VALUES(docs_added),
+            citations_added = VALUES(citations_added),
+            total_docs = VALUES(total_docs),
+            total_citations = VALUES(total_citations)
+    """, (
+        scopus_id, faculty_id,
+        year, month,
+        docs_added, citations_added,
+        total_docs, total_citations
+    ))
+    conn.commit()
+
+
+def generate_monthly_author_report(cursor, conn):
+    report_year, report_month = get_previous_month()
+    log_progress(
+        f"Generating monthly author report for {report_month}/{report_year}",
+        0.95
+    )
+
+    cursor.execute("""
+        SELECT faculty_id, scopus_id, docs_count, citations
+        FROM users
+        WHERE scopus_id IS NOT NULL
+    """)
+    authors = cursor.fetchall()
+
+    total = len(authors)
+    processed = 0
+
+    for faculty_id, scopus_id, docs_count, citations in authors:
+        if not scopus_id:
+            continue
+
+        docs_count = int(docs_count or 0)
+        citations = int(citations or 0)
+
+        last_docs, last_citations = get_last_snapshot(cursor, scopus_id)
+
+        docs_added = max(docs_count - last_docs, 0)
+        citations_added = max(citations - last_citations, 0)
+
+        insert_monthly_report(
+            cursor, conn,
+            scopus_id, faculty_id,
+            report_year, report_month,
+            docs_added, citations_added,
+            docs_count, citations
+        )
+
+        processed += 1
+        log_progress(
+            f"Monthly report ({processed}/{total})",
+            0.95 + (processed / total) * 0.05
+        )
+
+    log_progress(
+        "Monthly author report completed",
+        1,
+        {"authors_processed": processed}
+    )
+
+# ---------- MAIN SCOPUS SYNC ----------
 
 def fetch_new_papers():
     clear_progress_log()
@@ -173,15 +273,19 @@ def fetch_new_papers():
         conn.commit()
 
     log_progress(
-        "Fetch complete",
-        1,
+        "Scopus fetch completed",
+        0.95,
         {"total_new_papers": total_new_papers}
     )
+
+    # ---------- MONTHLY REPORT ----------
+    generate_monthly_author_report(cursor, conn)
 
     cursor.close()
     conn.close()
     log_progress("DB closed", 1)
 
 # ---------- ENTRY ----------
+
 if __name__ == "__main__":
     fetch_new_papers()

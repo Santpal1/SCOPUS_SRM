@@ -13,7 +13,7 @@ router.get("/run-refresh-stream", (req, res) => {
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders();
 
-    const scriptPath = path.join(__dirname, "../python_files/scopus_sync.py");
+    const scriptPath = path.join(__dirname, "../db_thingies/new_scoups_sync.py");
     const pythonProcess = spawn("python3", [scriptPath]);
 
     pythonProcess.stdout.on("data", (data) => {
@@ -48,7 +48,7 @@ router.get("/run-scopus-scraper", (req, res) => {
     res.setHeader("Connection", "keep-alive");
     res.flushHeaders();
 
-    const scriptPath = path.join(__dirname, "../python_files/graphing_time.py");
+    const scriptPath = path.join(__dirname, "../db_thingies/user_scraper.py");
     const pythonProcess = spawn("python3", [scriptPath, "--express"]);
 
     let processedCount = 0;

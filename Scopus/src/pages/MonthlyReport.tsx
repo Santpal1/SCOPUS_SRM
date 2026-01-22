@@ -79,9 +79,7 @@ export default function MonthlyReport() {
             "Scopus ID",
             "Period",
             "Docs Added",
-            "Citations Added",
-            "Total Docs",
-            "Total Citations"
+            "Citations Added"
         ];
 
         const csvContent = [
@@ -94,9 +92,7 @@ export default function MonthlyReport() {
                     ? `${monthNames[item.report_month - 1]} ${item.report_year}`
                     : "No Report"}"`,
                 item.docs_added,
-                item.citations_added,
-                item.total_docs,
-                item.total_citations
+                item.citations_added
             ].join(","))
         ].join("\n");
 
@@ -261,24 +257,12 @@ export default function MonthlyReport() {
                                                     Citations Added
                                                 </div>
                                             </th>
-                                            <th className={style.hindexColumn}>
-                                                <div className={style.columnHeader}>
-                                                    <span className={style.columnIcon}>📚</span>
-                                                    Total Docs
-                                                </div>
-                                            </th>
-                                            <th className={style.hindexColumn}>
-                                                <div className={style.columnHeader}>
-                                                    <span className={style.columnIcon}>⭐</span>
-                                                    Total Citations
-                                                </div>
-                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan={8} className={style.loadingCell}>
+                                                <td colSpan={6} className={style.loadingCell}>
                                                     <div className={style.loadingContent}>
                                                         <div className={style.spinner}></div>
                                                         <span>Loading monthly report...</span>
@@ -323,21 +307,11 @@ export default function MonthlyReport() {
                                                             {item.citations_added}
                                                         </div>
                                                     </td>
-                                                    <td className={style.hindexCell}>
-                                                        <div className={style.hindexBadge}>
-                                                            {item.total_docs}
-                                                        </div>
-                                                    </td>
-                                                    <td className={style.hindexCell}>
-                                                        <div className={style.hindexBadge}>
-                                                            {item.total_citations}
-                                                        </div>
-                                                    </td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan={8} className={style.emptyStateCell}>
+                                                <td colSpan={6} className={style.emptyStateCell}>
                                                     <div className={style.emptyStateContent}>
                                                         <div className={style.emptyStateIcon}>📊</div>
                                                         <h3>No records found</h3>
