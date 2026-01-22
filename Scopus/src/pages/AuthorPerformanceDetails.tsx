@@ -27,12 +27,14 @@ interface PerformanceData {
 
 // Helper Functions
 const getAcademicYearDisplay = (academicYear: string): string => {
-    const yearMap: Record<string, string> = {
-        '2022-23': 'July 2022 - June 2023',
-        '2023-24': 'July 2023 - June 2024',
-        '2024-25': 'July 2024 - June 2025'
-    };
-    return yearMap[academicYear] || academicYear;
+    // Parse academic year format like "2022-23" to "July 2022 - June 2023"
+    const parts = academicYear.split('-');
+    if (parts.length === 2) {
+        const startYear = parts[0];
+        const endYear = parseInt(startYear) + 1;
+        return `July ${startYear} - June ${endYear}`;
+    }
+    return academicYear;
 };
 
 const getConsistencyMessage = (status: string): string => {
@@ -65,7 +67,7 @@ const PageHeader = () => (
             <Link to="/author-performance" className={style.backButton}>
                 ← Back
             </Link>
-            <h1 className={style.pageTitle}>Author Performance Report</h1>
+            <h1 className={style.pageTitle}>Faculty Performance Report</h1>
         </div>
     </div>
 );

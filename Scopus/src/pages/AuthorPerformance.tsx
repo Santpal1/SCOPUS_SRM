@@ -109,7 +109,7 @@ export default function AuthorPerformance() {
 
                         {/* Title */}
                         <div className={style.titleSection}>
-                            <h2 className={style.pageTitle}>Author Yearly Performance</h2>
+                            <h2 className={style.pageTitle}>Faculty Yearly Performance</h2>
                             <p className={style.pageSubtitle}>
                                 Search and filter faculty members by their research performance
                             </p>

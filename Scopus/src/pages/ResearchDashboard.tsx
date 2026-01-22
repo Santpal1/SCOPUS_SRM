@@ -504,13 +504,13 @@ export default function ResearchDashboard() {
             className={style.performanceBtn}
             onClick={() => navigate("/author-performance")}
           >
-            Author Yearly Performance
+            Faculty Yearly Performance
           </button>
           <button
             className={style.monthlyReportBtn}
             onClick={() => navigate("/monthly-report")}
           >
-            Monthly Faculty Report
+            Faculty Monthly Report
           </button>
         </div>
       </div>
