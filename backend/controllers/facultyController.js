@@ -4,23 +4,33 @@ exports.getAllFaculty = (req, res) => {
     const { sdg, domain, year } = req.query;
 
     const filters = [];
+    const params = [];
 
+    // ✅ Fixed: Using parameterized queries to prevent SQL injection
     if (sdg) {
         filters.push(`
             REPLACE(LOWER(pi.sustainable_development_goals), ' ', '') 
-            LIKE '%${sdg.toLowerCase().replace(/\s+/g, '')}%'
+            LIKE ?
         `);
+        params.push(`%${sdg.toLowerCase().replace(/\s+/g, '')}%`);
     }
 
     if (domain) {
         filters.push(`
             REPLACE(LOWER(pi.qs_subject_field_name), ' ', '') 
-            LIKE '%${domain.toLowerCase().replace(/\s+/g, '')}%'
+            LIKE ?
         `);
+        params.push(`%${domain.toLowerCase().replace(/\s+/g, '')}%`);
     }
 
     if (year) {
-        filters.push(`YEAR(p.date) = ${db.escape(year)}`);
+        // ✅ Fixed: Added validation for year
+        const yearNum = parseInt(year);
+        if (isNaN(yearNum) || yearNum < 1900 || yearNum > 2100) {
+            return res.status(400).json({ error: "Invalid year parameter" });
+        }
+        filters.push(`YEAR(p.date) = ?`);
+        params.push(yearNum);
     }
 
     const whereClause = filters.length ? `AND ${filters.join(" AND ")}` : "";
@@ -52,7 +62,7 @@ exports.getAllFaculty = (req, res) => {
         ORDER BY u.faculty_name;
     `;
 
-    db.query(query, (err, results) => {
+    db.query(query, params, (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Failed to fetch faculty data" });
@@ -73,8 +83,6 @@ exports.getAllFaculty = (req, res) => {
         res.json(enriched);
     });
 };
-
-
 
 exports.getFacultyPaperStats = (req, res) => {
     const { timeframe } = req.query;
@@ -181,10 +189,18 @@ exports.getCriteriaFilteredFaculty = (req, res) => {
     });
 };
 
-
 exports.getFacultyDetails = (req, res) => {
     const { facultyId } = req.params;
     const { sdg, domain, year, quartileYear, start, end } = req.query;
+
+    // ✅ Fixed: Validate quartileYear input
+    let safeQuartileYear = "2024"; // default
+    if (quartileYear && /^\d{4}$/.test(quartileYear)) {
+        const yearNum = parseInt(quartileYear);
+        if (yearNum >= 2022 && yearNum <= 2030) {
+            safeQuartileYear = quartileYear;
+        }
+    }
 
     // 1️⃣ Fetch faculty (single identity)
     db.query(
@@ -219,7 +235,7 @@ exports.getFacultyDetails = (req, res) => {
                             ? idRows[0].scopus_ids.split('|').filter(Boolean)
                             : [];
 
-                    // Merge aggregated metrics into faculty object so front-end shows faculty-level totals
+                    // Merge aggregated metrics into faculty object
                     const faculty = {
                         name: facultyResults[0].faculty_name,
                         ...facultyResults[0],
@@ -228,19 +244,17 @@ exports.getFacultyDetails = (req, res) => {
                         docs_count: idRows?.[0]?.docs_count || facultyResults[0].docs_count || 0,
                         h_index: idRows?.[0]?.h_index || facultyResults[0].h_index || null
                     };
-                    let safeQuartileYear = quartileYear;
-                    if (!/^\d{4}$/.test(safeQuartileYear)) {
-                        safeQuartileYear = "2024";
-                    }
 
-                    const queryParams = [facultyId, facultyId];
+                    const queryParams = [facultyId];
 
+                    // ✅ Fixed: Papers table doesn't have quartile columns by year
+                    // The quartile in papers table is just varchar(4) - current quartile
+                    // faculty_quartile_summary table has year-wise quartiles
                     let baseQuery = `
                         SELECT
                             p.*,
                             pi.sustainable_development_goals AS sdg,
                             pi.qs_subject_field_name AS domain,
-
                             fqs.quartile_2022,
                             fqs.quartile_2023,
                             fqs.quartile_2024,
@@ -281,8 +295,12 @@ exports.getFacultyDetails = (req, res) => {
                         }
 
                         if (year) {
+                            const yearNum = parseInt(year);
+                            if (isNaN(yearNum)) {
+                                return res.status(400).json({ error: "Invalid year parameter" });
+                            }
                             conditions.push("YEAR(p.date) = ?");
-                            queryParams.push(year);
+                            queryParams.push(yearNum);
                         }
                     }
 
@@ -297,7 +315,7 @@ exports.getFacultyDetails = (req, res) => {
 
                         // 2️⃣ Enrich quartile info
                         papersResults.forEach(paper => {
-                            paper.quartile = paper.quartile_value || null;
+                            paper.quartile = paper.quartile_value || paper.quartile || null;
                             paper.quartile_year = safeQuartileYear;
 
                             paper.quartiles = {};
@@ -319,7 +337,6 @@ exports.getFacultyDetails = (req, res) => {
         }
     );
 };
-
 
 exports.getFacultyQuartileSummary = (req, res) => {
     const { facultyId } = req.params;
@@ -392,7 +409,6 @@ exports.getFacultyQuartileSummary = (req, res) => {
     );
 };
 
-
 // Performance
 exports.getAuthorList = (req, res) => {
     const { search, h_index_filter } = req.query;
@@ -463,7 +479,6 @@ exports.getAuthorList = (req, res) => {
     });
 };
 
-
 exports.getAuthorPerformance = (req, res) => {
     const facultyId = req.params.facultyId;
     const scopusId = req.params.scopus_id;
@@ -510,7 +525,7 @@ exports.getAuthorPerformance = (req, res) => {
         const currentYear = new Date().getFullYear();
         const last5Years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
-        // 2️⃣ Chart data: if scopus id use sc.scopus_id = ?, else aggregate by faculty_id
+        // 2️⃣ Chart data
         const chartQuery = isScopus
             ? `
                 SELECT
@@ -589,8 +604,6 @@ exports.getAuthorPerformance = (req, res) => {
                 return res.status(500).json({ error: "Failed to fetch chart data" });
             }
 
-            // fill missing years with zeros.
-            // If client asked for full history (?full=true) return min..max inclusive; otherwise default to last 5 years.
             const full = req.query && req.query.full === 'true';
 
             let normalized;
@@ -608,7 +621,6 @@ exports.getAuthorPerformance = (req, res) => {
                     });
                 }
             } else {
-                // default behavior: last 5 years
                 normalized = last5Years.map(y => {
                     const found = chartResults.find(r => Number(r.year) === y);
                     return {
@@ -626,7 +638,6 @@ exports.getAuthorPerformance = (req, res) => {
                     return res.status(500).json({ error: "Failed to fetch academic year data" });
                 }
 
-                // Ensure all 3 academic years exist
                 const processedAcademicData = academicYears.map(year => {
                     const found = academicResults.find(r => r.academic_year === year);
                     return {
@@ -635,7 +646,6 @@ exports.getAuthorPerformance = (req, res) => {
                     };
                 });
 
-                // Consistency logic (unchanged)
                 const consistentYears = processedAcademicData.filter(
                     y => y.document_count >= 2
                 ).length;
@@ -663,8 +673,6 @@ exports.getAuthorPerformance = (req, res) => {
     });
 };
 
-
-// New helper endpoints to fetch raw scopus_chart_data rows (for debugging or CSV export)
 exports.getScopusChart = (req, res) => {
     const { scopus_id } = req.params;
 
