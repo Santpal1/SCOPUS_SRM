@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "../components/ResearchDashboard.module.css";
 import srmLogo from "../assets/srmist-logo.png";
+import UserMenu from "../components/UserMenu";
 
 interface PublicationData {
   month: string;
@@ -177,6 +178,7 @@ export default function ResearchDashboard() {
           <img src={srmLogo} alt="SRM Logo" className={style.navLogo} />
           <span>SPM SP</span>
         </a>
+        <UserMenu />
       </div>
 
       <div className={style.container}>

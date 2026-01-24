@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import style from "../components/MonthlyReport.module.css";
 import srmLogo from "../assets/srmist-logo.png";
+import UserMenu from "../components/UserMenu";
 
 interface MonthlyReportData {
     faculty_id: string | null;
@@ -116,6 +117,7 @@ export default function MonthlyReport() {
                     <img src={srmLogo} alt="SRM Logo" className={style.navLogo} />
                     <span>SRM SP</span>
                 </div>
+                <UserMenu />
             </div>
 
             {/* Main Content */}

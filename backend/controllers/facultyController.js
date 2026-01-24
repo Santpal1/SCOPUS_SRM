@@ -202,18 +202,22 @@ exports.getFacultyDetails = (req, res) => {
         }
     }
 
-    // 1️⃣ Fetch faculty (single identity)
-    db.query(
-        `
+    // 1️⃣ Fetch faculty - try by faculty_id first, then by scopus_id
+    const facultyQuery = `
         SELECT *
         FROM users
-        WHERE faculty_id = ?
+        WHERE faculty_id = ? OR scopus_id = ?
         LIMIT 1
-        `,
-        [facultyId],
+    `;
+    
+    db.query(
+        facultyQuery,
+        [facultyId, facultyId],
         (err, facultyResults) => {
             if (err) return res.status(500).json({ error: "Failed to fetch faculty details" });
             if (!facultyResults.length) return res.status(404).json({ error: "Faculty not found" });
+
+            const foundFacultyId = facultyResults[0].faculty_id;
 
             // Attach aggregated scopus_ids for this faculty
             db.query(
@@ -226,7 +230,7 @@ exports.getFacultyDetails = (req, res) => {
                 FROM users
                 WHERE faculty_id = ?
                 `,
-                [facultyId],
+                [foundFacultyId],
                 (err2, idRows) => {
                     if (err2) console.warn('Failed to aggregate scopus_ids and metrics:', err2);
 
@@ -245,7 +249,7 @@ exports.getFacultyDetails = (req, res) => {
                         h_index: idRows?.[0]?.h_index || facultyResults[0].h_index || null
                     };
 
-                    const queryParams = [facultyId];
+                    const queryParams = [foundFacultyId];
 
                     // ✅ Fixed: Papers table doesn't have quartile columns by year
                     // The quartile in papers table is just varchar(4) - current quartile

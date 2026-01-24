@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import UserMenu from '../components/UserMenu';
 import '../components/FacultyDetailPage.css';
 
 interface Faculty {
@@ -642,6 +643,10 @@ const FacultyDetailPage: React.FC = () => {
 
   return (
     <div className="faculty-detail-container">
+      <div className="faculty-navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', background: 'rgba(255, 255, 255, 0.95)', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 500 }}>
+        <h3 style={{ margin: 0, color: '#0061a8' }}>Faculty Detail</h3>
+        <UserMenu />
+      </div>
       <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
 
       <div className="faculty-card">

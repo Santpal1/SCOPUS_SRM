@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import srmLogo from "../assets/srmist-logo.png";
+import UserMenu from "../components/UserMenu";
 import style from "../components/AuthorPerformanceDetails.module.css";
 
 // Types and Interfaces
@@ -58,6 +59,7 @@ const NavigationBar = () => (
             <img src={srmLogo} alt="SRM Logo" className={style.navLogo} />
             <span>SRM SP</span>
         </a>
+        <UserMenu />
     </div>
 );
 

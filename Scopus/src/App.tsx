@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 import AgentLogin from "./pages/AgentLogin";
 import AgentSignUp from "./pages/AgentSignUp";
 import AnalyticsPage from './pages/AnalyticsPage';
@@ -12,24 +13,108 @@ import AdminPage from "./pages/AdminPage";
 import AuthorPerformance from "./pages/AuthorPerformance";
 import AuthorPerformanceDetail from "./pages/AuthorPerformanceDetails";
 import MonthlyReport from "./pages/MonthlyReport";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App: React.FC = () => {
+  const { isAuthenticated, isRestrictedFaculty, user } = useAuth();
+
   return (
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<AgentLogin />} />
-        <Route path="/signup" element={<AgentSignUp />} />
-        <Route path="/hero" element={<HeroSection />}></Route>
-        <Route path="/dashboard" element={<ResearchDashboard />}></Route>
-        <Route path="/faculty" element={<FacultyListPage />}></Route>
-        <Route path="/faculty/:scopusId" element={<FacultyDetailPage />}></Route>
-        <Route path="/paper/:doi" element={<PaperDetailPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/author-performance" element={<AuthorPerformance />} />
-        <Route path="/author-performance/:scopus_id" element={<AuthorPerformanceDetail />}/>
-        <Route path="/monthly-report" element={<MonthlyReport />} />
-      </Routes>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<AgentLogin />} />
+      <Route path="/signup" element={<AgentSignUp />} />
+      <Route path="/hero" element={<HeroSection />} />
+
+      {/* Protected routes - any authenticated user */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            {/* Restricted faculty (level 3) are redirected to their faculty detail page */}
+            {isAuthenticated && isRestrictedFaculty() && user?.facultyId ? (
+              <Navigate to={`/faculty/${user.scopusId || user.facultyId}`} replace />
+            ) : (
+              <ResearchDashboard />
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Faculty List - visible to all authenticated users except restricted faculty (level 3) */}
+      <Route
+        path="/faculty"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <FacultyListPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Faculty Detail - restricted faculty can only see their own */}
+      <Route
+        path="/faculty/:scopusId"
+        element={
+          <ProtectedRoute>
+            <FacultyDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/paper/:doi" element={<ProtectedRoute><PaperDetailPage /></ProtectedRoute>} />
+
+      {/* Analytics - admin and full-access faculty only */}
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <AnalyticsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Page - admin only (level 1) */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredLevels={[1]}>
+            <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Author Performance - admin and full-access faculty only */}
+      <Route
+        path="/author-performance"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <AuthorPerformance />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/author-performance/:scopus_id"
+        element={
+          <ProtectedRoute>
+            <AuthorPerformanceDetail />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Monthly Report - admin and full-access faculty only */}
+      <Route
+        path="/monthly-report"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <MonthlyReport />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch all - redirect to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
 

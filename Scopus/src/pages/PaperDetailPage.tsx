@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import UserMenu from '../components/UserMenu';
 import styles from '../components/PaperDetailPage.module.css';
 
 interface Paper {
@@ -90,6 +91,10 @@ const PaperDetailPage: React.FC = () => {
 
     return (
         <div className={styles.paperDetailContainer}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', background: 'rgba(255, 255, 255, 0.95)', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 500 }}>
+                <h3 style={{ margin: 0, color: '#0061a8' }}>Paper Detail</h3>
+                <UserMenu />
+            </div>
             {/* Animated Background Elements */}
             <div className={styles.backgroundPattern}></div>
             <div className={styles.floatingOrbs}>

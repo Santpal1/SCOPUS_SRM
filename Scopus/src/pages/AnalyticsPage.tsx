@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import GlobalCollabMap from '../components/GlobalCollabMap';
 import CombinedSDGDashboard from '../components/CombinedSDGDashboard';
 import srmLogo from "../assets/srmist-logo.png";
+import UserMenu from '../components/UserMenu';
 import '../components/AnalyticsPage.css';
 
 import { useEffect } from 'react';
@@ -21,6 +22,7 @@ const AnalyticsPage: React.FC = () => {
                     <img src={srmLogo} alt="SRM Logo" className="analytics-navLogo" />
                     <span>SRM SP</span>
                 </a>
+                <UserMenu />
             </div>
 
             <div className="analytics-container">

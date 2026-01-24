@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import UserMenu from "../components/UserMenu";
 import styles from "../components/AdminPage.module.css";
 
 interface ProgressEntry {
@@ -466,6 +467,10 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 2rem', background: 'rgba(248, 250, 252, 0.95)', borderBottom: '1px solid rgba(222, 226, 230, 0.5)', marginBottom: '2rem' }}>
+        <h2 style={{ margin: 0, color: '#1e40af' }}>Admin Panel</h2>
+        <UserMenu />
+      </div>
       <div className={styles.header}>
         <h1>Admin Panel</h1>
         <p>Manage data operations and monitor progress</p>

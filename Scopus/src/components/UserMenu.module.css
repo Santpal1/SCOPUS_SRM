@@ -1,0 +1,144 @@
+/* UserMenu Styles */
+
+.userMenuContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.userMenuButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.userMenuButton:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.username {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 280px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.userInfo {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.userDetails {
+  font-size: 13px;
+}
+
+.label {
+  margin: 0;
+  margin-bottom: 4px;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  margin: 0;
+  margin-bottom: 12px;
+  color: #333;
+  word-break: break-word;
+}
+
+.accessLevel {
+  margin-bottom: 12px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logoutButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #ff6b6b;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+}
+
+.logoutButton:hover {
+  background-color: #ff5252;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+@media (max-width: 600px) {
+  .username {
+    display: none;
+  }
+
+  .dropdown {
+    right: -10px;
+    min-width: 250px;
+  }
+
+  .userDetails {
+    font-size: 12px;
+  }
+}

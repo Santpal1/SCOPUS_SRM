@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import srmLogo from "../assets/srmist-logo.png";
+import UserMenu from "../components/UserMenu";
 import "../components/FacultyListPage.css";
 
 interface Faculty {
@@ -231,6 +232,7 @@ const FacultyListPage: React.FC = () => {
           <img src={srmLogo} alt="SRM Logo" className="faculty-navLogo" />
           <span>SRM SP</span>
         </a>
+        <UserMenu />
       </div>
       <div className="faculty-container">
         <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>

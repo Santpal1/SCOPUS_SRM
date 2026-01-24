@@ -42,7 +42,13 @@ router.get('/:facultyId/scopus-chart', (req, res) => {
 router.get('/', getAllFaculty);
 router.get('/papers', getFacultyPaperStats);
 router.get('/criteria-filter', getCriteriaFilteredFaculty);
+// Support both :id/quartile-summary (works for both faculty_id and scopus_id as fallback)
 router.get('/:facultyId/quartile-summary', getFacultyQuartileSummary);
-router.get('/:facultyId', getFacultyDetails);
+// Support both :id (works for both faculty_id and scopus_id as fallback)
+router.get('/:facultyId', (req, res) => {
+    console.log('Faculty detail route hit with id:', req.params.facultyId);
+    // Try to fetch by faculty_id first, then scopus_id if that fails
+    getFacultyDetails(req, res);
+});
 
 module.exports = router;

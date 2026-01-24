@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import style from "../components/AuthorPerformance.module.css";
 import srmLogoN from "../assets/srmist-logo.png";
+import UserMenu from "../components/UserMenu";
 
 interface Author {
     scopus_id: string;
@@ -90,6 +91,7 @@ export default function AuthorPerformance() {
                     <img src={srmLogoN} alt="SRM Logo" className={style.navLogo} />
                     <span>SRM SP</span>
                 </div>
+                <UserMenu />
             </div>
 
             {/* Main Content */}
