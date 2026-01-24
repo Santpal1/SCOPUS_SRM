@@ -388,11 +388,9 @@ const AdminPage: React.FC = () => {
       const result = await response.json();
       if (result.success) {
         setPendingAuthors(result.data || []);
-      } else {
-        console.error("Failed to fetch pending authors:", result.error);
       }
     } catch (error) {
-      console.error("Error fetching pending authors:", error);
+      // Handle error silently
     } finally {
       setLoadingPendingAuthors(false);
     }
@@ -418,7 +416,6 @@ const AdminPage: React.FC = () => {
         alert(`Error: ${result.error || "Failed to approve author"}`);
       }
     } catch (error) {
-      console.error("Error approving author:", error);
       alert("Network error. Please try again.");
     } finally {
       setApprovingAuthorId(null);
@@ -449,7 +446,6 @@ const AdminPage: React.FC = () => {
         alert(`Error: ${result.error || "Failed to reject author"}`);
       }
     } catch (error) {
-      console.error("Error rejecting author:", error);
       alert("Network error. Please try again.");
     } finally {
       setRejectingAuthorId(null);
@@ -820,7 +816,7 @@ const AdminPage: React.FC = () => {
         <div className={styles.modalOverlay} onClick={(e) => {
           if (e.target === e.currentTarget) closePendingApprovalsModal();
         }}>
-          <div className={styles.pendingApprovalsModal} style={{ maxWidth: '900px', maxHeight: '80vh', overflow: 'auto' }}>
+          <div className={styles.pendingApprovalsModal}>
             <div className={styles.addAuthorHeader}>
               <div className={styles.addAuthorIconWrapper}>
                 <div className={styles.addAuthorIcon}>👥</div>
@@ -830,99 +826,116 @@ const AdminPage: React.FC = () => {
             </div>
 
             {loadingPendingAuthors && (
-              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <div className={styles.pendingLoadingContainer}>
+                <div className={styles.pendingEmptyIcon}>⏳</div>
                 <p>Loading pending requests...</p>
               </div>
             )}
 
             {!loadingPendingAuthors && pendingAuthors.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <p style={{ fontSize: '16px', color: '#666' }}>No pending approval requests</p>
+              <div className={styles.pendingEmptyContainer}>
+                <div className={styles.pendingEmptyIcon}>✓</div>
+                <p>No pending approval requests</p>
               </div>
             )}
 
             {!loadingPendingAuthors && pendingAuthors.length > 0 && (
-              <div style={{ padding: '20px' }}>
+              <div className={styles.pendingAuthorsList}>
                 {pendingAuthors.map((author) => (
                   <div
                     key={author.id}
-                    style={{
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      padding: '16px',
-                      marginBottom: '16px',
-                      backgroundColor: '#f9f9f9'
-                    }}
+                    className={`${styles.pendingAuthorCard} ${author.status === 'approved' ? styles.approved : author.status === 'rejected' ? styles.rejected : ''}`}
                   >
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                    <div className={styles.pendingAuthorHeader}>
                       <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Faculty Name</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px', fontWeight: '500' }}>{author.faculty_name}</p>
+                        <div className={styles.pendingAuthorName}>{author.faculty_name}</div>
+                        <div className={styles.pendingCreatedAt}>
+                          Submitted: {new Date(author.created_at).toLocaleDateString('en-IN', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Email</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.email}</p>
+                      <span className={`${styles.pendingStatusBadge} ${styles[author.status]}`}>
+                        {author.status}
+                      </span>
+                    </div>
+
+                    <div className={styles.pendingAuthorGrid}>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Email</span>
+                        <span className={styles.pendingFieldValue}>{author.email}</span>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Scopus ID</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.scopus_id}</p>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Scopus ID</span>
+                        <span className={styles.pendingFieldValue}>{author.scopus_id}</span>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Faculty ID</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.faculty_id}</p>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Faculty ID</span>
+                        <span className={styles.pendingFieldValue}>{author.faculty_id}</span>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Designation</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.designation || 'N/A'}</p>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Designation</span>
+                        <span className={styles.pendingFieldValue}>{author.designation || 'N/A'}</span>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Mobile No</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.mobile_no || 'N/A'}</p>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Mobile No</span>
+                        <span className={styles.pendingFieldValue}>{author.mobile_no || 'N/A'}</span>
                       </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Date of Joining</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.doj || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Submitted On</label>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{new Date(author.created_at).toLocaleDateString()}</p>
+                      <div className={styles.pendingAuthorField}>
+                        <span className={styles.pendingFieldLabel}>Date of Joining</span>
+                        <span className={styles.pendingFieldValue}>{author.doj || 'N/A'}</span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      <button
-                        onClick={() => handleApprovePendingAuthor(author.id, author.faculty_name)}
-                        disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
-                        style={{
-                          padding: '8px 16px',
-                          backgroundColor: '#4CAF50',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 'not-allowed' : 'pointer',
-                          opacity: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 0.6 : 1,
-                          fontSize: '14px'
-                        }}
-                      >
-                        {approvingAuthorId === author.id ? 'Approving...' : '✓ Approve'}
-                      </button>
-                      <button
-                        onClick={() => handleRejectPendingAuthor(author.id, author.faculty_name)}
-                        disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
-                        style={{
-                          padding: '8px 16px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 'not-allowed' : 'pointer',
-                          opacity: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 0.6 : 1,
-                          fontSize: '14px'
-                        }}
-                      >
-                        {rejectingAuthorId === author.id ? 'Rejecting...' : '✕ Reject'}
-                      </button>
-                    </div>
+                    {author.status === 'pending' && (
+                      <div className={styles.pendingAuthorActions}>
+                        <button
+                          onClick={() => handleApprovePendingAuthor(author.id, author.faculty_name)}
+                          disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
+                          className={styles.pendingApproveButton}
+                          title="Approve this request"
+                        >
+                          {approvingAuthorId === author.id ? (
+                            <>
+                              <span className={styles.pendingButtonSpinner}></span>
+                              Approving...
+                            </>
+                          ) : (
+                            <>✓ Approve</>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleRejectPendingAuthor(author.id, author.faculty_name)}
+                          disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
+                          className={styles.pendingRejectButton}
+                          title="Reject this request"
+                        >
+                          {rejectingAuthorId === author.id ? (
+                            <>
+                              <span className={styles.pendingButtonSpinner}></span>
+                              Rejecting...
+                            </>
+                          ) : (
+                            <>✕ Reject</>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {author.status === 'rejected' && author.rejection_reason && (
+                      <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', borderRadius: '4px' }}>
+                        <p style={{ margin: '0 0 4px', fontSize: '12px', fontWeight: '600', color: '#7f1d1d' }}>
+                          Rejection Reason:
+                        </p>
+                        <p style={{ margin: '0', fontSize: '14px', color: '#991b1b' }}>
+                          {author.rejection_reason}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
