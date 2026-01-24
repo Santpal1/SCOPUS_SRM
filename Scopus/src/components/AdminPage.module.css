@@ -688,6 +688,238 @@
   }
 }
 
+/* Pending Approvals Modal Styles */
+.pendingApprovalsModal {
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+.pendingApprovalsContent {
+  padding: 32px;
+}
+
+.pendingLoadingContainer {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.pendingLoadingContainer p {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.pendingEmptyContainer {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.pendingEmptyContainer p {
+  font-size: 18px;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 500;
+}
+
+.pendingEmptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.pendingAuthorsList {
+  padding: 20px;
+}
+
+.pendingAuthorCard {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transition: all 0.3s ease;
+}
+
+.pendingAuthorCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.pendingAuthorCard.approved {
+  border-color: #86efac;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+}
+
+.pendingAuthorCard.rejected {
+  border-color: #fca5a5;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.pendingAuthorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .pendingAuthorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pendingAuthorField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pendingFieldLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pendingFieldValue {
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.pendingAuthorActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.pendingApproveButton {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 110px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.pendingApproveButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.pendingApproveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pendingRejectButton {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 110px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.pendingRejectButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.pendingRejectButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pendingButtonSpinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.pendingStatusBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+}
+
+.pendingStatusBadge.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #d97706;
+}
+
+.pendingStatusBadge.approved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+.pendingStatusBadge.rejected {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+.pendingAuthorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+}
+
+.pendingAuthorName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.pendingCreatedAt {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .addAuthorModal {

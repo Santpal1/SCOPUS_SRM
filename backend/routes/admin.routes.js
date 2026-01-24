@@ -403,7 +403,6 @@ router.get("/pending-authors", (req, res) => {
             return res.status(500).json({ error: "Failed to fetch pending approvals" });
         }
 
-        console.log("Pending authors query result:", results);
         res.json({
             success: true,
             count: results ? results.length : 0,
