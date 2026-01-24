@@ -1,6 +1,6 @@
-import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import srmLogo from "../assets/srmist-logo.png";
 import srmLogoN from "../assets/srmist-logo.png"; 
 import styles from "../components/AgentSignUp.module.css";
@@ -8,29 +8,87 @@ import styles from "../components/AgentSignUp.module.css";
 const AgentSignUp: React.FC = () => {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [facultyName, setFacultyName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string }>({});
+  const [scopusId, setScopusId] = useState("");
+  const [facultyId, setFacultyId] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [mobileNo, setMobileNo] = useState("");
+  const [doj, setDoj] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSignUp = () => {
-    let newErrors: { username?: string; email?: string; password?: string } = {};
+  const handleSignUp = async () => {
+    let newErrors: { [key: string]: string } = {};
 
-    if (!username) newErrors.username = "Username is required";
+    if (!facultyName) newErrors.facultyName = "Faculty name is required";
     if (!email) newErrors.email = "Email is required";
     else if (!email.endsWith("@gmail.com") && !email.endsWith("@srmist.edu.in")) {
       newErrors.email = "Email must be @gmail.com or @srmist.edu.in";
     }
-    if (!password) newErrors.password = "Password is required";
+    if (!scopusId) newErrors.scopusId = "Scopus ID is required";
+    else if (!/^\d+$/.test(scopusId.trim()) || scopusId.trim().length !== 11) {
+      newErrors.scopusId = "Scopus ID should be exactly 11 digits";
+    }
+    if (!facultyId) newErrors.facultyId = "Faculty ID is required";
+    else if (facultyId.trim().length !== 6) {
+      newErrors.facultyId = "Faculty ID should be exactly 6 characters";
+    }
+    if (!designation) newErrors.designation = "Designation is required";
+    if (!mobileNo) newErrors.mobileNo = "Mobile number is required";
+    else if (!/^\d{10}$/.test(mobileNo.trim())) {
+      newErrors.mobileNo = "Mobile number must be exactly 10 digits";
+    }
+    if (!doj) newErrors.doj = "Date of joining is required";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      setSuccessMessage("Account created successfully!");
-      setTimeout(() => navigate("/login"), 1000);
+      setIsSubmitting(true);
+      try {
+        const response = await fetch("http://localhost:5001/admin/submit-author-for-approval", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            faculty_name: facultyName.trim(),
+            email: email.trim(),
+            scopus_id: scopusId.trim(),
+            faculty_id: facultyId.trim(),
+            designation: designation.trim(),
+            mobile_no: mobileNo.trim(),
+            doj: doj.trim(),
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setSuccessMessage("✓ Request submitted! Your profile is pending admin approval. You will be notified once approved.");
+          setFacultyName("");
+          setEmail("");
+          setScopusId("");
+          setFacultyId("");
+          setDesignation("");
+          setMobileNo("");
+          setDoj("");
+          setTimeout(() => setSuccessMessage(""), 5000);
+        } else {
+          setErrors({ form: result.error || "Failed to submit request. Please try again." });
+        }
+      } catch (error) {
+        console.error("Sign up error:", error);
+        setErrors({ form: "Network error. Please try again." });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
+  };
+
+  const handleBack = () => {
+    navigate("/");
   };
 
   // Handle Enter key press
@@ -43,6 +101,9 @@ const AgentSignUp: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
+        <button className={styles.backButton} onClick={handleBack} title="Go to Home">
+          <ArrowLeft size={24} />
+        </button>
         <a className={styles.logo1}>
           <img src={srmLogoN} alt="SRM Logo" className={styles.navLogo} /> 
           <span>SRM SP</span>
@@ -58,16 +119,18 @@ const AgentSignUp: React.FC = () => {
             </p>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Username</label>
+              <label className={styles.inputLabel}>Faculty Name</label>
               <input
                 type="text"
-                placeholder="Username"
+                placeholder="Dr. Jane Smith"
                 className={styles.inputField}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={facultyName}
+                onChange={(e) => setFacultyName(e.target.value)}
+                disabled={isSubmitting}
+                autoFocus
               />
-              {errors.username && (
-                <p className={styles.errorText}>{errors.username}</p>
+              {errors.facultyName && (
+                <p className={styles.errorText}>{errors.facultyName}</p>
               )}
             </div>
 
@@ -79,6 +142,7 @@ const AgentSignUp: React.FC = () => {
                 className={styles.inputField}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
               />
               {errors.email && (
                 <p className={styles.errorText}>{errors.email}</p>
@@ -86,24 +150,77 @@ const AgentSignUp: React.FC = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Password</label>
-              <div className={styles.passwordWrapper}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className={styles.inputField}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <span
-                  className={styles.passwordToggle}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </span>
-              </div>
-              {errors.password && (
-                <p className={styles.errorText}>{errors.password}</p>
+              <label className={styles.inputLabel}>Scopus ID</label>
+              <input
+                type="text"
+                placeholder="57123456789"
+                className={styles.inputField}
+                value={scopusId}
+                onChange={(e) => setScopusId(e.target.value)}
+                disabled={isSubmitting}
+              />
+              {errors.scopusId && (
+                <p className={styles.errorText}>{errors.scopusId}</p>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Faculty ID</label>
+              <input
+                type="text"
+                placeholder="124477"
+                className={styles.inputField}
+                value={facultyId}
+                onChange={(e) => setFacultyId(e.target.value)}
+                disabled={isSubmitting}
+              />
+              {errors.facultyId && (
+                <p className={styles.errorText}>{errors.facultyId}</p>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Designation</label>
+              <input
+                type="text"
+                placeholder="Associate Professor"
+                className={styles.inputField}
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                disabled={isSubmitting}
+              />
+              {errors.designation && (
+                <p className={styles.errorText}>{errors.designation}</p>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Mobile No</label>
+              <input
+                type="tel"
+                placeholder="9876543210"
+                className={styles.inputField}
+                value={mobileNo}
+                onChange={(e) => setMobileNo(e.target.value)}
+                disabled={isSubmitting}
+                maxLength={10}
+              />
+              {errors.mobileNo && (
+                <p className={styles.errorText}>{errors.mobileNo}</p>
+              )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Date of Joining</label>
+              <input
+                type="date"
+                className={styles.inputField}
+                value={doj}
+                onChange={(e) => setDoj(e.target.value)}
+                disabled={isSubmitting}
+              />
+              {errors.doj && (
+                <p className={styles.errorText}>{errors.doj}</p>
               )}
             </div>
 
@@ -111,8 +228,16 @@ const AgentSignUp: React.FC = () => {
               <p className={styles.successText}>{successMessage}</p>
             )}
 
-            <button className={styles.signUpBtn} onClick={handleSignUp}>
-              Sign Up
+            {errors.form && (
+              <p className={styles.errorText}>{errors.form}</p>
+            )}
+
+            <button 
+              className={styles.signUpBtn} 
+              onClick={handleSignUp}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Sign Up"}
             </button>
           </div>
         </div>

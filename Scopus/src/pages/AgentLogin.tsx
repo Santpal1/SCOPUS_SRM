@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import srmLogo from "../assets/srmist-logo.png";
@@ -50,6 +50,10 @@ const AgentLogin: React.FC = () => {
     navigate("/signup");
   };
 
+  const handleBack = () => {
+    navigate("/");
+  };
+
   // Handle Enter key press
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -60,6 +64,9 @@ const AgentLogin: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.navbar}>
+        <button className={styles.backButton} onClick={handleBack} title="Go to Home">
+          <ArrowLeft size={24} />
+        </button>
         <a className={styles.logo1}>
           <img src={srmLogoN} alt="Srm Logo" className={styles.navLogo} /> 
           <span>SRM SP</span>

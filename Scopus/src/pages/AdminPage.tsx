@@ -11,6 +11,20 @@ interface ProgressEntry {
   details?: Record<string, any>;
 }
 
+interface PendingAuthor {
+  id: number;
+  email: string;
+  faculty_name: string;
+  scopus_id: string;
+  faculty_id: string;
+  designation: string;
+  mobile_no: string;
+  doj: string;
+  status: string;
+  created_at: string;
+  rejection_reason?: string;
+}
+
 const AdminPage: React.FC = () => {
   const [logs, setLogs] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,6 +50,14 @@ const AdminPage: React.FC = () => {
   const [addingAuthor, setAddingAuthor] = useState(false);
   const [authorFormError, setAuthorFormError] = useState("");
   const [authorFormSuccess, setAuthorFormSuccess] = useState("");
+
+  // Pending Approvals state
+  const [pendingAuthors, setPendingAuthors] = useState<PendingAuthor[]>([]);
+  const [loadingPendingAuthors, setLoadingPendingAuthors] = useState(false);
+  const [pendingApprovalsModalOpen, setPendingApprovalsModalOpen] = useState(false);
+  const [approvingAuthorId, setApprovingAuthorId] = useState<number | null>(null);
+  const [rejectingAuthorId, setRejectingAuthorId] = useState<number | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const logsEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -354,6 +376,94 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  // =====================================================
+  // PENDING AUTHOR APPROVALS FUNCTIONS
+  // =====================================================
+
+  const fetchPendingAuthors = async () => {
+    setLoadingPendingAuthors(true);
+    try {
+      const response = await fetch("http://localhost:5001/admin/pending-authors");
+      const result = await response.json();
+      if (result.success) {
+        setPendingAuthors(result.data || []);
+      } else {
+        console.error("Failed to fetch pending authors:", result.error);
+      }
+    } catch (error) {
+      console.error("Error fetching pending authors:", error);
+    } finally {
+      setLoadingPendingAuthors(false);
+    }
+  };
+
+  const handleApprovePendingAuthor = async (authorId: number, authorName: string) => {
+    setApprovingAuthorId(authorId);
+    try {
+      const response = await fetch(`http://localhost:5001/admin/approve-author/${authorId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`✓ Author "${authorName}" approved and added to database!`);
+        // Refresh pending authors list
+        fetchPendingAuthors();
+      } else {
+        alert(`Error: ${result.error || "Failed to approve author"}`);
+      }
+    } catch (error) {
+      console.error("Error approving author:", error);
+      alert("Network error. Please try again.");
+    } finally {
+      setApprovingAuthorId(null);
+    }
+  };
+
+  const handleRejectPendingAuthor = async (authorId: number, authorName: string) => {
+    const reason = prompt(`Enter rejection reason for "${authorName}" (optional):`, "");
+    if (reason === null) return; // User cancelled
+
+    setRejectingAuthorId(authorId);
+    try {
+      const response = await fetch(`http://localhost:5001/admin/reject-author/${authorId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rejection_reason: reason || "No reason provided" }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`Author request rejected.`);
+        // Refresh pending authors list
+        fetchPendingAuthors();
+      } else {
+        alert(`Error: ${result.error || "Failed to reject author"}`);
+      }
+    } catch (error) {
+      console.error("Error rejecting author:", error);
+      alert("Network error. Please try again.");
+    } finally {
+      setRejectingAuthorId(null);
+    }
+  };
+
+  const openPendingApprovalsModal = () => {
+    setPendingApprovalsModalOpen(true);
+    fetchPendingAuthors();
+  };
+
+  const closePendingApprovalsModal = () => {
+    setPendingApprovalsModalOpen(false);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -429,15 +539,15 @@ const AdminPage: React.FC = () => {
         </div>
 
         <div className={styles.actionCard}>
-          <div className={styles.cardIcon}>➕</div>
-          <h3>Add New Author</h3>
-          <p>Add a new faculty member with their Scopus ID</p>
+          <div className={styles.cardIcon}>✅</div>
+          <h3>Pending Author Approvals</h3>
+          <p>Review and approve new faculty member sign-up requests</p>
           <button
-            onClick={openAddAuthorModal}
+            onClick={openPendingApprovalsModal}
             disabled={loading}
             className={styles.actionButton}
           >
-            Add Author
+            View Approvals
           </button>
         </div>
       </div>
@@ -697,6 +807,130 @@ const AdminPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {pendingApprovalsModalOpen && (
+        <div className={styles.modalOverlay} onClick={(e) => {
+          if (e.target === e.currentTarget) closePendingApprovalsModal();
+        }}>
+          <div className={styles.pendingApprovalsModal} style={{ maxWidth: '900px', maxHeight: '80vh', overflow: 'auto' }}>
+            <div className={styles.addAuthorHeader}>
+              <div className={styles.addAuthorIconWrapper}>
+                <div className={styles.addAuthorIcon}>👥</div>
+              </div>
+              <h2 className={styles.addAuthorTitle}>Pending Author Approvals</h2>
+              <p className={styles.addAuthorSubtitle}>Review and manage new faculty member sign-up requests</p>
+            </div>
+
+            {loadingPendingAuthors && (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <p>Loading pending requests...</p>
+              </div>
+            )}
+
+            {!loadingPendingAuthors && pendingAuthors.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <p style={{ fontSize: '16px', color: '#666' }}>No pending approval requests</p>
+              </div>
+            )}
+
+            {!loadingPendingAuthors && pendingAuthors.length > 0 && (
+              <div style={{ padding: '20px' }}>
+                {pendingAuthors.map((author) => (
+                  <div
+                    key={author.id}
+                    style={{
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      marginBottom: '16px',
+                      backgroundColor: '#f9f9f9'
+                    }}
+                  >
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Faculty Name</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px', fontWeight: '500' }}>{author.faculty_name}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Email</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.email}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Scopus ID</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.scopus_id}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Faculty ID</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.faculty_id}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Designation</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.designation || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Mobile No</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.mobile_no || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Date of Joining</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{author.doj || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Submitted On</label>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>{new Date(author.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={() => handleApprovePendingAuthor(author.id, author.faculty_name)}
+                        disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#4CAF50',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 'not-allowed' : 'pointer',
+                          opacity: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 0.6 : 1,
+                          fontSize: '14px'
+                        }}
+                      >
+                        {approvingAuthorId === author.id ? 'Approving...' : '✓ Approve'}
+                      </button>
+                      <button
+                        onClick={() => handleRejectPendingAuthor(author.id, author.faculty_name)}
+                        disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 'not-allowed' : 'pointer',
+                          opacity: approvingAuthorId === author.id || rejectingAuthorId === author.id ? 0.6 : 1,
+                          fontSize: '14px'
+                        }}
+                      >
+                        {rejectingAuthorId === author.id ? 'Rejecting...' : '✕ Reject'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className={styles.modalFooter} style={{ borderTop: '1px solid #e0e0e0', padding: '16px', marginTop: '20px' }}>
+              <button
+                onClick={closePendingApprovalsModal}
+                className={styles.closeButton}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
