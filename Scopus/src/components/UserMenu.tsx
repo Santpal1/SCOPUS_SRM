@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Menu, X, User } from 'lucide-react';
+import { LogOut, Menu, X, User, BarChart3 } from 'lucide-react';
 import styles from './UserMenu.module.css';
 
 const UserMenu: React.FC = () => {
@@ -88,6 +88,19 @@ const UserMenu: React.FC = () => {
               )}
             </div>
           </div>
+
+          {(user.accessLevel === 1 || user.accessLevel === 2) && (
+            <button
+              className={styles.reportsButton}
+              onClick={() => {
+                navigate('/reports');
+                setIsOpen(false);
+              }}
+            >
+              <BarChart3 size={18} />
+              <span>Reports & Analytics</span>
+            </button>
+          )}
 
           <button className={styles.logoutButton} onClick={handleLogout}>
             <LogOut size={18} />

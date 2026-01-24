@@ -13,6 +13,8 @@ import AdminPage from "./pages/AdminPage";
 import AuthorPerformance from "./pages/AuthorPerformance";
 import AuthorPerformanceDetail from "./pages/AuthorPerformanceDetails";
 import MonthlyReport from "./pages/MonthlyReport";
+import ReportsPage from "./pages/ReportsPage";
+import AdvancedSearch from "./pages/AdvancedSearch";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const App: React.FC = () => {
@@ -102,12 +104,32 @@ const App: React.FC = () => {
         }
       />
 
+      {/* Reports & Analytics - admin and full-access faculty only */}
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <ReportsPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Monthly Report - admin and full-access faculty only */}
       <Route
         path="/monthly-report"
         element={
           <ProtectedRoute requiredLevels={[1, 2]}>
             <MonthlyReport />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Advanced Search - admin and full-access faculty only */}
+      <Route
+        path="/advanced-search"
+        element={
+          <ProtectedRoute requiredLevels={[1, 2]}>
+            <AdvancedSearch />
           </ProtectedRoute>
         }
       />

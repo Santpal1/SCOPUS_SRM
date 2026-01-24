@@ -98,6 +98,27 @@
   letter-spacing: 0.5px;
 }
 
+.reportsButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 1px solid #ddd;
+  border-radius: 0;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.reportsButton:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6b3a8f 100%);
+}
+
 .logoutButton {
   width: 100%;
   padding: 12px 16px;

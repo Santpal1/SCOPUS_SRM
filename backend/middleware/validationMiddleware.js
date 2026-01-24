@@ -83,12 +83,8 @@ exports.validateLoginInput = (req, res, next) => {
         });
     }
     
-    if (!exports.validatePassword(password)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Password must be at least 6 characters' 
-        });
-    }
+    // For login, just check password exists (don't enforce length)
+    // Length enforcement is only for signup/password reset
     
     next();
 };

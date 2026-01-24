@@ -24,9 +24,6 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // Logging middleware
 app.use(logging.requestLogger);
 
-// General rate limiter
-app.use(rateLimit.apiLimiter);
-
 // Routes
 app.use('/api', require('./routes/auth'));
 app.use('/api', require('./routes/publications'));

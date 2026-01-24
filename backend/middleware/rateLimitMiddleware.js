@@ -49,8 +49,8 @@ exports.signupLimiter = rateLimit({
  * API endpoint rate limiter
  */
 exports.apiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 30, // limit each IP to 30 requests per minute
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // limit each IP to 1000 requests per 15 minutes
     message: 'Too many API requests, please try again later',
     standardHeaders: true,
     legacyHeaders: false,
