@@ -5,7 +5,7 @@ import sys
 import json
 
 def setup_pending_authors_table():
-    """Create pending_author_approvals table if it doesn't exist"""
+    """Create pending_faculty_approvals table if it doesn't exist"""
     try:
         conn = mysql.connector.connect(
             host="localhost",
@@ -16,9 +16,9 @@ def setup_pending_authors_table():
         )
         cursor = conn.cursor()
         
-        # Create pending_author_approvals table
+        # Create pending_faculty_approvals table
         create_table_query = """
-        CREATE TABLE IF NOT EXISTS pending_author_approvals (
+        CREATE TABLE IF NOT EXISTS pending_faculty_approvals (
             id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(100) NOT NULL UNIQUE,
             faculty_name VARCHAR(150) NOT NULL,
@@ -42,7 +42,7 @@ def setup_pending_authors_table():
         
         print(json.dumps({
             "status": "SUCCESS",
-            "message": "pending_author_approvals table created successfully"
+            "message": "pending_faculty_approvals table created successfully"
         }))
         
         cursor.close()

@@ -343,9 +343,9 @@ router.post("/submit-author-for-approval", express.json(), (req, res) => {
             });
         }
 
-        // Insert into pending_author_approvals directly
+        // Insert into pending_faculty_approvals directly
         const insertQuery = `
-            INSERT INTO pending_author_approvals 
+            INSERT INTO pending_faculty_approvals 
             (faculty_name, email, scopus_id, faculty_id, designation, mobile_no, doj, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
         `;
@@ -392,7 +392,7 @@ router.post("/submit-author-for-approval", express.json(), (req, res) => {
 router.get("/pending-authors", (req, res) => {
     const query = `
         SELECT id, email, faculty_name, scopus_id, faculty_id, designation, mobile_no, doj, status, created_at, rejection_reason
-        FROM pending_author_approvals
+        FROM pending_faculty_approvals
         WHERE status = 'pending'
         ORDER BY created_at DESC
     `;
@@ -418,7 +418,7 @@ router.post("/approve-author/:id", express.json(), async (req, res) => {
 
         // Get pending author details
         const getAuthorQuery = `
-            SELECT * FROM pending_author_approvals WHERE id = ? AND status = 'pending'
+            SELECT * FROM pending_faculty_approvals WHERE id = ? AND status = 'pending'
         `;
 
         db.query(getAuthorQuery, [id], (err, results) => {
@@ -461,9 +461,9 @@ router.post("/approve-author/:id", express.json(), async (req, res) => {
                             });
                         }
 
-                        // Update pending_author_approvals status
+                        // Update pending_faculty_approvals status
                         const updateStatusQuery = `
-                            UPDATE pending_author_approvals 
+                            UPDATE pending_faculty_approvals 
                             SET status = 'approved', reviewed_at = NOW()
                             WHERE id = ?
                         `;
@@ -515,7 +515,7 @@ router.post("/reject-author/:id", express.json(), (req, res) => {
         const { rejection_reason } = req.body;
 
         const updateQuery = `
-            UPDATE pending_author_approvals 
+            UPDATE pending_faculty_approvals
             SET status = 'rejected', rejection_reason = ?, reviewed_at = NOW()
             WHERE id = ? AND status = 'pending'
         `;

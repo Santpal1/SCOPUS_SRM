@@ -733,11 +733,11 @@
   margin-bottom: 16px;
 }
 
-.pendingAuthorsList {
+.pendingFacultiesList {
   padding: 20px;
 }
 
-.pendingAuthorCard {
+.pendingFacultyCard {
   border: 2px solid #e2e8f0;
   border-radius: 12px;
   padding: 20px;
@@ -746,23 +746,23 @@
   transition: all 0.3s ease;
 }
 
-.pendingAuthorCard:hover {
+.pendingFacultyCard:hover {
   border-color: #cbd5e1;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 
-.pendingAuthorCard.approved {
+.pendingFacultyCard.approved {
   border-color: #86efac;
   background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
 }
 
-.pendingAuthorCard.rejected {
+.pendingFacultyCard.rejected {
   border-color: #fca5a5;
   background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
 }
 
-.pendingAuthorGrid {
+.pendingFacultyGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
@@ -770,12 +770,12 @@
 }
 
 @media (max-width: 768px) {
-  .pendingAuthorGrid {
+  .pendingFacultyGrid {
     grid-template-columns: 1fr;
   }
 }
 
-.pendingAuthorField {
+.pendingFacultyField {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -796,7 +796,7 @@
   word-break: break-word;
 }
 
-.pendingAuthorActions {
+.pendingFacultyActions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
@@ -899,7 +899,7 @@
   color: #dc2626;
 }
 
-.pendingAuthorHeader {
+.pendingFacultyHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -908,7 +908,7 @@
   border-bottom: 2px solid rgba(226, 232, 240, 0.5);
 }
 
-.pendingAuthorName {
+.pendingFacultyName {
   font-size: 16px;
   font-weight: 700;
   color: #1e293b;

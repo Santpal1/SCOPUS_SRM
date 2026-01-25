@@ -12,7 +12,7 @@ interface ProgressEntry {
   details?: Record<string, any>;
 }
 
-interface PendingAuthor {
+interface PendingFaculty {
   id: number;
   email: string;
   faculty_name: string;
@@ -53,8 +53,8 @@ const AdminPage: React.FC = () => {
   const [authorFormSuccess, setAuthorFormSuccess] = useState("");
 
   // Pending Approvals state
-  const [pendingAuthors, setPendingAuthors] = useState<PendingAuthor[]>([]);
-  const [loadingPendingAuthors, setLoadingPendingAuthors] = useState(false);
+  const [pendingFaculties, setPendingFaculties] = useState<PendingFaculty[]>([]);
+  const [loadingPendingFaculties, setLoadingPendingFaculties] = useState(false);
   const [pendingApprovalsModalOpen, setPendingApprovalsModalOpen] = useState(false);
   const [approvingAuthorId, setApprovingAuthorId] = useState<number | null>(null);
   const [rejectingAuthorId, setRejectingAuthorId] = useState<number | null>(null);
@@ -378,25 +378,25 @@ const AdminPage: React.FC = () => {
   };
 
   // =====================================================
-  // PENDING AUTHOR APPROVALS FUNCTIONS
+  // PENDING FACULTY APPROVALS FUNCTIONS
   // =====================================================
 
-  const fetchPendingAuthors = async () => {
-    setLoadingPendingAuthors(true);
+  const fetchPendingFaculties = async () => {
+    setLoadingPendingFaculties(true);
     try {
       const response = await fetch("http://localhost:5001/admin/pending-authors");
       const result = await response.json();
       if (result.success) {
-        setPendingAuthors(result.data || []);
+        setPendingFaculties(result.data || []);
       }
     } catch (error) {
       // Handle error silently
     } finally {
-      setLoadingPendingAuthors(false);
+      setLoadingPendingFaculties(false);
     }
   };
 
-  const handleApprovePendingAuthor = async (authorId: number, authorName: string) => {
+  const handleApprovePendingFaculty = async (authorId: number, authorName: string) => {
     setApprovingAuthorId(authorId);
     try {
       const response = await fetch(`http://localhost:5001/admin/approve-author/${authorId}`, {
@@ -409,9 +409,9 @@ const AdminPage: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert(`✓ Author "${authorName}" approved and added to database!`);
-        // Refresh pending authors list
-        fetchPendingAuthors();
+        alert(`✓ Faculty "${authorName}" approved and added to database!`);
+        // Refresh pending faculties list
+        fetchPendingFaculties();
       } else {
         alert(`Error: ${result.error || "Failed to approve author"}`);
       }
@@ -422,7 +422,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleRejectPendingAuthor = async (authorId: number, authorName: string) => {
+  const handleRejectPendingFaculty = async (authorId: number, authorName: string) => {
     const reason = prompt(`Enter rejection reason for "${authorName}" (optional):`, "");
     if (reason === null) return; // User cancelled
 
@@ -439,9 +439,9 @@ const AdminPage: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert(`Author request rejected.`);
-        // Refresh pending authors list
-        fetchPendingAuthors();
+        alert(`Faculty request rejected.`);
+        // Refresh pending faculties list
+        fetchPendingFaculties();
       } else {
         alert(`Error: ${result.error || "Failed to reject author"}`);
       }
@@ -454,7 +454,7 @@ const AdminPage: React.FC = () => {
 
   const openPendingApprovalsModal = () => {
     setPendingApprovalsModalOpen(true);
-    fetchPendingAuthors();
+    fetchPendingFaculties();
   };
 
   const closePendingApprovalsModal = () => {
@@ -541,7 +541,7 @@ const AdminPage: React.FC = () => {
 
         <div className={styles.actionCard}>
           <div className={styles.cardIcon}>✅</div>
-          <h3>Pending Author Approvals</h3>
+          <h3>Pending Faculty Approvals</h3>
           <p>Review and approve new faculty member sign-up requests</p>
           <button
             onClick={openPendingApprovalsModal}
@@ -825,30 +825,30 @@ const AdminPage: React.FC = () => {
               <p className={styles.addAuthorSubtitle}>Review and manage new faculty member sign-up requests</p>
             </div>
 
-            {loadingPendingAuthors && (
+            {loadingPendingFaculties && (
               <div className={styles.pendingLoadingContainer}>
                 <div className={styles.pendingEmptyIcon}>⏳</div>
                 <p>Loading pending requests...</p>
               </div>
             )}
 
-            {!loadingPendingAuthors && pendingAuthors.length === 0 && (
+            {!loadingPendingFaculties && pendingFaculties.length === 0 && (
               <div className={styles.pendingEmptyContainer}>
                 <div className={styles.pendingEmptyIcon}>✓</div>
                 <p>No pending approval requests</p>
               </div>
             )}
 
-            {!loadingPendingAuthors && pendingAuthors.length > 0 && (
-              <div className={styles.pendingAuthorsList}>
-                {pendingAuthors.map((author) => (
+            {!loadingPendingFaculties && pendingFaculties.length > 0 && (
+              <div className={styles.pendingFacultiesList}>
+                {pendingFaculties.map((author) => (
                   <div
                     key={author.id}
-                    className={`${styles.pendingAuthorCard} ${author.status === 'approved' ? styles.approved : author.status === 'rejected' ? styles.rejected : ''}`}
+                    className={`${styles.pendingFacultyCard} ${author.status === 'approved' ? styles.approved : author.status === 'rejected' ? styles.rejected : ''}`}
                   >
-                    <div className={styles.pendingAuthorHeader}>
+                    <div className={styles.pendingFacultyHeader}>
                       <div>
-                        <div className={styles.pendingAuthorName}>{author.faculty_name}</div>
+                        <div className={styles.pendingFacultyName}>{author.faculty_name}</div>
                         <div className={styles.pendingCreatedAt}>
                           Submitted: {new Date(author.created_at).toLocaleDateString('en-IN', {
                             year: 'numeric',
@@ -864,37 +864,37 @@ const AdminPage: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className={styles.pendingAuthorGrid}>
-                      <div className={styles.pendingAuthorField}>
+                    <div className={styles.pendingFacultyGrid}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Email</span>
                         <span className={styles.pendingFieldValue}>{author.email}</span>
                       </div>
-                      <div className={styles.pendingAuthorField}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Scopus ID</span>
                         <span className={styles.pendingFieldValue}>{author.scopus_id}</span>
                       </div>
-                      <div className={styles.pendingAuthorField}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Faculty ID</span>
                         <span className={styles.pendingFieldValue}>{author.faculty_id}</span>
                       </div>
-                      <div className={styles.pendingAuthorField}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Designation</span>
                         <span className={styles.pendingFieldValue}>{author.designation || 'N/A'}</span>
                       </div>
-                      <div className={styles.pendingAuthorField}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Mobile No</span>
                         <span className={styles.pendingFieldValue}>{author.mobile_no || 'N/A'}</span>
                       </div>
-                      <div className={styles.pendingAuthorField}>
+                      <div className={styles.pendingFacultyField}>
                         <span className={styles.pendingFieldLabel}>Date of Joining</span>
                         <span className={styles.pendingFieldValue}>{author.doj || 'N/A'}</span>
                       </div>
                     </div>
 
                     {author.status === 'pending' && (
-                      <div className={styles.pendingAuthorActions}>
+                      <div className={styles.pendingFacultyActions}>
                         <button
-                          onClick={() => handleApprovePendingAuthor(author.id, author.faculty_name)}
+                          onClick={() => handleApprovePendingFaculty(author.id, author.faculty_name)}
                           disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
                           className={styles.pendingApproveButton}
                           title="Approve this request"
@@ -908,22 +908,22 @@ const AdminPage: React.FC = () => {
                             <>✓ Approve</>
                           )}
                         </button>
-                        <button
-                          onClick={() => handleRejectPendingAuthor(author.id, author.faculty_name)}
-                          disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
-                          className={styles.pendingRejectButton}
-                          title="Reject this request"
-                        >
-                          {rejectingAuthorId === author.id ? (
-                            <>
-                              <span className={styles.pendingButtonSpinner}></span>
-                              Rejecting...
-                            </>
-                          ) : (
-                            <>✕ Reject</>
-                          )}
-                        </button>
-                      </div>
+ <button
+ onClick={() => handleRejectPendingFaculty(author.id, author.faculty_name)}
+ disabled={approvingAuthorId === author.id || rejectingAuthorId === author.id}
+ className={styles.pendingRejectButton}
+ title="Reject this request"
+ >
+ {rejectingAuthorId === author.id ? (
+ <>
+ <span className={styles.pendingButtonSpinner}></span>
+ Rejecting...
+ </>
+ ) : (
+ <>✕ Reject</>
+ )}
+ </button>
+ </div>
                     )}
 
                     {author.status === 'rejected' && author.rejection_reason && (
