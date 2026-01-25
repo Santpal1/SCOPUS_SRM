@@ -343,41 +343,89 @@ router.post("/submit-author-for-approval", express.json(), (req, res) => {
             });
         }
 
-        // Insert into pending_faculty_approvals directly
-        const insertQuery = `
-            INSERT INTO pending_faculty_approvals 
-            (faculty_name, email, scopus_id, faculty_id, designation, mobile_no, doj, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+        // First check if scopus_id exists with 'rejected' status
+        const checkRejectedQuery = `
+            SELECT id, status FROM pending_faculty_approvals 
+            WHERE scopus_id = ? AND status = 'rejected'
         `;
 
-        db.query(
-            insertQuery,
-            [faculty_name, email, scopus_id, faculty_id, designation || null, mobile_no || null, doj || null],
-            (err, result) => {
-                if (err) {
-                    console.error("Database error during insert:", err);
-                    console.error("Error code:", err.code);
-                    console.error("Error message:", err.message);
-                    
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        return res.status(400).json({ 
-                            error: "Email, Scopus ID, or Faculty ID already exists in pending requests or system" 
-                        });
-                    }
-                    return res.status(500).json({ 
-                        error: "Failed to submit request",
-                        details: err.message 
-                    });
-                }
-
-                console.log("Successfully inserted approval request with ID:", result.insertId);
-                res.status(201).json({
-                    success: true,
-                    message: "Your profile has been submitted for admin approval",
-                    requestId: result.insertId
+        db.query(checkRejectedQuery, [scopus_id], (err, results) => {
+            if (err) {
+                console.error("Database error during check:", err);
+                return res.status(500).json({ 
+                    error: "Failed to process request",
+                    details: err.message 
                 });
             }
-        );
+
+            // If rejected record exists, update it to pending instead of inserting
+            if (results && results.length > 0) {
+                const rejectedId = results[0].id;
+                const updateQuery = `
+                    UPDATE pending_faculty_approvals 
+                    SET faculty_name = ?, email = ?, faculty_id = ?, designation = ?, mobile_no = ?, doj = ?, 
+                        status = 'pending', created_at = NOW(), rejection_reason = NULL, reviewed_at = NULL
+                    WHERE id = ?
+                `;
+
+                db.query(
+                    updateQuery,
+                    [faculty_name, email, faculty_id, designation || null, mobile_no || null, doj || null, rejectedId],
+                    (err, result) => {
+                        if (err) {
+                            console.error("Database error during update:", err);
+                            return res.status(500).json({ 
+                                error: "Failed to update request",
+                                details: err.message 
+                            });
+                        }
+
+                        console.log("Successfully updated rejected request to pending with ID:", rejectedId);
+                        res.status(201).json({
+                            success: true,
+                            message: "Your profile has been resubmitted for admin approval",
+                            requestId: rejectedId
+                        });
+                    }
+                );
+            } else {
+                // No rejected record, proceed with normal insert
+                const insertQuery = `
+                    INSERT INTO pending_faculty_approvals 
+                    (faculty_name, email, scopus_id, faculty_id, designation, mobile_no, doj, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
+                `;
+
+                db.query(
+                    insertQuery,
+                    [faculty_name, email, scopus_id, faculty_id, designation || null, mobile_no || null, doj || null],
+                    (err, result) => {
+                        if (err) {
+                            console.error("Database error during insert:", err);
+                            console.error("Error code:", err.code);
+                            console.error("Error message:", err.message);
+                            
+                            if (err.code === 'ER_DUP_ENTRY') {
+                                return res.status(400).json({ 
+                                    error: "Scopus ID already exists in pending requests or system" 
+                                });
+                            }
+                            return res.status(500).json({ 
+                                error: "Failed to submit request",
+                                details: err.message 
+                            });
+                        }
+
+                        console.log("Successfully inserted approval request with ID:", result.insertId);
+                        res.status(201).json({
+                            success: true,
+                            message: "Your profile has been submitted for admin approval",
+                            requestId: result.insertId
+                        });
+                    }
+                );
+            }
+        });
 
     } catch (error) {
         console.error("Submit author error:", error);
