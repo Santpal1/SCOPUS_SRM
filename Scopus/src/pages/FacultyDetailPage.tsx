@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import srmLogo from '../assets/srmist-logo.png';
 import UserMenu from '../components/UserMenu';
 import '../components/FacultyDetailPage.css';
 
@@ -85,12 +86,12 @@ const FacultyDetailPage: React.FC = () => {
         break;
       case 'start':
         setCriteriaStartFilter("");
-        queryParams.delete('end'); // Remove both start and end when clearing criteria
+        queryParams.delete('end');
         setCriteriaEndFilter("");
         break;
       case 'end':
         setCriteriaEndFilter("");
-        queryParams.delete('start'); // Remove both start and end when clearing criteria
+        queryParams.delete('start');
         setCriteriaStartFilter("");
         break;
       default:
@@ -125,14 +126,12 @@ const FacultyDetailPage: React.FC = () => {
         });
         setFacultyData(response.data);
 
-        // Only fetch quartile summary if no criteria filter is applied
         if (!criteriaStartFilter && !criteriaEndFilter) {
           try {
             const quartRes = await axios.get(`http://localhost:5001/api/faculty/${id}/quartile-summary`);
             const summaryData = quartRes.data || {};
             setQuartileSummaryAllYears(summaryData);
 
-            // Dynamically set default quartile year if not already set
             const allYears = Object.keys(summaryData);
             if (!quartileYear && allYears.length > 0) {
               const latestYear = allYears.sort((a, b) => Number(b) - Number(a))[0];
@@ -163,14 +162,11 @@ const FacultyDetailPage: React.FC = () => {
     setIframeLoaded(true);
   };
 
-  // Dynamic Highcharts rendering using backend `author-performance` data
   const chartRef = useRef<HTMLDivElement | null>(null);
   const [chartLoading, setChartLoading] = useState<boolean>(false);
   const [chartError, setChartError] = useState<string | null>(null);
-  // Toggle to request full history (min..max years) from backend
   const [fullHistory, setFullHistory] = useState<boolean>(false);
 
-  // Persist the user's preference per faculty in localStorage
   useEffect(() => {
     if (!id) return;
     const key = `faculty_${id}_full_history`;
@@ -178,7 +174,7 @@ const FacultyDetailPage: React.FC = () => {
       const saved = localStorage.getItem(key);
       if (saved !== null) setFullHistory(saved === 'true');
     } catch (e) {
-      // ignore (e.g., SSR or blocked storage)
+      // ignore
     }
   }, [id]);
 
@@ -205,9 +201,7 @@ const FacultyDetailPage: React.FC = () => {
   useEffect(() => {
     const renderChart = async () => {
       if (!id) return;
-      // Only render when no filters applied and not filtering by quartile
       if (sdgFilter !== 'none' || domainFilter !== 'none' || yearFilter !== 'none' || selectedQuartile || criteriaStartFilter || criteriaEndFilter) {
-        // Clear chart container when filters applied
         if (chartRef.current) chartRef.current.innerHTML = '';
         return;
       }
@@ -216,7 +210,6 @@ const FacultyDetailPage: React.FC = () => {
       setChartError(null);
 
       try {
-        // Load Highcharts (via CDN) if not already present
         if (!(window as any).Highcharts) {
           await loadScript('https://code.highcharts.com/highcharts.js');
           await loadScript('https://code.highcharts.com/modules/exporting.js');
@@ -224,7 +217,6 @@ const FacultyDetailPage: React.FC = () => {
           await loadScript('https://code.highcharts.com/modules/accessibility.js');
         }
 
-        // Try faculty-level route first, fallback to scopus route
         let res;
         const facultyUrl = `http://localhost:5001/api/faculty/${id}/author-performance`;
         const scopusUrl = `http://localhost:5001/api/faculty/author-performance/${id}`;
@@ -244,8 +236,7 @@ const FacultyDetailPage: React.FC = () => {
         const documents = chartData.map((r: any) => r.documents);
         const citations = chartData.map((r: any) => r.citations);
 
-        // Compute xAxis label behavior for long ranges
-        const maxLabels = 12; // desired maximum visible labels on x-axis
+        const maxLabels = 12;
         const labelStep = categories.length > maxLabels ? Math.ceil(categories.length / maxLabels) : 1;
         const xAxisOptions: any = {
           categories,
@@ -257,14 +248,12 @@ const FacultyDetailPage: React.FC = () => {
           tickInterval: labelStep
         };
 
-        // Render chart
         const Highcharts = (window as any).Highcharts;
         if (!Highcharts) {
           setChartError('Highcharts not available');
           return;
         }
 
-        // Wait for chart container to be mounted (retry for up to 1s)
         const waitForContainer = async (timeoutMs = 1000, intervalMs = 50) => {
           const maxTries = Math.ceil(timeoutMs / intervalMs);
           for (let i = 0; i < maxTries; i++) {
@@ -282,7 +271,6 @@ const FacultyDetailPage: React.FC = () => {
           return;
         }
 
-        // Clear previous chart content (if any)
         if (chartRef.current) {
           chartRef.current.innerHTML = '';
         }
@@ -291,10 +279,10 @@ const FacultyDetailPage: React.FC = () => {
           chart: { zoomType: 'xy' },
           title: { text: `Document and Citation Trends${fullHistory ? ' (Full history)' : ''}` },
           xAxis: xAxisOptions,
-          yAxis: [{ // documents
+          yAxis: [{
             title: { text: 'Documents' },
             labels: { style: { color: '#3679e0' } }
-          }, { // citations
+          }, {
             title: { text: 'Citations' },
             labels: { style: { color: '#000347' } },
             opposite: true
@@ -308,7 +296,6 @@ const FacultyDetailPage: React.FC = () => {
           exporting: { enabled: true }
         });
 
-        // Optionally set the iframeLoaded flag so other features can detect chart is ready
         setIframeLoaded(true);
       } catch (err: any) {
         console.error('Failed to render chart:', err);
@@ -338,16 +325,13 @@ const FacultyDetailPage: React.FC = () => {
 
       let yPos = margin + 15;
 
-      // Header
       doc.setFontSize(18);
       doc.setFont('times', 'bold');
       doc.text('FACULTY REPORT', pageWidth / 2, margin + 5, { align: 'center' });
 
-      // Faculty Information
       doc.setFontSize(12);
       yPos = margin + 20;
 
-      // Name
       doc.setFont('helvetica', 'bold');
       doc.text('Name:', margin, yPos);
       doc.setFont('helvetica', 'normal');
@@ -355,16 +339,13 @@ const FacultyDetailPage: React.FC = () => {
       doc.text(facultyName, margin + 20, yPos);
       yPos += 8;
 
-      // Scopus ID(s) - Handle multiple IDs
       doc.setFont('helvetica', 'bold');
-      // Check if faculty has scopus_ids array or single scopus_id
       const hasScopusIds = (faculty as any).scopus_ids && Array.isArray((faculty as any).scopus_ids);
       const scopusLabel = hasScopusIds ? 'Scopus IDs:' : 'Scopus ID:';
       doc.text(scopusLabel, margin, yPos);
       doc.setFont('helvetica', 'normal');
 
       if (hasScopusIds) {
-        // Multiple Scopus IDs
         const scopusIds = (faculty as any).scopus_ids.join(', ');
         const scopusIdLines = doc.splitTextToSize(scopusIds, pageWidth - margin * 2 - 30);
         let scopusYPos = yPos;
@@ -374,12 +355,10 @@ const FacultyDetailPage: React.FC = () => {
         });
         yPos = scopusYPos + 3;
       } else {
-        // Single Scopus ID
         doc.text(String(faculty.scopus_id || 'N/A'), margin + 30, yPos);
         yPos += 8;
       }
 
-      // Faculty ID (if exists)
       if (faculty.faculty_id) {
         doc.setFont('helvetica', 'bold');
         doc.text('Faculty ID:', margin, yPos);
@@ -388,28 +367,24 @@ const FacultyDetailPage: React.FC = () => {
         yPos += 8;
       }
 
-      // Documents Published
       doc.setFont('helvetica', 'bold');
       doc.text('Documents Published:', margin, yPos);
       doc.setFont('helvetica', 'normal');
       doc.text(String(faculty.docs_count || 0), margin + 60, yPos);
       yPos += 8;
 
-      // Citations
       doc.setFont('helvetica', 'bold');
       doc.text('Citations:', margin, yPos);
       doc.setFont('helvetica', 'normal');
       doc.text(String(faculty.citation_count || 0), margin + 30, yPos);
       yPos += 8;
 
-      // H-Index
       doc.setFont('helvetica', 'bold');
       doc.text('H-Index:', margin, yPos);
       doc.setFont('helvetica', 'normal');
       doc.text(String(faculty.h_index ?? 'N/A'), margin + 25, yPos);
       yPos += 10;
 
-      // Applied Filters
       const filterLines: string[] = [];
       if (sdgFilter !== 'none') filterLines.push(`SDG: ${sdgFilter}`);
       if (domainFilter !== 'none') filterLines.push(`Domain: ${domainFilter}`);
@@ -436,7 +411,6 @@ const FacultyDetailPage: React.FC = () => {
 
       yPos += 6;
 
-      // Publications Section Header
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text('Publications', pageWidth / 2, yPos, { align: 'center' });
@@ -447,9 +421,7 @@ const FacultyDetailPage: React.FC = () => {
         return String(text).replace(/[^\x20-\x7E]/g, '').trim() || 'N/A';
       };
 
-      // Add each publication
       papers.forEach((paper, index) => {
-        // Check if we need a new page
         if (yPos + 50 > pageHeight - margin) {
           doc.addPage();
           yPos = margin + 10;
@@ -462,7 +434,6 @@ const FacultyDetailPage: React.FC = () => {
 
         doc.setFontSize(10);
 
-        // Title
         doc.setFont('helvetica', 'bold');
         doc.text('Title:', margin, yPos);
         doc.setFont('helvetica', 'normal');
@@ -475,7 +446,6 @@ const FacultyDetailPage: React.FC = () => {
         });
         yPos = titleYPos;
 
-        // DOI
         if (yPos + 10 > pageHeight - margin) {
           doc.addPage();
           yPos = margin + 10;
@@ -486,7 +456,6 @@ const FacultyDetailPage: React.FC = () => {
         doc.text(cleanText(paper.doi), margin + 20, yPos);
         yPos += 5;
 
-        // Type
         if (yPos + 10 > pageHeight - margin) {
           doc.addPage();
           yPos = margin + 10;
@@ -497,7 +466,6 @@ const FacultyDetailPage: React.FC = () => {
         doc.text(cleanText(paper.type), margin + 20, yPos);
         yPos += 5;
 
-        // Publication Name
         if (yPos + 10 > pageHeight - margin) {
           doc.addPage();
           yPos = margin + 10;
@@ -514,7 +482,6 @@ const FacultyDetailPage: React.FC = () => {
         });
         yPos = pubYPos;
 
-        // Date
         if (yPos + 10 > pageHeight - margin) {
           doc.addPage();
           yPos = margin + 10;
@@ -526,7 +493,6 @@ const FacultyDetailPage: React.FC = () => {
         doc.text(dateText, margin + 20, yPos);
         yPos += 5;
 
-        // Quartile (if available)
         if (paper.quartiles && Object.keys(paper.quartiles).length > 0) {
           if (yPos + 10 > pageHeight - margin) {
             doc.addPage();
@@ -546,10 +512,9 @@ const FacultyDetailPage: React.FC = () => {
           }
         }
 
-        yPos += 8; // Space between publications
+        yPos += 8;
       });
 
-      // Add chart if no filters applied
       if (sdgFilter === 'none' &&
         domainFilter === 'none' &&
         yearFilter === 'none' &&
@@ -570,7 +535,6 @@ const FacultyDetailPage: React.FC = () => {
             doc.text('Document and Citation Trends', pageWidth / 2, yPos, { align: 'center' });
             yPos += 12;
 
-            // Wait for iframe to be fully loaded
             await new Promise(resolve => setTimeout(resolve, 500));
 
             const canvas = await html2canvas(iframe.contentDocument.body, {
@@ -606,7 +570,6 @@ const FacultyDetailPage: React.FC = () => {
         }
       }
 
-      // Generate filename and save
       const fileName = `${facultyName.replace(/[^a-zA-Z0-9]/g, '_')}_Faculty_Report.pdf`;
       console.log('Saving PDF:', fileName);
       doc.save(fileName);
@@ -627,7 +590,7 @@ const FacultyDetailPage: React.FC = () => {
   const allPapers = [...unsortedPapers].sort((a, b) => {
     const dateA = new Date(a.date || '').getTime();
     const dateB = new Date(b.date || '').getTime();
-    return dateB - dateA; // Sort from latest to oldest
+    return dateB - dateA;
   });
 
   const filteredPapers = selectedQuartile
@@ -638,232 +601,248 @@ const FacultyDetailPage: React.FC = () => {
     )
     : allPapers;
 
-  // Check if criteria filter is active
   const isCriteriaFilterActive = criteriaStartFilter && criteriaEndFilter;
 
   return (
-    <div className="faculty-detail-container">
-      <div className="faculty-navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', background: 'rgba(255, 255, 255, 0.95)', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 500 }}>
-        <h3 style={{ margin: 0, color: '#0061a8' }}>Faculty Detail</h3>
-        <UserMenu />
-      </div>
-      <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
-
-      <div className="faculty-card">
-        <div className="faculty-info">
-          {selectedQuartile && (
-            <div className="filter-badges">
-              <strong>Quartile Filter: </strong>
-              <span className="filter-chip">
-                {selectedQuartile} <button onClick={() => setSelectedQuartile(null)}>❌</button>
-              </span>
-            </div>
-          )}
-
-          <h2 className="faculty-name">{faculty.name}</h2>
-          <p><strong>Scopus ID(s):</strong> {faculty.scopus_ids && faculty.scopus_ids.length ? faculty.scopus_ids.join(', ') : faculty.scopus_id || 'N/A'}</p>
-          {faculty.faculty_id && (
-            <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
-          )}
-          <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
-          <p><strong>Citations:</strong> {faculty.citation_count}</p>
-          <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
-
-          <div className="filter-badges">
-            <strong>Filters Applied: </strong>
-            {sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !isCriteriaFilterActive ? (
-              <span className="filter-chip">NA</span>
-            ) : (
-              <>
-                {sdgFilter !== 'none' && (
-                  <span className="filter-chip">
-                    SDG: {sdgFilter} <button onClick={() => updateQuery('sdg')}>❌</button>
-                  </span>
-                )}
-                {domainFilter !== 'none' && (
-                  <span className="filter-chip">
-                    Domain: {domainFilter} <button onClick={() => updateQuery('domain')}>❌</button>
-                  </span>
-                )}
-                {yearFilter !== 'none' && (
-                  <span className="filter-chip">
-                    Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
-                  </span>
-                )}
-                {isCriteriaFilterActive && (
-                  <span className="filter-chip">
-                    Date Range: {criteriaStartFilter} to {criteriaEndFilter} <button onClick={() => updateQuery('start')}>❌</button>
-                  </span>
-                )}
-              </>
-            )}
+    <div className="faculty-detail-page-wrapper">
+      {/* Fixed Header - Outside Main Container */}
+      <div className="faculty-detail-header">
+        <div className="header-content">
+          <div className="header-left">
+            <a className="faculty-logo">
+              <img src={srmLogo} alt="SRM Logo" className="faculty-navLogo" />
+              <span>SRM SP</span>
+            </a>
           </div>
-
-        </div>
-
-        <div className="faculty-bottom">
-          <a
-            href={`https://www.scopus.com/authid/detail.uri?authorId=${(faculty.scopus_ids && faculty.scopus_ids[0]) || faculty.scopus_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="scopus-link-button"
-          >
-            View on Scopus
-          </a>
-        </div>
-
-        <div className="faculty-actions">
-          <button onClick={generatePDF} className="generate-pdf-button">
-            📄 Generate Report
-          </button>
-
-          {quartileSummaryAllYears && quartileSummaryAllYears[quartileYear] && !isCriteriaFilterActive && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
-            <div className="quartile-summary-table">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <h4>Quartile Summary for {quartileYear}</h4>
-
-                {quartileSummaryAllYears && (
-                  <select
-                    value={quartileYear}
-                    onChange={(e) => setQuartileYear(e.target.value)}
-                    style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
-                  >
-                    {Object.keys(quartileSummaryAllYears)
-                      .sort((a, b) => Number(b) - Number(a)) // optional: show latest year first
-                      .map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                  </select>
-                )}
-
-              </div>
-
-              <table>
-                <tbody>
-                  <tr
-                    className={`q1 ${selectedQuartile === 'Q1' ? 'selected' : ''}`}
-                    onClick={() => setSelectedQuartile('Q1')}
-                  >
-                    <td>Q1</td><td>{yearSummary.q1_count}</td>
-                  </tr>
-                  <tr
-                    className={`q2 ${selectedQuartile === 'Q2' ? 'selected' : ''}`}
-                    onClick={() => setSelectedQuartile('Q2')}
-                  >
-                    <td>Q2</td><td>{yearSummary.q2_count}</td>
-                  </tr>
-                  <tr
-                    className={`q3 ${selectedQuartile === 'Q3' ? 'selected' : ''}`}
-                    onClick={() => setSelectedQuartile('Q3')}
-                  >
-                    <td>Q3</td><td>{yearSummary.q3_count}</td>
-                  </tr>
-                  <tr
-                    className={`q4 ${selectedQuartile === 'Q4' ? 'selected' : ''}`}
-                    onClick={() => setSelectedQuartile('Q4')}
-                  >
-                    <td>Q4</td><td>{yearSummary.q4_count}</td>
-                  </tr>
-
-                </tbody>
-              </table>
-
-            </div>
-          )}
-
+          <div className="header-right">
+            <UserMenu />
+          </div>
         </div>
       </div>
 
-      <h3 className="publications-title">Publications</h3>
-      {filteredPapers.length > 0 ? (
-        filteredPapers.map((paper, index) => (
-          <Link
-            to={`/paper/${encodeURIComponent(paper.doi)}`}
-            key={paper.doi || `paper-${index}`}
-            className="publication-card-link"
-          >
-            <div className="publication-card">
-              <div className="publication-left">
-                <h4>{paper.title}</h4>
-                <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
-                <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
-                <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
-                <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
-              </div>
-              {paper.quartiles && paper.type?.toLowerCase().includes("journal") && !isCriteriaFilterActive && (
-                <div className="quartile-badge-container">
-                  {selectedQuartile
-                    ? (() => {
-                      const q = paper.quartiles?.[quartileYear];
-                      return q &&
-                        q.trim() !== "-" &&
-                        q.toUpperCase() === selectedQuartile ? (
-                        <div
-                          className={`quartile-badge ${q.toLowerCase()}`}
-                          key={`${paper.doi}-${quartileYear}`}
-                        >
-                          <span className="quartile-text">
-                            {q.toUpperCase()} {quartileYear}
-                          </span>
-                          <i className="badge-icon">★</i>
-                        </div>
-                      ) : null;
-                    })()
-                    : Object.entries(paper.quartiles).map(([year, quartile]) =>
-                      quartile && quartile.trim() !== "-" ? (
-                        <div
-                          key={`${paper.doi}-${year}`}
-                          className={`quartile-badge ${quartile.toLowerCase()}`}
-                        >
-                          <span className="quartile-text">
-                            {quartile.toUpperCase()} {year}
-                          </span>
-                          <i className="badge-icon">★</i>
-                        </div>
-                      ) : null
-                    )}
+      {/* Main Content Container */}
+      <div className="faculty-detail-container">
+        <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "10px" }}>
+          <Link to="/faculty" className="back-button">&laquo; Back to Faculty List</Link>
+        </div>
+        
+        <div className="faculty-card">
+          <div className="faculty-card-layout">
+            {/* Left Side - Faculty Info */}
+            <div className="faculty-info">
+              {selectedQuartile && (
+                <div className="filter-badges">
+                  <strong>Quartile Filter: </strong>
+                  <span className="filter-chip">
+                    {selectedQuartile} <button onClick={() => setSelectedQuartile(null)}>❌</button>
+                  </span>
                 </div>
               )}
-            </div>
-          </Link>
-        ))
-      ) : (
-        <div className="no-records">No publications found for this faculty member.</div>
-      )}
 
-      {!isCriteriaFilterActive && (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
-        <>
-          <h3 className="publications-title">Interactive Scopus Dashboard</h3>
-          <div className="full-history-control" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <label className="full-history-toggle" role="switch" aria-checked={fullHistory}>
-              <div className="switch">
-                <input
-                  className="switch-input"
-                  type="checkbox"
-                  checked={fullHistory}
-                  onChange={(e) => setFullHistory(e.target.checked)}
-                />
-                <span className="slider" aria-hidden="true"></span>
+              <h2 className="faculty-name">{faculty.name}</h2>
+              <p><strong>Scopus ID(s):</strong> {faculty.scopus_ids && faculty.scopus_ids.length ? faculty.scopus_ids.join(', ') : faculty.scopus_id || 'N/A'}</p>
+              {faculty.faculty_id && (
+                <p><strong>Faculty ID:</strong> {faculty.faculty_id}</p>
+              )}
+              <p><strong>Documents Published:</strong> {faculty.docs_count}</p>
+              <p><strong>Citations:</strong> {faculty.citation_count}</p>
+              <p><strong>H-Index:</strong> {faculty.h_index ?? 'N/A'}</p>
+
+              <div className="filter-badges">
+                <strong>Filters Applied: </strong>
+                {sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !isCriteriaFilterActive ? (
+                  <span className="filter-chip">NA</span>
+                ) : (
+                  <>
+                    {sdgFilter !== 'none' && (
+                      <span className="filter-chip">
+                        SDG: {sdgFilter} <button onClick={() => updateQuery('sdg')}>❌</button>
+                      </span>
+                    )}
+                    {domainFilter !== 'none' && (
+                      <span className="filter-chip">
+                        Domain: {domainFilter} <button onClick={() => updateQuery('domain')}>❌</button>
+                      </span>
+                    )}
+                    {yearFilter !== 'none' && (
+                      <span className="filter-chip">
+                        Year: {yearFilter} <button onClick={() => updateQuery('year')}>❌</button>
+                      </span>
+                    )}
+                    {isCriteriaFilterActive && (
+                      <span className="filter-chip">
+                        Date Range: {criteriaStartFilter} to {criteriaEndFilter} <button onClick={() => updateQuery('start')}>❌</button>
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
-              <span className="switch-label">Show full history</span>
-            </label>
-            {fullHistory && <small style={{ color: '#666' }}>Displaying full data range (may be large)</small>}
-          </div>
-          <div className="highcharts-frame-container">
-            <div id="faculty-highcharts-container" ref={chartRef} style={{ width: '100%', height: '420px' }}></div>
 
-            {chartLoading && (
-              <div style={{ marginTop: 8, color: '#666' }}>Loading chart...</div>
-            )}
+              <div className="faculty-bottom">
+                <a
+                  href={`https://www.scopus.com/authid/detail.uri?authorId=${(faculty.scopus_ids && faculty.scopus_ids[0]) || faculty.scopus_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="scopus-link-button"
+                >
+                  View on Scopus
+                </a>
+              </div>
 
-            {chartError && (
-              <div style={{ marginTop: 8, color: 'red' }}>{chartError}</div>
+              <div className="faculty-actions">
+                <button onClick={generatePDF} className="generate-pdf-button">
+                  📄 Generate Report
+                </button>
+              </div>
+            </div>
+
+            {/* Right Side - Quartile Summary Table */}
+            {quartileSummaryAllYears && quartileSummaryAllYears[quartileYear] && !isCriteriaFilterActive && sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && (
+              <div className="quartile-summary-section">
+                <div className="quartile-summary-table">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <h4>Quartile Summary for {quartileYear}</h4>
+
+                    {quartileSummaryAllYears && (
+                      <select
+                        value={quartileYear}
+                        onChange={(e) => setQuartileYear(e.target.value)}
+                        style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                      >
+                        {Object.keys(quartileSummaryAllYears)
+                          .sort((a, b) => Number(b) - Number(a))
+                          .map((year) => (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </div>
+
+                  <table>
+                    <tbody>
+                      <tr
+                        className={`q1 ${selectedQuartile === 'Q1' ? 'selected' : ''}`}
+                        onClick={() => setSelectedQuartile('Q1')}
+                      >
+                        <td>Q1</td><td>{yearSummary.q1_count}</td>
+                      </tr>
+                      <tr
+                        className={`q2 ${selectedQuartile === 'Q2' ? 'selected' : ''}`}
+                        onClick={() => setSelectedQuartile('Q2')}
+                      >
+                        <td>Q2</td><td>{yearSummary.q2_count}</td>
+                      </tr>
+                      <tr
+                        className={`q3 ${selectedQuartile === 'Q3' ? 'selected' : ''}`}
+                        onClick={() => setSelectedQuartile('Q3')}
+                      >
+                        <td>Q3</td><td>{yearSummary.q3_count}</td>
+                      </tr>
+                      <tr
+                        className={`q4 ${selectedQuartile === 'Q4' ? 'selected' : ''}`}
+                        onClick={() => setSelectedQuartile('Q4')}
+                      >
+                        <td>Q4</td><td>{yearSummary.q4_count}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             )}
           </div>
-        </>
-      )}
+        </div>
+
+        <h3 className="publications-title">Publications</h3>
+        {filteredPapers.length > 0 ? (
+          filteredPapers.map((paper, index) => (
+            <Link
+              to={`/paper/${encodeURIComponent(paper.doi)}`}
+              key={paper.doi || `paper-${index}`}
+              className="publication-card-link"
+            >
+              <div className="publication-card">
+                <div className="publication-left">
+                  <h4>{paper.title}</h4>
+                  <p><strong>DOI:</strong> {paper.doi || 'N/A'}</p>
+                  <p><strong>Type:</strong> {paper.type || 'N/A'}</p>
+                  <p><strong>Publication:</strong> {paper.publication_name || 'N/A'}</p>
+                  <p><strong>Date:</strong> {paper.date ? new Date(paper.date).toLocaleDateString() : 'N/A'}</p>
+                </div>
+                {paper.quartiles && paper.type?.toLowerCase().includes("journal") && !isCriteriaFilterActive && (
+                  <div className="quartile-badge-container">
+                    {selectedQuartile
+                      ? (() => {
+                        const q = paper.quartiles?.[quartileYear];
+                        return q &&
+                          q.trim() !== "-" &&
+                          q.toUpperCase() === selectedQuartile ? (
+                          <div
+                            className={`quartile-badge ${q.toLowerCase()}`}
+                            key={`${paper.doi}-${quartileYear}`}
+                          >
+                            <span className="quartile-text">
+                              {q.toUpperCase()} {quartileYear}
+                            </span>
+                            <i className="badge-icon">★</i>
+                          </div>
+                        ) : null;
+                      })()
+                      : Object.entries(paper.quartiles).map(([year, quartile]) =>
+                        quartile && quartile.trim() !== "-" ? (
+                          <div
+                            key={`${paper.doi}-${year}`}
+                            className={`quartile-badge ${quartile.toLowerCase()}`}
+                          >
+                            <span className="quartile-text">
+                              {quartile.toUpperCase()} {year}
+                            </span>
+                            <i className="badge-icon">★</i>
+                          </div>
+                        ) : null
+                      )}
+                  </div>
+                )}
+              </div>
+            </Link>
+          ))
+        ) : (
+          <div className="no-records">No publications found for this faculty member.</div>
+        )}
+
+        {!isCriteriaFilterActive && (sdgFilter === 'none' && domainFilter === 'none' && yearFilter === 'none' && !selectedQuartile) && (
+          <>
+            <h3 className="publications-title">Interactive Scopus Dashboard</h3>
+            <div className="full-history-control" style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label className="full-history-toggle" role="switch" aria-checked={fullHistory}>
+                <div className="switch">
+                  <input
+                    className="switch-input"
+                    type="checkbox"
+                    checked={fullHistory}
+                    onChange={(e) => setFullHistory(e.target.checked)}
+                  />
+                  <span className="slider" aria-hidden="true"></span>
+                </div>
+                <span className="switch-label">Show full history</span>
+              </label>
+              {fullHistory && <small style={{ color: '#666' }}>Displaying full data range (may be large)</small>}
+            </div>
+            <div className="highcharts-frame-container">
+              <div id="faculty-highcharts-container" ref={chartRef} style={{ width: '100%', height: '420px' }}></div>
+
+              {chartLoading && (
+                <div style={{ marginTop: 8, color: '#666' }}>Loading chart...</div>
+              )}
+
+              {chartError && (
+                <div style={{ marginTop: 8, color: 'red' }}>{chartError}</div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import srmLogo from '../assets/srmist-logo.png';
 import UserMenu from '../components/UserMenu';
 import styles from '../components/PaperDetailPage.module.css';
 
@@ -28,7 +29,6 @@ interface PaperInsights {
     total_authors: number;
 }
 
-// Helper to split and clean tags (remove counts in parentheses and trim)
 const parseTags = (str: string, separator = '|'): string[] => {
     if (!str) return [];
     return str
@@ -38,7 +38,6 @@ const parseTags = (str: string, separator = '|'): string[] => {
         .filter((item) => item.length > 0);
 };
 
-// Helper to parse paired fields like "Name (Code)" and return as tag text
 const parsePairedTags = (namesStr: string, codesStr: string): string[] => {
     const names = namesStr ? namesStr.split('|').map((n) => n.trim()) : [];
     const codes = codesStr ? codesStr.split('|').map((c) => c.trim()) : [];
@@ -90,227 +89,241 @@ const PaperDetailPage: React.FC = () => {
     if (!paper) return <div className={styles.errorMessage}>No data found for this paper.</div>;
 
     return (
-        <div className={styles.paperDetailContainer}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', background: 'rgba(255, 255, 255, 0.95)', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 500 }}>
-                <h3 style={{ margin: 0, color: '#0061a8' }}>Paper Detail</h3>
-                <UserMenu />
-            </div>
-            {/* Animated Background Elements */}
-            <div className={styles.backgroundPattern}></div>
-            <div className={styles.floatingOrbs}>
-                <div className={styles.orb}></div>
-                <div className={styles.orb}></div>
-                <div className={styles.orb}></div>
-            </div>
-
-            {/* Back Button */}
-            <div className={styles.headerSection}>
-                <button onClick={() => navigate(-1)} className={styles.backButton}>
-                    <span className={styles.backIcon}>←</span>
-                    <span>Back to Faculty Details</span>
-                    <div className={styles.buttonRipple}></div>
-                </button>
+        <div>
+            {/* Fixed Header - Full Width */}
+            <div className={styles.fullWidthHeader}>
+                <div className={styles.headerContentWrapper}>
+                    <div className={styles.headerLeft}>
+                        <a className={styles.headerTextGroup}>
+                            <img src={srmLogo} alt="SRM Logo" className={styles.srmLogo} />
+                            <span className={styles.headerSubtitle}>SRM SP</span>
+                        </a>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                        <UserMenu />
+                    </div>
+                </div>
             </div>
 
-            {/* Paper Info Card */}
-            <div className={styles.card}>
-                <div className={styles.cardHeader}>
-                    <div className={styles.pulseIcon}>📄</div>
-                    <div className={styles.cardHeaderContent}>
-                        <h1 className={styles.paperTitle} title={paper.title}>{paper.title}</h1>
-                        <div className={styles.titleUnderline}></div>
+            {/* Main Content Container */}
+            <div className={styles.paperDetailContainer}>
+                {/* Animated Background Elements */}
+                <div className={styles.backgroundPattern}></div>
+                <div className={styles.floatingOrbs}>
+                    <div className={styles.orb}></div>
+                    <div className={styles.orb}></div>
+                    <div className={styles.orb}></div>
+                </div>
+
+                {/* Back Button */}
+                <div className={styles.headerSection}>
+                    <button onClick={() => navigate(-1)} className={styles.backButton}>
+                        <span className={styles.backIcon}>←</span>
+                        <span>Back to Faculty Details</span>
+                        <div className={styles.buttonRipple}></div>
+                    </button>
+                </div>
+
+                {/* Paper Info Card */}
+                <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                        <div className={styles.pulseIcon}>📄</div>
+                        <div className={styles.cardHeaderContent}>
+                            <h1 className={styles.paperTitle} title={paper.title}>{paper.title}</h1>
+                            <div className={styles.titleUnderline}></div>
+                        </div>
+                    </div>
+
+                    <div className={styles.paperMetadata}>
+                        <div className={styles.metadataGrid}>
+                            <div className={styles.metadataItem}>
+                                <span className={styles.metadataIcon}>🔗</span>
+                                <div className={styles.metadataContent}>
+                                    <span className={styles.label}>DOI</span>
+                                    <span className={styles.value}>{paper.doi}</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.metadataItem}>
+                                <span className={styles.metadataIcon}>📖</span>
+                                <div className={styles.metadataContent}>
+                                    <span className={styles.label}>Publication</span>
+                                    <span className={styles.value}>{paper.publication_name}</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.metadataItem}>
+                                <span className={styles.metadataIcon}>📋</span>
+                                <div className={styles.metadataContent}>
+                                    <span className={styles.label}>Type</span>
+                                    <span className={styles.value}>{paper.type}</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.metadataItem}>
+                                <span className={styles.metadataIcon}>📅</span>
+                                <div className={styles.metadataContent}>
+                                    <span className={styles.label}>Date</span>
+                                    <span className={styles.value}>{new Date(paper.date).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced View Paper Button */}
+                    <div className={styles.actionSection}>
+                        <a
+                            href={`https://doi.org/${paper.doi}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.doiButton}
+                        >
+                            <span className={styles.buttonIcon}>🚀</span>
+                            <span>View Paper on DOI.org</span>
+                            <div className={styles.buttonGlow}></div>
+                        </a>
                     </div>
                 </div>
 
-                <div className={styles.paperMetadata}>
-                    <div className={styles.metadataGrid}>
-                        <div className={styles.metadataItem}>
-                            <span className={styles.metadataIcon}>🔗</span>
-                            <div className={styles.metadataContent}>
-                                <span className={styles.label}>DOI</span>
-                                <span className={styles.value}>{paper.doi}</span>
-                            </div>
+                {/* Enhanced Analytics Card */}
+                {insights ? (
+                    <div className={styles.analyticsCard}>
+                        <div className={styles.sectionHeader}>
+                            <div className={styles.headerIcon}>📊</div>
+                            <h3 className={styles.sectionTitle}>Research Analytics</h3>
+                            <div className={styles.headerDecoration}></div>
                         </div>
 
-                        <div className={styles.metadataItem}>
-                            <span className={styles.metadataIcon}>📖</span>
-                            <div className={styles.metadataContent}>
-                                <span className={styles.label}>Publication</span>
-                                <span className={styles.value}>{paper.publication_name}</span>
-                            </div>
-                        </div>
-
-                        <div className={styles.metadataItem}>
-                            <span className={styles.metadataIcon}>📋</span>
-                            <div className={styles.metadataContent}>
-                                <span className={styles.label}>Type</span>
-                                <span className={styles.value}>{paper.type}</span>
-                            </div>
-                        </div>
-
-                        <div className={styles.metadataItem}>
-                            <span className={styles.metadataIcon}>📅</span>
-                            <div className={styles.metadataContent}>
-                                <span className={styles.label}>Date</span>
-                                <span className={styles.value}>{new Date(paper.date).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Enhanced View Paper Button */}
-                <div className={styles.actionSection}>
-                    <a
-                        href={`https://doi.org/${paper.doi}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.doiButton}
-                    >
-                        <span className={styles.buttonIcon}>🚀</span>
-                        <span>View Paper on DOI.org</span>
-                        <div className={styles.buttonGlow}></div>
-                    </a>
-                </div>
-            </div>
-
-            {/* Enhanced Analytics Card */}
-            {insights ? (
-                <div className={styles.analyticsCard}>
-                    <div className={styles.sectionHeader}>
-                        <div className={styles.headerIcon}>📊</div>
-                        <h3 className={styles.sectionTitle}>Research Analytics</h3>
-                        <div className={styles.headerDecoration}></div>
-                    </div>
-
-                    <div className={styles.analyticsGrid}>
-                        {/* Author Information */}
-                        <div className={styles.analyticsSection}>
-                            <h4 className={styles.subsectionTitle}>
-                                <span className={styles.subsectionIcon}>👥</span>
-                                Author Information
-                            </h4>
-                            <div className={styles.authorGrid}>
-                                <div className={styles.authorCard}>
-                                    <div className={styles.authorIconWrapper}>
-                                        <span className={styles.authorIcon}>👤</span>
+                        <div className={styles.analyticsGrid}>
+                            {/* Author Information */}
+                            <div className={styles.analyticsSection}>
+                                <h4 className={styles.subsectionTitle}>
+                                    <span className={styles.subsectionIcon}>👥</span>
+                                    Author Information
+                                </h4>
+                                <div className={styles.authorGrid}>
+                                    <div className={styles.authorCard}>
+                                        <div className={styles.authorIconWrapper}>
+                                            <span className={styles.authorIcon}>👤</span>
+                                        </div>
+                                        <div className={styles.authorContent}>
+                                            <span className={styles.authorLabel}>First Author</span>
+                                            <span className={styles.authorId}>ID: {insights.scopus_author_id_first}</span>
+                                        </div>
                                     </div>
-                                    <div className={styles.authorContent}>
-                                        <span className={styles.authorLabel}>First Author</span>
-                                        <span className={styles.authorId}>ID: {insights.scopus_author_id_first}</span>
+                                    
+                                    <div className={styles.authorCard}>
+                                        <div className={styles.authorIconWrapper}>
+                                            <span className={styles.authorIcon}>✍️</span>
+                                        </div>
+                                        <div className={styles.authorContent}>
+                                            <span className={styles.authorLabel}>Corresponding Author</span>
+                                            <span className={styles.authorId}>ID: {insights.scopus_author_id_corresponding}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className={styles.authorCard}>
+                                        <div className={styles.authorIconWrapper}>
+                                            <span className={styles.authorIcon}>👥</span>
+                                        </div>
+                                        <div className={styles.authorContent}>
+                                            <span className={styles.authorLabel}>Total Authors</span>
+                                            <span className={styles.countBadge}>{insights.total_authors}</span>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Research Classification */}
+                            <div className={styles.analyticsSection}>
+                                <h4 className={styles.subsectionTitle}>
+                                    <span className={styles.subsectionIcon}>🔬</span>
+                                    Research Classification
+                                </h4>
                                 
-                                <div className={styles.authorCard}>
-                                    <div className={styles.authorIconWrapper}>
-                                        <span className={styles.authorIcon}>✍️</span>
+                                <div className={styles.tagSection}>
+                                    <div className={styles.tagGroup}>
+                                        <span className={styles.tagGroupLabel}>🎯 SDGs</span>
+                                        <div className={styles.tagContainer}>
+                                            {insights.sustainable_development_goals
+                                                ? insights.sustainable_development_goals.split('|').map((sdg, idx) => (
+                                                    <span key={idx} className={`${styles.tag} ${styles.sdgTag}`}>{sdg.trim()}</span>
+                                                ))
+                                                : <span className={styles.noDataTag}>None</span>}
+                                        </div>
                                     </div>
-                                    <div className={styles.authorContent}>
-                                        <span className={styles.authorLabel}>Corresponding Author</span>
-                                        <span className={styles.authorId}>ID: {insights.scopus_author_id_corresponding}</span>
+
+                                    <div className={styles.tagGroup}>
+                                        <span className={styles.tagGroupLabel}>🏫 QS Subject</span>
+                                        <div className={styles.tagContainer}>
+                                            {parsePairedTags(insights.qs_subject_field_name, insights.qs_subject_code).map((tag, idx) => (
+                                                <span key={idx} className={`${styles.tag} ${styles.qsTag}`}>{tag}</span>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div className={styles.authorCard}>
-                                    <div className={styles.authorIconWrapper}>
-                                        <span className={styles.authorIcon}>👥</span>
-                                    </div>
-                                    <div className={styles.authorContent}>
-                                        <span className={styles.authorLabel}>Total Authors</span>
-                                        <span className={styles.countBadge}>{insights.total_authors}</span>
+
+                                    <div className={styles.tagGroup}>
+                                        <span className={styles.tagGroupLabel}>🔬 ASJC Field</span>
+                                        <div className={styles.tagContainer}>
+                                            {parsePairedTags(insights.asjc_field_name, insights.asjc_code).map((tag, idx) => (
+                                                <span key={idx} className={`${styles.tag} ${styles.asjcTag}`}>{tag}</span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Research Classification */}
-                        <div className={styles.analyticsSection}>
-                            <h4 className={styles.subsectionTitle}>
-                                <span className={styles.subsectionIcon}>🔬</span>
-                                Research Classification
-                            </h4>
-                            
-                            <div className={styles.tagSection}>
-                                <div className={styles.tagGroup}>
-                                    <span className={styles.tagGroupLabel}>🎯 SDGs</span>
-                                    <div className={styles.tagContainer}>
-                                        {insights.sustainable_development_goals
-                                            ? insights.sustainable_development_goals.split('|').map((sdg, idx) => (
-                                                <span key={idx} className={`${styles.tag} ${styles.sdgTag}`}>{sdg.trim()}</span>
-                                            ))
-                                            : <span className={styles.noDataTag}>None</span>}
+                            {/* Global Reach */}
+                            <div className={styles.analyticsSection}>
+                                <h4 className={styles.subsectionTitle}>
+                                    <span className={styles.subsectionIcon}>🌍</span>
+                                    Global Reach
+                                </h4>
+                                
+                                <div className={styles.reachStats}>
+                                    <div className={styles.statCard}>
+                                        <span className={styles.statIcon}>🌍</span>
+                                        <div className={styles.statContent}>
+                                            <span className={styles.statNumber}>{insights.no_of_countries}</span>
+                                            <span className={styles.statLabel}>Countries</span>
+                                        </div>
+                                    </div>
+                                    <div className={styles.statCard}>
+                                        <span className={styles.statIcon}>🏛️</span>
+                                        <div className={styles.statContent}>
+                                            <span className={styles.statNumber}>{insights.no_of_institutions}</span>
+                                            <span className={styles.statLabel}>Institutions</span>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className={styles.tagGroup}>
-                                    <span className={styles.tagGroupLabel}>🏫 QS Subject</span>
+                                    <span className={styles.tagGroupLabel}>🗺️ Countries</span>
                                     <div className={styles.tagContainer}>
-                                        {parsePairedTags(insights.qs_subject_field_name, insights.qs_subject_code).map((tag, idx) => (
-                                            <span key={idx} className={`${styles.tag} ${styles.qsTag}`}>{tag}</span>
+                                        {parseTags(insights.country_list).map((country, idx) => (
+                                            <span key={idx} className={`${styles.tag} ${styles.countryTag}`}>{country}</span>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div className={styles.tagGroup}>
-                                    <span className={styles.tagGroupLabel}>🔬 ASJC Field</span>
+                                    <span className={styles.tagGroupLabel}>🏢 Institutions</span>
                                     <div className={styles.tagContainer}>
-                                        {parsePairedTags(insights.asjc_field_name, insights.asjc_code).map((tag, idx) => (
-                                            <span key={idx} className={`${styles.tag} ${styles.asjcTag}`}>{tag}</span>
+                                        {parseTags(insights.institution_list).map((inst, idx) => (
+                                            <span key={idx} className={`${styles.tag} ${styles.institutionTag}`}>{inst}</span>
                                         ))}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Global Reach */}
-                        <div className={styles.analyticsSection}>
-                            <h4 className={styles.subsectionTitle}>
-                                <span className={styles.subsectionIcon}>🌍</span>
-                                Global Reach
-                            </h4>
-                            
-                            <div className={styles.reachStats}>
-                                <div className={styles.statCard}>
-                                    <span className={styles.statIcon}>🌍</span>
-                                    <div className={styles.statContent}>
-                                        <span className={styles.statNumber}>{insights.no_of_countries}</span>
-                                        <span className={styles.statLabel}>Countries</span>
-                                    </div>
-                                </div>
-                                <div className={styles.statCard}>
-                                    <span className={styles.statIcon}>🏛️</span>
-                                    <div className={styles.statContent}>
-                                        <span className={styles.statNumber}>{insights.no_of_institutions}</span>
-                                        <span className={styles.statLabel}>Institutions</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={styles.tagGroup}>
-                                <span className={styles.tagGroupLabel}>🗺️ Countries</span>
-                                <div className={styles.tagContainer}>
-                                    {parseTags(insights.country_list).map((country, idx) => (
-                                        <span key={idx} className={`${styles.tag} ${styles.countryTag}`}>{country}</span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className={styles.tagGroup}>
-                                <span className={styles.tagGroupLabel}>🏢 Institutions</span>
-                                <div className={styles.tagContainer}>
-                                    {parseTags(insights.institution_list).map((inst, idx) => (
-                                        <span key={idx} className={`${styles.tag} ${styles.institutionTag}`}>{inst}</span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                </div>
-            ) : (
-                <div className={styles.noDataCard}>
-                    <div className={styles.noDataIcon}>📊</div>
-                    <p className={styles.noDataMessage}>No advanced insights available for this paper.</p>
-                </div>
-            )}
+                ) : (
+                    <div className={styles.noDataCard}>
+                        <div className={styles.noDataIcon}>📊</div>
+                        <p className={styles.noDataMessage}>No advanced insights available for this paper.</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
